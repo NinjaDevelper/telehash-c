@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "util.h"
+#include "boehm_gc.h"
 
 
 static inline uint32_t rotl32(uint32_t x, int8_t r)

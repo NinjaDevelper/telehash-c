@@ -1,4 +1,5 @@
 #include "ext.h"
+#include "boehm_gc.h"
 
 void ext_peer(chan_t c)
 {

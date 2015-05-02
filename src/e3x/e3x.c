@@ -2,6 +2,7 @@
 #include "e3x_cipher.h"
 #include "util_sys.h"
 #include <string.h>
+#include "boehm_gc.h"
 
 static uint8_t _initialized = 0;
 

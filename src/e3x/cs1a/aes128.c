@@ -32,6 +32,7 @@
 
 
 #include "aes128.h"
+#include "boehm_gc.h"
 
 #if !defined(POLARSSL_AES_ALT)
 

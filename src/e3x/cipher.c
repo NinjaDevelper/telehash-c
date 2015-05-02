@@ -5,6 +5,7 @@
 
 #include "e3x.h"
 #include "util.h"
+#include "boehm_gc.h"
 
 e3x_cipher_t e3x_cipher_sets[CS_MAX];
 e3x_cipher_t e3x_cipher_default = NULL;

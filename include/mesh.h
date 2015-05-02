@@ -55,7 +55,7 @@ uint8_t mesh_receive(mesh_t mesh, lob_t packet, pipe_t pipe);
 link_t mesh_receive_handshake(mesh_t mesh, lob_t handshake, pipe_t pipe);
 
 // callback when the mesh is free'd
-void mesh_on_free(mesh_t mesh, char *id, void (*free)(mesh_t mesh));
+void mesh_on_free(mesh_t mesh, char *id, void (*freee)(mesh_t mesh));
 
 // callback when a path needs to be turned into a pipe
 void mesh_on_path(mesh_t mesh, char *id, pipe_t (*path)(link_t link, lob_t path));

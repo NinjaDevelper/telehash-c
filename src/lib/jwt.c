@@ -2,6 +2,7 @@
 #include "util.h"
 #include "base64.h"
 #include "jwt.h"
+#include "boehm_gc.h"
 
 // this lib implements basic JWT support using the crypto/lob utilities in telehash-c
 

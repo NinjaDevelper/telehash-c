@@ -1,4 +1,5 @@
 #include "ext.h"
+#include "boehm_gc.h"
 
 // list of active pipes and state per link
 typedef struct ping_struct

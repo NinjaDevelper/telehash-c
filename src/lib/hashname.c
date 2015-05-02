@@ -5,6 +5,7 @@
 #include "base32.h"
 #include "util.h"
 #include "e3x.h" // for sha256 e3x_hash()
+#include "boehm_gc.h"
 
 // how many csids can be used to make a hashname
 #define MAX_CSIDS 8

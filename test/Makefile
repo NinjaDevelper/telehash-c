@@ -7,6 +7,7 @@ TESTS = lib_base32 lib_lob lib_hashname lib_murmur lib_chunks lib_util \
 CC=gcc
 CFLAGS+=-g -Wall -Wextra -Wno-unused-parameter -DDEBUG
 INCLUDE+=-I../unix -I../include -I../include/lib
+LDFLAGS +=-lgc
 
 
 LIB = src/lib/lob.c src/lib/hashname.c src/lib/xht.c src/lib/js0n.c src/lib/base32.c src/lib/chacha.c src/lib/murmur.c src/lib/socketio.c src/lib/jwt.c src/lib/base64.c

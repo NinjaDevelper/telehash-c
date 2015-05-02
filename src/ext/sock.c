@@ -1,4 +1,5 @@
 #include "ext.h"
+#include "boehm_gc.h"
 
 sockc_t sockc_new(chan_t c)
 {

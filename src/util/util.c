@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "util.h"
+#include "boehm_gc.h"
 
 char *util_hex(uint8_t *in, size_t len, char *out)
 {

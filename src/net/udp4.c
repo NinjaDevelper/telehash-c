@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "net_udp4.h"
+#include "boehm_gc.h"
 
 // individual pipe local info
 typedef struct pipe_udp4_struct

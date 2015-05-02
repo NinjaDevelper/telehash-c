@@ -1,4 +1,5 @@
 #include "ext.h"
+#include "boehm_gc.h"
 
 typedef struct thtp_struct 
 {

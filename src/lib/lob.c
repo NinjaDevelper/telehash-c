@@ -9,6 +9,7 @@
 #include "js0n.h"
 #include "base32.h"
 #include "chacha.h"
+#include "boehm_gc.h"
 
 lob_t lob_new()
 {

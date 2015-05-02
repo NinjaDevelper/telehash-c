@@ -6,6 +6,7 @@
 #include "e3x.h"
 #include "e3x_cipher.h"
 #include "util_sys.h"
+#include "boehm_gc.h"
 
 // undefine the void* aliases so we can define them locally
 #undef local_t

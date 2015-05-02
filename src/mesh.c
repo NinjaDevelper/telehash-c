@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "util.h"
+#include "boehm_gc.h"
 
 // a default prime number for the internal hashtable used to track all active hashnames/lines
 #define MAXPRIME 4211
@@ -12,7 +13,7 @@ typedef struct on_struct
 {
   char *id; // used to store in index
   
-  void (*free)(mesh_t mesh); // relese resources
+  void (*freee)(mesh_t mesh); // relese resources
   void (*link)(link_t link); // when a link is created, and again when exchange is created
   pipe_t (*path)(link_t link, lob_t path); // convert path->pipe
   lob_t (*open)(link_t link, lob_t open); // incoming channel requests
@@ -51,7 +52,7 @@ mesh_t mesh_free(mesh_t mesh)
   {
     on = mesh->on;
     mesh->on = on->next;
-    if(on->free) on->free(mesh);
+    if(on->freee) on->freee(mesh);
     free(on->id);
     free(on);
   }
@@ -183,10 +184,10 @@ on_t on_get(mesh_t mesh, char *id)
   return on;
 }
 
-void mesh_on_free(mesh_t mesh, char *id, void (*free)(mesh_t mesh))
+void mesh_on_free(mesh_t mesh, char *id, void (*freee)(mesh_t mesh))
 {
   on_t on = on_get(mesh, id);
-  if(on) on->free = free;
+  if(on) on->freee = freee;
 }
 
 void mesh_on_path(mesh_t mesh, char *id, pipe_t (*path)(link_t link, lob_t path))

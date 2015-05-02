@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "util.h"
 #include "e3x.h"
+#include "boehm_gc.h"
 
 // every new channel has a unique global id
 static uint32_t _uids = 0;

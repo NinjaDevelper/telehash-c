@@ -1,6 +1,7 @@
 #include "base64.h"
 #include "e3x.h"
 #include "unit_test.h"
+#include "boehm_gc.h"
 
 /*
 BASE64("") = ""

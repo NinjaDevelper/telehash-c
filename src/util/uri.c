@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include "util.h"
+#include "boehm_gc.h"
 
 // this is a very simple single-pass telehash uri parser, no magic
 lob_t util_uri_parse(char *encoded)

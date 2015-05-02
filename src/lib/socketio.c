@@ -1,4 +1,5 @@
 #include "socketio.h"
+#include "boehm_gc.h"
 
 // utilities to parse and generate minimal socket.io / engine.io packets
 

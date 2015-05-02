@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "util.h"
 #include "pipe.h"
+#include "boehm_gc.h"
 
 pipe_t pipe_new(char *type)
 {
