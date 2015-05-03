@@ -192,6 +192,7 @@ link_t link_pipe(link_t link, pipe_t pipe)
   }
 
   // add this pipe to this link
+  LOG("adding pipe %s",pipe->id);
   if(!(seen = malloc(sizeof (struct seen_struct)))) return NULL;
   memset(seen,0,sizeof (struct seen_struct));
   seen->pipe = pipe;
@@ -258,10 +259,8 @@ link_t link_receive_handshake(link_t link, lob_t inner, pipe_t pipe)
   ready = link_up(link);
 
   // if bad at, always send current handshake
-  uint32_t backup_in=link->x->in;
   if(e3x_exchange_in(link->x, lob_get_uint(inner,"at")) < out)
   {
-    link->x->in=backup_in;
     LOG("old/bad at: %s (%d,%d,%d)",lob_json(inner),lob_get_int(inner,"at"),e3x_exchange_in(link->x,0),e3x_exchange_out(link->x,0));
     // just reset pipe seen and call link_sync to resend handshake
     for(seen = link->pipes;pipe && seen;seen = seen->next) if(seen->pipe == pipe) seen->at = 0;
