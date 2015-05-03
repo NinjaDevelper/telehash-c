@@ -1,7 +1,7 @@
 CPP=g++
 CFLAGS+=-g -Wall -Wextra -Wno-unused-parameter -DDEBUG
 INCLUDE+=-Itelehash-c/unix -Itelehash-c/include -Itelehash-c/include/lib -IMessagingTelehash
-LDFLAGS += telehash-c/libtelehash.a
+LDFLAGS += telehash-c/libtelehash.a -lgc
 TEST_LDFLAGS= -Llibtap -ltap 
 TEST_CPPFLAGS=-fprofile-arcs -ftest-coverage  -Ilibtap -g -ggdb3
 

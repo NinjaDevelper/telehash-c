@@ -78,7 +78,6 @@ private:
     net_udp4_t udp4;
     int stopFlag;
     vector<link_t> links;
-    static vector<e3x_channel_t> channels;
     static int status;
     static link_t targetLink;
     static list<link_t> broadcastee;
@@ -100,7 +99,6 @@ private:
         void *arg);
     static void serviceOnOpenHandler(link_t link, e3x_channel_t chan, 
         void *arg);
-    static e3x_channel_t _link_channel(link_t link, lob_t open);
     
 public:
     static char globalIP[3*4+3+1];

@@ -47,17 +47,7 @@ link_t MessagingTelehash::targetLink=NULL;
 list<link_t> MessagingTelehash::broadcastee;
 char * (*MessagingTelehash::broadcastHandler)(char *json)  ;
 char MessagingTelehash::globalIP[3*4+3+1]; ;
-vector<e3x_channel_t> MessagingTelehash::channels;
 
-e3x_channel_t MessagingTelehash::_link_channel(link_t link, lob_t open){
-    e3x_channel_t chan=link_channel(link,open);
-    vector<e3x_channel_t>::iterator cIter = find( channels.begin(),
-                                                 channels.end() , chan );
-    if(cIter==channels.end()){
-        channels.push_back(chan);
-    }
-    return chan;
-}
 
 int MessagingTelehash::isLocal(char *adr){
     if(strcmp(adr,"127.0.0.1") || strstr(adr,"10.") 
@@ -217,7 +207,7 @@ lob_t MessagingTelehash::serviceOnOpen(link_t link,lob_t open){
     if(!c) return open;
 
     LOG("openning channel in link_handler() with %s",lob_json(open));
-    e3x_channel_t chan=_link_channel(link,open);
+    e3x_channel_t chan=link_channel(link,open);
     link_handle(link, chan, serviceOnOpenHandler,c);
     sendOnChannel(link,chan,open,c);
     return NULL;
@@ -283,7 +273,7 @@ lob_t MessagingTelehash::broadcastOnOpen(link_t link,lob_t open){
                 lob_set(json,(char *)"end",(char *)"true");
                 lob_set(json,(char *)"type",(char *)"broadcast");
                 LOG("sent %s",lob_json(json));
-                e3x_channel_t chan=_link_channel(*it,json);
+                e3x_channel_t chan=link_channel(*it,json);
                 link_flush(*it,chan, json); 
                 //json was freed in link_flush()
             }
@@ -343,10 +333,7 @@ link_t MessagingTelehash::_link(char *location){
     lob_t _1a=lob_get_json(loc,(char *)"keys");
     LOG("keys:%s",lob_json(_1a));
     link_t link=link_keys(mesh,_1a);
-    vector<link_t>::iterator cIter = find( links.begin(),links.end() , link );
-    if( cIter == links.end() ){
-        links.push_back(link);
-    }
+
     //path='{"type":"udp4","ip":"127.0.0.1","port":33592}'
     lob_t path=lob_get_array(loc,(char *)"paths");
     LOG("linking to %s\n",lob_json(path));
@@ -371,7 +358,7 @@ void MessagingTelehash::openChannel(char *location, char *name){
     char *json=h->handle(NULL);
     lob_set_raw(options,(char *)"data",4,json,strlen(json));
     LOG("openChannel %s",lob_json(options));
-    e3x_channel_t chan=_link_channel(link,options);
+    e3x_channel_t chan=link_channel(link,options);
     link_handle(link, chan, serviceOnOpenHandler, h);
     link_flush(link,chan, options); 
     free(json);
@@ -388,7 +375,7 @@ void MessagingTelehash::addBroadcaster(char *location,int add){
         lob_set(options,(char *)"action",(char *)"del");
     }
     lob_set(options,(char *)"end",(char *)"true");
-    e3x_channel_t chan=_link_channel(link,options);
+    e3x_channel_t chan=link_channel(link,options);
     link_handle(link, chan, addBroadcasterHandler,NULL);
     link_flush(link,chan, options); 
     //options is freed in link_flush
@@ -410,7 +397,7 @@ void MessagingTelehash::broadcast(char *location, char *json){
     lob_set_raw(options,(char *)"data",4,json,strlen(json));
     lob_set(options,(char *)"end",(char *)"true");
     LOG("sending %s",lob_json(options));
-    e3x_channel_t chan=_link_channel(link,options);
+    e3x_channel_t chan=link_channel(link,options);
     link_flush(link,chan, options); 
     //options is freed in link_flush
 }
@@ -424,18 +411,8 @@ void MessagingTelehash::start(){
 }	
 
 MessagingTelehash::~MessagingTelehash(){
-
-    vector<link_t>::iterator it = links.begin();
-    while( it != links.end() ){
-        link_free(*it);
-        it++;
-    }
-    
-    vector<e3x_channel_t>::iterator itc = channels.begin();
-    while( itc != channels.end() ){
-        e3x_channel_free(*itc);
-        itc=channels.erase(itc);
-    }
     mesh_free(mesh);
     net_udp4_free(udp4);
+    mesh=NULL;
+    udp4=NULL;
 }	
