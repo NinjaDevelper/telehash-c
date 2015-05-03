@@ -1,0 +1,6 @@
+[submodule "telehash-c"]
+	path = telehash-c
+	url = https://github.com/StorjPlatform/telehash-c.git
+[submodule "libtap"]
+	path = libtap
+	url = https://github.com/zorgnax/libtap.git
