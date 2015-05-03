@@ -1,5 +1,4 @@
 language: c
-sudo: required
-before-install:
+before_install:
     - sudo apt-get install libgc-dev 
 script: make test
