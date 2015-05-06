@@ -4,7 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "net_udp4.h"
-#include "boehm_gc.h"
+#include "tgc.h"
 
 // individual pipe local info
 typedef struct pipe_udp4_struct
@@ -162,7 +162,7 @@ net_udp4_t net_udp4_receive(net_udp4_t net)
   // create the id and look for existing pipe
   pipe = udp4_pipe(net, inet_ntoa(sa.sin_addr), ntohs(sa.sin_port));
   mesh_receive(net->mesh, packet, pipe);
-  
+
   return net;
 }
 

@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "boehm_gc.h"
+#include "tgc.h"
 
 typedef struct xhashname_struct
 {

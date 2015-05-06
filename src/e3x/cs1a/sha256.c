@@ -29,7 +29,7 @@
  */
 
 #include "sha256.h"
-#include "boehm_gc.h"
+#include "tgc.h"
 
 /*
  * 32-bit integer manipulation macros (big endian)

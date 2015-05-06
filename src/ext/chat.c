@@ -1,5 +1,5 @@
 #include "ext.h"
-#include "boehm_gc.h"
+#include "tgc.h"
 
 // chatr is just per-chat-channel state holder
 typedef struct chatr_struct 

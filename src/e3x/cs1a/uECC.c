@@ -2,7 +2,7 @@
 
 #include <stddef.h>
 #include "uECC.h"
-#include "boehm_gc.h"
+#include "tgc.h"
 
 #ifndef uECC_PLATFORM
     #if __AVR__

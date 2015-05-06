@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "util.h"
-#include "boehm_gc.h"
+#include "tgc.h"
 
 // a default prime number for the internal hashtable used to track all active hashnames/lines
 #define MAXPRIME 4211
@@ -38,7 +38,7 @@ mesh_t mesh_new(uint32_t prime)
   if(!mesh->index) return mesh_free(mesh);
   
   LOG("mesh created version %d.%d.%d",TELEHASH_VERSION_MAJOR,TELEHASH_VERSION_MINOR,TELEHASH_VERSION_PATCH);
-
+  tgc_addRoot(mesh);
   return mesh;
 }
 
@@ -65,6 +65,8 @@ mesh_t mesh_free(mesh_t mesh)
   if(mesh->ipv4_local) free(mesh->ipv4_local);
   if(mesh->ipv4_public) free(mesh->ipv4_public);
 
+  tgc_rmRoot(mesh);
+  tgc_gcollect();
   free(mesh);
   return NULL;
 }
@@ -375,6 +377,7 @@ uint8_t mesh_receive(mesh_t mesh, lob_t outer, pipe_t pipe)
     {
       LOG("%02x handshake failed %s",outer->head[0],e3x_err());
       lob_free(outer);
+      tgc_gcollect();
       return 2;
     }
     
@@ -386,7 +389,9 @@ uint8_t mesh_receive(mesh_t mesh, lob_t outer, pipe_t pipe)
     lob_set(inner,"id",hex);
 
     // process the handshake
-    return mesh_receive_handshake(mesh, inner, pipe) ? 0 : 3;
+    uint8_t ret= mesh_receive_handshake(mesh, inner, pipe) ? 0 : 3;
+    tgc_gcollect();
+    return ret;
   }
 
   // handle channel packets
@@ -395,6 +400,7 @@ uint8_t mesh_receive(mesh_t mesh, lob_t outer, pipe_t pipe)
     if(outer->body_len < 16)
     {
       LOG("packet too small %d",outer->body_len);
+      tgc_gcollect();
       return 5;
     }
     util_hex(outer->body, 16, hex);
@@ -403,6 +409,7 @@ uint8_t mesh_receive(mesh_t mesh, lob_t outer, pipe_t pipe)
     {
       LOG("dropping, no link for token %s",hex);
       lob_free(outer);
+      tgc_gcollect();
       return 6;
     }
 
@@ -411,16 +418,19 @@ uint8_t mesh_receive(mesh_t mesh, lob_t outer, pipe_t pipe)
     {
       LOG("channel decryption fail for link %s %s",link->id->hashname,e3x_err());
       lob_free(outer);
+      tgc_gcollect();
       return 7;
     }
     
     LOG("channel packet %d bytes from %s",lob_len(inner),link->id->hashname);
-    return link_receive(link,inner,pipe) ? 0 : 8;
+    uint8_t ret= link_receive(link,inner,pipe) ? 0 : 8;
+    tgc_gcollect();
+    return ret;
     
   }
   
   LOG("dropping unknown outer packet with header %d %s",outer->head_len,util_hex(outer->head,outer->head_len,NULL));
   lob_free(outer);
-
+  tgc_gcollect();
   return 10;
 }

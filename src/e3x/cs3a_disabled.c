@@ -1,5 +1,5 @@
 #include "e3x_cipher.h"
-#include "boehm_gc.h"
+#include "tgc.h"
 
 e3x_cipher_t cs3a_init(lob_t options)
 {

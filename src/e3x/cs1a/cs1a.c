@@ -12,7 +12,7 @@
 #include "uECC.h"
 #include "aes.h"
 #include "hmac.h"
-#include "boehm_gc.h"
+#include "tgc.h"
 
 // undefine the void* aliases so we can define them locally
 #undef local_t

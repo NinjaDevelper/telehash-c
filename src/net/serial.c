@@ -3,6 +3,8 @@
 #include <string.h>
 #include "net_serial.h"
 
+#include "tgc.h"
+
 
 // individual pipe local info
 typedef struct pipe_serial_struct

@@ -1,5 +1,5 @@
 #include "ext.h"
-#include "boehm_gc.h"
+#include "tgc.h"
 
 /*
 typedef struct seek_struct 

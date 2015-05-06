@@ -3,7 +3,7 @@
 #include <string.h>
 #include "e3x.h"
 #include "util.h"
-#include "boehm_gc.h"
+#include "tgc.h"
 
 // load secrets/keys to create a new local endpoint
 e3x_self_t e3x_self_new(lob_t secrets, lob_t keys)

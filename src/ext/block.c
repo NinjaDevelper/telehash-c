@@ -1,5 +1,5 @@
 #include "ext.h"
-#include "boehm_gc.h"
+#include "tgc.h"
 
 // individual pipe local info
 typedef struct ext_block_struct

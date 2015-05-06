@@ -1,5 +1,5 @@
 #include "aes128.h"
-#include "boehm_gc.h"
+#include "tgc.h"
 
 void aes_128_ctr(unsigned char *key, size_t length, unsigned char iv[16], const unsigned char *input, unsigned char *output)
 {
