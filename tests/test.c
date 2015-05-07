@@ -137,6 +137,12 @@ void locationTest(){
             get<object>()["port"].get<double>();
     LOG("port=%d",p2);
     ok( p2==1234,"port check.");
+    
+    ok( m1._isLocalTest((char *)"192.168.1.1"),"isLocal() check 1.");
+    ok( m1._isLocalTest((char *)"172.16.22.22"),"isLocal() check 2.");
+    ok( m1._isLocalTest((char *)"172.22.22.22"),"isLocal() check 3.");
+    ok( !m1._isLocalTest((char *)"172.32.22.22"),"isLocal() check 4.");
+    ok( !m1._isLocalTest((char *)"172.15.22.22"),"isLocal() check 5.");
 
     location=
         "{\"keys\":{\"1a\":\""+k2+"\"},\"paths\":[{\"type\":\"udp4\",\"ip\""

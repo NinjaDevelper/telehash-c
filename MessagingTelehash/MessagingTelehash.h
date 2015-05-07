@@ -119,6 +119,7 @@ public:
     void broadcast(char *location, char *json);
     void start();
     void stop();
+    int _isLocalTest(char *addr);
 
     static void gcollect();
     void setGC(int use);

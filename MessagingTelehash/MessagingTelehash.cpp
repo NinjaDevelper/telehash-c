@@ -414,6 +414,10 @@ void MessagingTelehash::start(){
 }	
 
 
+int MessagingTelehash::_isLocalTest(char *adr){
+    return isLocal(adr);
+}	
+
 
 MessagingTelehash::~MessagingTelehash(){
     net_udp4_free(udp4);
