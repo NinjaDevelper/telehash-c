@@ -124,11 +124,7 @@ char *MessagingTelehash::getMyLocation(){
         sprintf(paths+strlen(paths),"%.*s,",(int)path_->head_len,path_->head);
         lob_free(path_);
     }
-    if(len == 3) {
-        sprintf(paths+strlen(paths),"]");
-    }else{
-        sprintf(paths+(strlen(paths)-1),"]");
-    }
+    sprintf(paths+(strlen(paths)-1),"]");
     lob_set_raw(json,(char *)"paths",0,paths,strlen(paths));
     char *jsonStr=lob_json(json);
     char *info=(char *)malloc(strlen(jsonStr)+1);
