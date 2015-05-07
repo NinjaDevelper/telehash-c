@@ -262,6 +262,14 @@ void channelTest(){
     tgc_gcollect();
 }
 
+void channelHandlerTest(){
+    ChannelHandler *h=ChannelHandler::createInstance("testetst");
+    ok(!h,"getting not registered name handler test");
+    h=ChannelHandler::createInstance("counter_test");
+    ok(!h->handle(NULL),"handle over registered number events test");
+    
+}
+
 int main (int argc, char *argv[]) {
 
     locationTest();
@@ -269,6 +277,7 @@ int main (int argc, char *argv[]) {
     multiBroadcasteeTest(1);
     multiBroadcasteeTest(0);
     channelTest();
+    channelHandlerTest();
 
     done_testing();
 
