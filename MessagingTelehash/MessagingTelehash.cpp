@@ -436,4 +436,3 @@ void MessagingTelehash::gcollect(){
     tgc_gcollect();
 #endif
 }
-#endif
