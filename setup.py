@@ -4,13 +4,29 @@
 # Copyright (c) 2015, Shinya Yagyu
 # All rights reserved.
 #
-# Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+# Redistribution and use in source and binary forms, with or without 
+# modification, are permitted provided that the following conditions are met:
 #
-# 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-# 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+# 1. Redistributions of source code must retain the above copyright notice, 
+#    this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright notice, 
+#    this list of conditions and the following disclaimer in the documentation 
+#    and/or other materials provided with the distribution.
+# 3. Neither the name of the copyright holder nor the names of its contributors
+#    may be used to endorse or promote products derived from this software 
+#    without specific prior written permission.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
 
 from distutils.core import setup, Extension
 
@@ -23,8 +39,10 @@ test_requirements = [
     'coveralls'
 ]
 
-module = Extension('MessagingTelehash', ['MessagingTelehash/MessagingTelehash_python.cpp','MessagingTelehash/MessagingTelehash.cpp'],
-                    libraries=['telehash'], include_dirs=['telehash-c'],)
+module = Extension('MessagingTelehash', 
+                   ['MessagingTelehash/MessagingTelehash_python.cpp',
+                    'MessagingTelehash/MessagingTelehash.cpp'],
+                   libraries=['telehash'], include_dirs=['telehash-c'],)
 
 setup(name='MessagingTelehash',
       ext_modules=[module],
@@ -33,8 +51,9 @@ setup(name='MessagingTelehash',
 setup(
     name='MessagingTelehash',
     version=VERSION,
-    url='https://github.com/StorjPlatform/MessagingTelehash',
-    download_url='https://github.com/StorjPlatform/ReedSolomon/tarball/' + VERSION,
+    url='https://github.com/MessagingTelehash/MessagingTelehash',
+    download_url='https://github.com/StorjPlatform/MessagingTelehash/tarball/' 
+                  + VERSION,
     license=open('LICENSE').read(),
     author='Utamaro',
     author_email='utamaro.sisho@gmail.com',
@@ -44,3 +63,4 @@ setup(
     install_requires=install_requirements,
     tests_require=test_requirements,
     keywords=['storj', 'storj-jp', 'utamaro', 'telehash']
+)
