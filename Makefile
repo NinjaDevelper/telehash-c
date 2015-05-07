@@ -13,9 +13,6 @@ test: MessagingTelehash/MessagingTelehash.cpp tests/test.c
 python: ${FILES} MessagingTelehash/MessagingTelehash_python.cpp
 	python setup.py build_ext -i
 
-a: MessagingTelehash/a.c
-	gcc $(INCLUDE) ${CFLAGS}   -o $@ $^  ${LDFLAGS} 
-
 clean:
 	rm -f *.o
 	rm -f bin/*
