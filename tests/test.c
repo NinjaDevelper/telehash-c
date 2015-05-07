@@ -112,6 +112,7 @@ char *broadcastHandler(char *json){
 }
 
 void locationTest(){
+    //stop GC to use thread. GC is thread-unsafe.
     m1.setGC(0);
     m2.setGC(0);
     m3.setGC(0);
@@ -187,6 +188,7 @@ void singleBroadcasteeTest(){
     t_daemon1.join();
     t_daemon2.join();
     ok( status==1,"broadcaster does not receive his json check.");
+    //bacause of stopping GC, run it manually.
     MessagingTelehash::gcollect();
 }
 
@@ -226,9 +228,10 @@ void multiBroadcasteeTest(int add){
     t_daemon2.join();
     t_daemon3.join();
     if(add){
-        ok( status==2,"broadcastee receives another's json check.");
+        ok( status==2,"broadcastee received another's json check.");
     }else{
-        ok( status==1,"broadcastee didn't receive another's json check.");
+        ok( status==1,"broadcastee didn't receive another's json check"
+                      "after removing broadcaster");
     }        
     MessagingTelehash::gcollect();
 }
