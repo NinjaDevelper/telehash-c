@@ -43,6 +43,7 @@
 
 map<string,vector<CHANNEL_HANDLER> > ChannelHandler::hmap;
 int MessagingTelehash::status=0;
+int MessagingTelehash::count=0;
 link_t MessagingTelehash::targetLink=NULL;
 list<link_t> MessagingTelehash::broadcastee;
 char * (*MessagingTelehash::broadcastHandler)(char *json)  ;
@@ -319,6 +320,8 @@ MessagingTelehash::MessagingTelehash(int port){
     util_sock_timeout(udp4->server,100);
     lob_free(p);
     lob_free(id);
+    
+    count++;
 }
 
 /*
@@ -410,9 +413,27 @@ void MessagingTelehash::start(){
     while(!stopFlag && net_udp4_receive(udp4));
 }	
 
+
+
 MessagingTelehash::~MessagingTelehash(){
-    mesh_free(mesh);
     net_udp4_free(udp4);
-    mesh=NULL;
-    udp4=NULL;
+    mesh_free(mesh);
+#ifndef __NO_TGC__
+    if(--count==0){
+        e3x_cipher_free();
+    }
+#endif
 }	
+
+void MessagingTelehash::setGC(int use){
+#ifndef __NO_TGC__
+    mesh->useGC=use;
+#endif
+}
+
+void MessagingTelehash::gcollect(){
+#ifndef __NO_TGC__
+    tgc_gcollect();
+#endif
+}
+#endif

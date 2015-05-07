@@ -38,6 +38,12 @@ extern "C"{
     #include "net_udp4.h"
 }
 
+#ifndef __NO_TGC__
+extern "C"{
+	#include "tgc.h"
+}
+#endif
+
 using namespace std;
 typedef char * (*CHANNEL_HANDLER)(char *json);
 
@@ -79,6 +85,7 @@ private:
     int stopFlag;
     vector<link_t> links;
     static int status;
+    static int count;
     static link_t targetLink;
     static list<link_t> broadcastee;
     static char * (*broadcastHandler)(char *json) ;
@@ -112,5 +119,8 @@ public:
     void broadcast(char *location, char *json);
     void start();
     void stop();
+
+    static void gcollect();
+    void setGC(int use);
 };
 #endif

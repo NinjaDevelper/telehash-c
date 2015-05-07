@@ -49,7 +49,6 @@ MessagingTelehash m3(-9999);
 MessagingTelehash m4(-9999);
 string location;
 thread t_daemon1,t_daemon2,t_daemon3;
-
     
 char *handler1(char *json){
     static int n=0;
@@ -113,6 +112,10 @@ char *broadcastHandler(char *json){
 }
 
 void locationTest(){
+    m1.setGC(0);
+    m2.setGC(0);
+    m3.setGC(0);
+    m4.setGC(0);
     char *info1=m1.getMyLocation();
     char *info2=m2.getMyLocation();
     LOG("info %s",info2);
@@ -160,7 +163,8 @@ void singleBroadcasteeTest(){
     t_daemon2.join();
     LOG("global IP=%s",m3.globalIP);
     ok( !strcmp(m3.globalIP,"127.0.0.1"),"addBroadcaster check.");
-    
+    MessagingTelehash::gcollect();
+
     m3.setBroadcastHandler(broadcastHandler);
     
     t_daemon1=std::thread([&](){
@@ -177,6 +181,7 @@ void singleBroadcasteeTest(){
     t_daemon1.join();
     t_daemon2.join();
     ok( status==1,"broadcaster does not receive his json check.");
+    MessagingTelehash::gcollect();
 }
 
 void multiBroadcasteeTest(){
@@ -194,6 +199,7 @@ void multiBroadcasteeTest(){
     m4.stop();
     t_daemon1.join();
     t_daemon2.join();
+    MessagingTelehash::gcollect();
 
     t_daemon1=std::thread([&](){
         m4.start();
@@ -214,6 +220,7 @@ void multiBroadcasteeTest(){
     t_daemon2.join();
     t_daemon3.join();
     ok( status==2,"broadcastee receives another's json check.");
+    MessagingTelehash::gcollect();
 }
 
 
@@ -226,7 +233,7 @@ void channelTest(){
 
     status=0;
     t_daemon1=std::thread([&](){
-            m2.start();
+        m2.start();
     });
     m3.openChannel((char *)location.c_str(),(char *)"counter_test");
     t_daemon2=std::thread([&](){
@@ -239,6 +246,7 @@ void channelTest(){
     t_daemon2.join();
     LOG("status=%d",status);
     ok( status==3,"channel check.");
+    tgc_gcollect();
 }
 
 int main (int argc, char *argv[]) {
@@ -247,7 +255,7 @@ int main (int argc, char *argv[]) {
     singleBroadcasteeTest();
     multiBroadcasteeTest();
     channelTest();
-    
+
     done_testing();
 
 }
