@@ -36,6 +36,7 @@ mesh_t mesh_new(uint32_t prime)
   memset(mesh, 0, sizeof(struct mesh_struct));
   mesh->index = xht_new(prime?prime:MAXPRIME);
   if(!mesh->index) return mesh_free(mesh);
+  mesh->useGC=1;
   
   LOG("mesh created version %d.%d.%d",TELEHASH_VERSION_MAJOR,TELEHASH_VERSION_MINOR,TELEHASH_VERSION_PATCH);
   tgc_addRoot(mesh);
@@ -364,6 +365,7 @@ uint8_t mesh_receive(mesh_t mesh, lob_t outer, pipe_t pipe)
   if(!mesh || !outer || !pipe)
   {
     LOG("bad args");
+    if(mesh->useGC) tgc_gcollect();
     return 1;
   }
   
@@ -377,7 +379,7 @@ uint8_t mesh_receive(mesh_t mesh, lob_t outer, pipe_t pipe)
     {
       LOG("%02x handshake failed %s",outer->head[0],e3x_err());
       lob_free(outer);
-      tgc_gcollect();
+      if(mesh->useGC) tgc_gcollect();
       return 2;
     }
     
@@ -390,7 +392,7 @@ uint8_t mesh_receive(mesh_t mesh, lob_t outer, pipe_t pipe)
 
     // process the handshake
     uint8_t ret= mesh_receive_handshake(mesh, inner, pipe) ? 0 : 3;
-    tgc_gcollect();
+    if(mesh->useGC) tgc_gcollect();
     return ret;
   }
 
@@ -400,7 +402,7 @@ uint8_t mesh_receive(mesh_t mesh, lob_t outer, pipe_t pipe)
     if(outer->body_len < 16)
     {
       LOG("packet too small %d",outer->body_len);
-      tgc_gcollect();
+      if(mesh->useGC) tgc_gcollect();
       return 5;
     }
     util_hex(outer->body, 16, hex);
@@ -409,7 +411,7 @@ uint8_t mesh_receive(mesh_t mesh, lob_t outer, pipe_t pipe)
     {
       LOG("dropping, no link for token %s",hex);
       lob_free(outer);
-      tgc_gcollect();
+      if(mesh->useGC) tgc_gcollect();
       return 6;
     }
 
@@ -418,19 +420,19 @@ uint8_t mesh_receive(mesh_t mesh, lob_t outer, pipe_t pipe)
     {
       LOG("channel decryption fail for link %s %s",link->id->hashname,e3x_err());
       lob_free(outer);
-      tgc_gcollect();
+      if(mesh->useGC) tgc_gcollect();
       return 7;
     }
     
     LOG("channel packet %d bytes from %s",lob_len(inner),link->id->hashname);
     uint8_t ret= link_receive(link,inner,pipe) ? 0 : 8;
-    tgc_gcollect();
+    if(mesh->useGC) tgc_gcollect();
     return ret;
     
   }
   
   LOG("dropping unknown outer packet with header %d %s",outer->head_len,util_hex(outer->head,outer->head_len,NULL));
   lob_free(outer);
-  tgc_gcollect();
+  if(mesh->useGC) tgc_gcollect();
   return 10;
 }

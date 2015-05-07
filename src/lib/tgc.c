@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
+
 
 
 #ifdef __MAIN__
@@ -32,6 +34,7 @@ typedef struct tgc_list {
 
 tgc_list_t blocks=NULL;
 tgc_list_t gcRoot=NULL;
+void *max=0,*min=0;
 
 tgc_list_t _tgc_addList(tgc_list_t* top,void *ptr){
     tgc_list_t list=(tgc_list_t)calloc(1,sizeof(struct tgc_list));
@@ -60,9 +63,17 @@ void _tgc_rmList(tgc_list_t *top,tgc_list_t list){
 
 void *tgc_malloc(size_t size){
     void *ptr=calloc(1,size);
+    if(ptr>max) max=ptr;
+    if(min==0 || ptr<min) min=ptr;
     tgc_list_t list=_tgc_addList(&blocks,ptr);
     list->size=size;
     return ptr;
+}
+
+char *tgc_strdup(const char *s){
+    char *p=(char *)tgc_malloc(strlen(s)+1);
+    if(p) strcpy(p,s);
+    return p;
 }
 
 void *tgc_realloc(void *ptr,size_t size){
@@ -77,18 +88,20 @@ void *tgc_realloc(void *ptr,size_t size){
         exit(1);
      }else{
         ptr=list->ptr=realloc(ptr,size);
+        if(ptr>max) max=ptr;
+        if(min==0 || ptr<min) min=ptr;
         list->size=size;
     }
     return ptr;
 }
 
 void tgc_addRoot(void *ptr){
-    _tgc_addList(&gcRoot,ptr);
+    if(ptr)  _tgc_addList(&gcRoot,ptr);
 }    
 
 void tgc_rmRoot(void *ptr){
     tgc_list_t list=NULL;
-    for(list=gcRoot;!list;list=list->next){
+    for(list=gcRoot;list;list=list->next){
         if(list->ptr==ptr){
              _tgc_rmList(&gcRoot,list);
              return;
@@ -107,9 +120,10 @@ void _tgc_mark(void *ptr){
             if(list->size>=sizeof(void*)){
                 for(i=0;i<list->size-sizeof(void*)+1;i++){
                    void *p=*(void **)(list->ptr+i);
-                    _tgc_mark(p);
+                   if(min<=p && p<=max)  _tgc_mark(p);
                 }
-           }
+            }
+            return;
         } 
     }
 }
@@ -122,15 +136,19 @@ void tgc_gcollect(){
     for(list=gcRoot;list;list=list->next){
         _tgc_mark(list->ptr);
     }
+    int fcount=0;
+    int ncount=0;
     for(list=blocks;list;){
+        ncount++;
         tgc_list_t next=list->next;
         if(!list->used){
-            LOG("freeing %p",list->ptr);
+            fcount++;
             free(list->ptr);
             _tgc_rmList(&blocks,list);
         }
         list=next;
     }
+    LOG("%d/%d blocks were freed",fcount,ncount);
 }   
 
 void tgc_info(){

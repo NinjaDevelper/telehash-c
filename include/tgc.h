@@ -5,6 +5,7 @@
 
 #define malloc tgc_malloc
 #define realloc tgc_realloc
+#define strdup tgc_strdup
 #define calloc(m,n) tgc_malloc((m)*(n))
 #define free(a) {}
 
@@ -15,5 +16,6 @@ void tgc_rmRoot(void *ptr);
 void tgc_addRoot(void *ptr);
 void *tgc_realloc(void *ptr,size_t size);
 void *tgc_malloc(size_t size);
+char *tgc_strdup(const char *s);
 
 #endif
