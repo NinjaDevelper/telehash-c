@@ -266,8 +266,10 @@ void channelHandlerTest(){
     ChannelHandler *h=ChannelHandler::createInstance("testetst");
     ok(!h,"getting not registered name handler test");
     h=ChannelHandler::createInstance("counter_test");
-    ok(!h->handle(NULL),"handle over registered number events test");
-    
+    h->handle(NULL);
+    h->handle(NULL);
+    ok(!h->handle(NULL),"handle over registered number events test 1");
+    delete h;    
 }
 
 int main (int argc, char *argv[]) {
