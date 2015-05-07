@@ -51,9 +51,9 @@ char MessagingTelehash::globalIP[3*4+3+1]; ;
 
 
 int MessagingTelehash::isLocal(char *adr){
-    if(strcmp(adr,"127.0.0.1") || strstr(adr,"10.") 
-        || strstr(adr,"192.168.")) return 1;
-    if(strstr(adr,"172.") && adr[6]=='.'){
+    if(!strcmp(adr,"127.0.0.1") || !strncmp(adr,"10.",3) 
+        || !strncmp(adr,"192.168.",7)) return 1;
+    if(!strncmp(adr,"172.",4) && adr[6]=='.'){
         int tmp=(adr[4]-'0')*10+(adr[5]-'0');
         if(16<=tmp && tmp<=31){
             return 1;

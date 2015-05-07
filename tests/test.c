@@ -190,13 +190,13 @@ void singleBroadcasteeTest(){
     MessagingTelehash::gcollect();
 }
 
-void multiBroadcasteeTest(){
+void multiBroadcasteeTest(int add){
     m4.setBroadcastHandler(broadcastHandler);
 
     t_daemon1=std::thread([&](){
             m2.start();
     });
-    m4.addBroadcaster((char *)location.c_str(),1);
+    m4.addBroadcaster((char *)location.c_str(),add);
     t_daemon2=std::thread([&](){
         m4.start();
     });
@@ -225,7 +225,11 @@ void multiBroadcasteeTest(){
     t_daemon1.join();
     t_daemon2.join();
     t_daemon3.join();
-    ok( status==2,"broadcastee receives another's json check.");
+    if(add){
+        ok( status==2,"broadcastee receives another's json check.");
+    }else{
+        ok( status==1,"broadcastee didn't receive another's json check.");
+    }        
     MessagingTelehash::gcollect();
 }
 
@@ -259,7 +263,8 @@ int main (int argc, char *argv[]) {
 
     locationTest();
     singleBroadcasteeTest();
-    multiBroadcasteeTest();
+    multiBroadcasteeTest(1);
+    multiBroadcasteeTest(0);
     channelTest();
 
     done_testing();
