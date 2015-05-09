@@ -45,7 +45,28 @@ extern "C"{
 #endif
 
 using namespace std;
-typedef char * (*CHANNEL_HANDLER)(char *json);
+
+/**
+ * Class for handling  received packets in telehash-c channel.
+ * 
+ * call one handler incrementally per one packet in handle() method.
+ */
+class ChannelHandler{
+
+public:
+    /**
+     * handle one packet.
+     * 
+     * @param json one packet described in json.
+     * @return a json packet that should be sent back. not be sent if NULL.
+     */
+	virtual char* handle(char *json)=0;
+    
+    /**
+     * destructor
+     */
+    virtual ~ChannelHandler(){}
+};
 
 /**
  * Class for handling  received packets in telehash-c channel.
@@ -53,77 +74,35 @@ typedef char * (*CHANNEL_HANDLER)(char *json);
  * stores all handlers associated with the channel name, and 
  * call one handler incrementally per one packet.
  */
-class ChannelHandler{
-private:
-    /**
-     *  current number of handling.
-     */
-    unsigned int n;
-
-    /**
-     * handlers 
-     */
-    vector<CHANNEL_HANDLER> h;
-
-    /**
-     * handlers and channel name map. 
-     */
-	static  map<string,vector<CHANNEL_HANDLER> > hmap;
+class ChannelHandlerFactory{
 
 public:
     /**
-     * add  handlers with channel name.
+     * return ChannelHandler instance which is associated channel name.
      * 
      * @param name channel name.
-     * @param h channel handlers.
+     * @return ChannelHandler instance associated the channel name.
      */
-	static void addChannelHandler(string name, vector<CHANNEL_HANDLER> &h){
-		hmap[name]=h;
-	}
-
+	virtual ChannelHandler* createInstance(string name)=0;
+ 
     /**
-     * return myself which is associated channel name.
-     * 
-     * @param name channel name.
-     * @return myself associated the channel name.
+     * destructor
      */
-	static ChannelHandler* createInstance(string name){
-        if (hmap.find(name) == hmap.end()) {
-            return NULL;
-        }
-		return new ChannelHandler(hmap[name]);
-	}
-	
-    /**
-     * create myself with handlers.
-     * 
-     * @param h channels.
-     */
-	ChannelHandler(vector<CHANNEL_HANDLER> &h){
-		n=0;
-		this->h.assign(h.begin(),h.end());
-	}
-	
-    /**
-     * handle one packet.
-     * 
-     * @param json one packet described in json.
-     * @return a json packet that should be sent back. not be sent if NULL.
-     */
-	char* handle(char *json){
-		if(n<h.size()){
-			CHANNEL_HANDLER f=h.at(n++);
- 		    return f(json);
-		}
-		return NULL;
-	}
+    virtual ~ChannelHandlerFactory(){}
 };
+
+
 
  /**
   * class for managing telehash-c.
   */
 class MessagingTelehash{
 private:
+    /**
+     * factory instance that creates ChannelHander instance.
+     */
+    static ChannelHandlerFactory *factory;
+
     /**
      * telehash-c mesh.
      */
@@ -281,8 +260,9 @@ public:
      * constructor.
      * 
      * @param port port number to be listened packets.
+     * @param factory ChannelHanderFactory instance to be set.
      */
-    MessagingTelehash(int port);
+    MessagingTelehash(int port,ChannelHandlerFactory &factory);
 
     /**
      * destructor.
@@ -308,15 +288,6 @@ public:
      * @param name channel name associated to channel.
      */
     void openChannel(char *location, char *name);
-
-    /**
-     * 
-     * set channel handlers associated a channel name.
-     * 
-     * @param  name channel name
-     * @param  h handlers.
-     */
-    void setChannelHandlers(char* name,  vector<CHANNEL_HANDLER> &h);
 
     /**
      * 
@@ -354,6 +325,8 @@ public:
      * stop start() loop.
      */
     void stop();
+
+
 
     /**
      * run GC. test use only. don't use it.

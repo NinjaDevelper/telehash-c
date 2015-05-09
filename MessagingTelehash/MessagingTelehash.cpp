@@ -41,14 +41,13 @@
 #include <algorithm> 
 #include "MessagingTelehash.h"
 
-map<string,vector<CHANNEL_HANDLER> > ChannelHandler::hmap;
 int MessagingTelehash::status=0;
 int MessagingTelehash::count=0;
 link_t MessagingTelehash::targetLink=NULL;
 list<link_t> MessagingTelehash::broadcastee;
 char * (*MessagingTelehash::broadcastHandler)(char *json)  ;
 char MessagingTelehash::globalIP[3*4+3+1]; ;
-
+ChannelHandlerFactory *MessagingTelehash::factory;
 
 int MessagingTelehash::isLocal(char *adr){
     if(!strcmp(adr,"127.0.0.1") || !strncmp(adr,"10.",3) 
@@ -200,7 +199,7 @@ void MessagingTelehash::serviceOnOpenHandler(link_t link, e3x_channel_t chan,
 lob_t MessagingTelehash::serviceOnOpen(link_t link,lob_t open){
     if(!link || !open) return open;
     char *type=(char *)lob_get(open,(char *)"type");
-    ChannelHandler *c=ChannelHandler::createInstance(type);
+    ChannelHandler *c=factory->createInstance(type);
     if(!c) return open;
 
     LOG("openning channel in link_handler() with %s",lob_json(open));
@@ -282,7 +281,10 @@ lob_t MessagingTelehash::broadcastOnOpen(link_t link,lob_t open){
     return NULL;
 }
 
-MessagingTelehash::MessagingTelehash(int port){
+MessagingTelehash::MessagingTelehash(int port ,
+    ChannelHandlerFactory &factory){
+
+    this->factory = &factory;
     globalIP[0]='\0';
     lob_t id = util_fjson((char *)"id.json");
     if(!id){
@@ -325,6 +327,7 @@ MessagingTelehash::MessagingTelehash(int port){
  *           "paths":[{"type":"udp4","ip":"127.0.0.1","port":45449}]}
 */
 link_t MessagingTelehash::_link(char *location){
+    LOG("%s",location);
     lob_t loc=lob_new();
     lob_head(loc,(uint8_t *)location,strlen(location));
 
@@ -353,7 +356,7 @@ void MessagingTelehash::openChannel(char *location, char *name){
     link_t link=_link(location);
     lob_t options = lob_new();
     lob_set(options,(char *)"type",name);
-    ChannelHandler *h=ChannelHandler::createInstance(name);
+    ChannelHandler *h=factory->createInstance(name);
     char *json=h->handle(NULL);
     lob_set_raw(options,(char *)"data",4,json,strlen(json));
     LOG("openChannel %s",lob_json(options));
@@ -380,11 +383,6 @@ void MessagingTelehash::addBroadcaster(char *location,int add){
     //options is freed in link_flush
 }
 
-void MessagingTelehash::setChannelHandlers(char* name,  
-    vector<CHANNEL_HANDLER> &h){
-    ChannelHandler::addChannelHandler(name,h);
-}
-
 void MessagingTelehash::setBroadcastHandler(char * (&bc)(char *json) ){
     broadcastHandler=&bc;
 }
@@ -408,7 +406,6 @@ void MessagingTelehash::start(){
     stopFlag=0;
     while(!stopFlag && net_udp4_receive(udp4));
 }	
-
 
 int MessagingTelehash::_isLocalTest(char *adr){
     return isLocal(adr);

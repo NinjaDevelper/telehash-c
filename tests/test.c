@@ -40,16 +40,95 @@
 using namespace std;
 using namespace picojson;
 
+typedef char * (*CHANNEL_HANDLER)(char *json);
+
+	
+class TestChannelHandler : public ChannelHandler{
+private:
+    /**
+     *  current number of handling.
+     */
+    unsigned int n;
+    
+    /**
+     * handlers 
+     */
+    vector<CHANNEL_HANDLER> h;
+
+public:
+    /**
+     * create myself with handlers.
+     * 
+     * @param h channels.
+     */
+	TestChannelHandler(vector<CHANNEL_HANDLER> &h){
+ 		n=0;
+		this->h.assign(h.begin(),h.end());
+	}
+	
+    /**
+     * handle one packet.
+     * 
+     * @param json one packet described in json.
+     * @return a json packet that should be sent back. not be sent if NULL.
+     */
+	char* handle(char *json){
+		if(n<h.size()){
+			CHANNEL_HANDLER f=h.at(n++);
+ 		    return f(json);
+		}
+		return NULL;
+	}
+    
+    ~TestChannelHandler(){
+    }
+};
+
+class TestChannelHandlerFactory : public ChannelHandlerFactory{
+private:
+    /**
+     * handlers and channel name map. 
+     */
+	map<string,vector<CHANNEL_HANDLER> > hmap;
+public:
+
+    /**
+     * add  handlers with channel name.
+     * 
+     * @param name channel name.
+     * @param h channel handlers.
+     */
+	void addChannelHandlers(string name, vector<CHANNEL_HANDLER> &h){
+		hmap[name]=h;
+	}
+    /**
+     * return myself which is associated channel name.
+     * 
+     * @param name channel name.
+     * @return myself associated the channel name.
+     */
+	virtual ChannelHandler* createInstance(string name){
+        if (hmap.find(name) == hmap.end()) {
+            return NULL;
+        }
+		return new TestChannelHandler(hmap[name]);
+	}
+    ~TestChannelHandlerFactory(){
+    }
+};
+
 int status=0;
 int status1=0;
+TestChannelHandlerFactory factory;
 //m1 cannot connect to m2 because they share key
-MessagingTelehash m1(0);
-MessagingTelehash m2(1234);
-MessagingTelehash m3(-9999);
-MessagingTelehash m4(-9999);
-string location;
+MessagingTelehash m1(0,factory);
+MessagingTelehash m2(1234,factory);
+MessagingTelehash m3(-9999,factory);
+MessagingTelehash m4(-9999,factory);
+string location_;
+char *location=NULL;
 thread t_daemon1,t_daemon2,t_daemon3;
-    
+
 char *handler1(char *json){
     static int n=0;
     char *message=NULL;
@@ -145,21 +224,23 @@ void locationTest(){
     ok( !m1._isLocalTest((char *)"172.32.22.22"),"isLocal() check 4.");
     ok( !m1._isLocalTest((char *)"172.15.22.22"),"isLocal() check 5.");
 
-    location=
+    location_=
         "{\"keys\":{\"1a\":\""+k2+"\"},\"paths\":[{\"type\":\"udp4\",\"ip\""
         ":\"127.0.0.1\",\"port\":1234}]}";
+    location=(char *)location_.c_str();
     free(info1);
     free(info2);
 
 }
 
 void singleBroadcasteeTest(){
-    LOG("location=%s",location.c_str());
     
     t_daemon1=std::thread([&](){
         m2.start();
     });
-    m3.addBroadcaster((char *)location.c_str(),1);
+    LOG("location=%s",location);
+    m3.addBroadcaster(location,1);
+    LOG("location=%s",location);
     t_daemon2=std::thread([&](){
         m3.start();
     });
@@ -178,7 +259,7 @@ void singleBroadcasteeTest(){
         m2.start();
     });
     status=0;
-    m3.broadcast((char *)location.c_str(),(char *)"{\"service\":\"farming\"}");
+    m3.broadcast((char *)location,(char *)"{\"service\":\"farming\"}");
     t_daemon2=std::thread([&](){
         m3.start();
     });
@@ -198,7 +279,7 @@ void multiBroadcasteeTest(int add){
     t_daemon1=std::thread([&](){
             m2.start();
     });
-    m4.addBroadcaster((char *)location.c_str(),add);
+    m4.addBroadcaster((char *)location,add);
     t_daemon2=std::thread([&](){
         m4.start();
     });
@@ -216,7 +297,7 @@ void multiBroadcasteeTest(int add){
         m2.start();
     });
     status=0;
-    m3.broadcast((char *)location.c_str(),(char *)"{\"service\":\"farming\"}");
+    m3.broadcast((char *)location,(char *)"{\"service\":\"farming\"}");
     t_daemon2=std::thread([&](){
         m3.start();
     });
@@ -242,13 +323,13 @@ void channelTest(){
     h.push_back(handler1);
     h.push_back(handler2);
     
-    m3.setChannelHandlers((char *)"counter_test",h);
+    factory.addChannelHandlers((char *)"counter_test",h);
 
     status=0;
     t_daemon1=std::thread([&](){
         m2.start();
     });
-    m3.openChannel((char *)location.c_str(),(char *)"counter_test");
+    m3.openChannel((char *)location,(char *)"counter_test");
     t_daemon2=std::thread([&](){
         m3.start();
     });
@@ -262,16 +343,6 @@ void channelTest(){
     tgc_gcollect();
 }
 
-void channelHandlerTest(){
-    ChannelHandler *h=ChannelHandler::createInstance("testetst");
-    ok(!h,"getting not registered name handler test");
-    h=ChannelHandler::createInstance("counter_test");
-    h->handle(NULL);
-    h->handle(NULL);
-    ok(!h->handle(NULL),"handle over registered number events test 1");
-    delete h;    
-}
-
 int main (int argc, char *argv[]) {
 
     locationTest();
@@ -279,7 +350,6 @@ int main (int argc, char *argv[]) {
     multiBroadcasteeTest(1);
     multiBroadcasteeTest(0);
     channelTest();
-    channelHandlerTest();
 
     done_testing();
 
