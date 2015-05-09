@@ -2,6 +2,7 @@
 #define __TGC__
 
 #include <stdlib.h>
+#include <string.h>
 
 #define malloc tgc_malloc
 #define realloc tgc_realloc
