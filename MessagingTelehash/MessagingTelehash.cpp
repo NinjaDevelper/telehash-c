@@ -108,7 +108,8 @@ char *MessagingTelehash::getMyLocation(){
 
     json = lob_new();
     lob_set(json,(char*)"hashname",mesh->id->hashname);
-    lob_set_raw(json,(char*)"keys",0,(char*)mesh->keys->head,mesh->keys->head_len);
+    lob_set_raw(json,(char*)"keys",0,
+                (char*)mesh->keys->head,mesh->keys->head_len);
 
     paths = (char *)malloc(len);
     sprintf(paths,"[");
@@ -352,16 +353,16 @@ link_t MessagingTelehash::_link(char *location){
     return link;
 }
 
-void MessagingTelehash::openChannel(char *location, char *name){
+void MessagingTelehash::openChannel(char *location, char *name,
+                                     ChannelHandler &h){
     link_t link=_link(location);
     lob_t options = lob_new();
     lob_set(options,(char *)"type",name);
-    ChannelHandler *h=factory->createInstance(name);
-    char *json=h->handle(NULL);
+    char *json=h.handle(NULL);
     lob_set_raw(options,(char *)"data",4,json,strlen(json));
     LOG("openChannel %s",lob_json(options));
     e3x_channel_t chan=link_channel(link,options);
-    link_handle(link, chan, serviceOnOpenHandler, h);
+    link_handle(link, chan, serviceOnOpenHandler, &h);
     link_flush(link,chan, options); 
     free(json);
     //options is freed in link_flush
@@ -424,12 +425,12 @@ MessagingTelehash::~MessagingTelehash(){
 
 void MessagingTelehash::setGC(int use){
 #ifndef __NO_TGC__
-    mesh->useGC=use;
+    tgc_setGC(use);
 #endif
 }
 
 void MessagingTelehash::gcollect(){
 #ifndef __NO_TGC__
-    tgc_gcollect();
+    tgc_gcollect_force();
 #endif
 }

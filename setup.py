@@ -28,28 +28,60 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from setuptools.command.test import test as TestCommand
+import os
 from distutils.core import setup, Extension
 
 LONG_DESCRIPTION = open('README.md').read()
 VERSION = '1.0'
 
+os.environ['CC'] = 'g++'
+
 install_requirements = []
 
 test_requirements = [
+    'pytest',
+    'pytest-pep8',
+    'pytest-cache',
     'coveralls'
 ]
 
-module = Extension('MessagingTelehash', 
-                   ['MessagingTelehash/MessagingTelehash_python.cpp',
-                    'MessagingTelehash/MessagingTelehash.cpp'],
-                   libraries=['telehash'], include_dirs=['telehash-c'],)
 
-setup(name='MessagingTelehash',
+module = Extension('TelehashBinder', 
+                   ['MessagingTelehash/TelehashBinder_python.cpp',
+                    'MessagingTelehash/MessagingTelehash.cpp'],
+                   libraries=['telehash'], 
+                   include_dirs=['telehash-c/unix','telehash-c/include',
+                                  'MessagingTelehash'],
+                   library_dirs=['telehash-c'],
+                   )
+
+
+setup(name='TelehashBinder',
       ext_modules=[module],
      )
 
+class PyTest(TestCommand):
+    user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
+
+    def initialize_options(self):
+        TestCommand.initialize_options(self)
+        self.pytest_args = []
+
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        # Import PyTest here because outside, the eggs are not loaded.
+        import pytest
+        import sys
+        errno = pytest.main(self.pytest_args)
+        sys.exit(errno)
+
 setup(
-    name='MessagingTelehash',
+    name='TelehashBinder',
     version=VERSION,
     url='https://github.com/MessagingTelehash/MessagingTelehash',
     download_url='https://github.com/StorjPlatform/MessagingTelehash/tarball/' 
@@ -57,7 +89,7 @@ setup(
     license=open('LICENSE').read(),
     author='Utamaro',
     author_email='utamaro.sisho@gmail.com',
-    description='Messaging Layer implemeted by Telehash.',
+    description='Messaging Layer in Telehash.',
     long_description=LONG_DESCRIPTION,
     ext_modules=[module],
     install_requires=install_requirements,

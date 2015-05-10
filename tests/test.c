@@ -26,16 +26,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "MessagingTelehash.h"
+
 #include "picojson.h"
 #include <stdio.h>
-#include <string.h>
 #include <tap.h>
 #include <vector>  
 #include <string>
 #include <thread>
-
-#include "MessagingTelehash.h"
-
+#include <string.h>
 
 using namespace std;
 using namespace picojson;
@@ -120,7 +119,7 @@ public:
 int status=0;
 int status1=0;
 TestChannelHandlerFactory factory;
-//m1 cannot connect to m2 because they share key
+//m1 cannot connect to m2 because they share a key
 MessagingTelehash m1(0,factory);
 MessagingTelehash m2(1234,factory);
 MessagingTelehash m3(-9999,factory);
@@ -192,10 +191,7 @@ char *broadcastHandler(char *json){
 
 void locationTest(){
     //stop GC to use thread. GC is thread-unsafe.
-    m1.setGC(0);
-    m2.setGC(0);
-    m3.setGC(0);
-    m4.setGC(0);
+    MessagingTelehash::setGC(0);
     char *info1=m1.getMyLocation();
     char *info2=m2.getMyLocation();
     LOG("info %s",info2);
@@ -329,7 +325,8 @@ void channelTest(){
     t_daemon1=std::thread([&](){
         m2.start();
     });
-    m3.openChannel((char *)location,(char *)"counter_test");
+    m3.openChannel((char *)location,(char *)"counter_test", 
+                                    *factory.createInstance("counter_test"));
     t_daemon2=std::thread([&](){
         m3.start();
     });
@@ -340,7 +337,7 @@ void channelTest(){
     t_daemon2.join();
     LOG("status=%d",status);
     ok( status==3,"channel check.");
-    tgc_gcollect();
+    MessagingTelehash::gcollect();
 }
 
 int main (int argc, char *argv[]) {
@@ -350,6 +347,7 @@ int main (int argc, char *argv[]) {
     multiBroadcasteeTest(1);
     multiBroadcasteeTest(0);
     channelTest();
+    MessagingTelehash::setGC(1);
 
     done_testing();
 

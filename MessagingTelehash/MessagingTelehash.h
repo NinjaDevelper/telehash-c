@@ -30,12 +30,14 @@
 #define _MESSAGINGTELEHASH_H_
 
 #include <vector>  
+#include <string>  
 #include <list>  
 #include <map>  
 
 extern "C"{
 	#include "mesh.h"
     #include "net_udp4.h"
+    #include "tgc.h"
 }
 
 #ifndef __NO_TGC__
@@ -75,7 +77,6 @@ public:
  * call one handler incrementally per one packet.
  */
 class ChannelHandlerFactory{
-
 public:
     /**
      * return ChannelHandler instance which is associated channel name.
@@ -83,7 +84,7 @@ public:
      * @param name channel name.
      * @return ChannelHandler instance associated the channel name.
      */
-	virtual ChannelHandler* createInstance(string name)=0;
+    virtual ChannelHandler* createInstance(string name)=0;
  
     /**
      * destructor
@@ -286,8 +287,10 @@ public:
      * 
      * @param location destination to be linked.
      * @param name channel name associated to channel.
+     * @param h channel handler to send a first packet and handle 
+     *         received packets.
      */
-    void openChannel(char *location, char *name);
+    void openChannel(char *location, char *name, ChannelHandler &h);
 
     /**
      * 
@@ -326,10 +329,8 @@ public:
      */
     void stop();
 
-
-
     /**
-     * run GC. test use only. don't use it.
+     * run force GC . test use only. don't use it.
     */
     static void gcollect();
 
@@ -337,7 +338,7 @@ public:
      * stop GC. test use only. don't use it.
      * @param use  0 if you do not want to use. others if not.
      */
-    void setGC(int use);
+    static void setGC(int use);
 
     /**
      * test use only. don't use it.

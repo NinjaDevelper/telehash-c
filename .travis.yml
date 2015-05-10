@@ -11,11 +11,15 @@ before_install:
   - git submodule update --init --recursive
   - make test
 #  - make python
-  - sudo pip install cpp-coveralls
+  - sudo pip install cpp-coveralls coverage 
+
 script:
   - LD_LIBRARY_PATH=libtap ./test
 #  - PYTHONPATH=. python tests/test.py
+  - coverage run setup.py test -a "--doctest-modules --pep8 -v tests/ MessagingTelehash/"
+
 after_success:
   - coveralls --exclude tests --exclude telehash-c --exclude libtap --gcov-options '\-lp'
   - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
   - cat a.log
+  - coverage report -m --include="MessagingTelehash/*.py"
