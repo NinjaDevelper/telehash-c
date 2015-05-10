@@ -127,7 +127,21 @@ void _tgc_mark(void *ptr){
         } 
     }
 }
-   
+
+void tgc_free(void *ptr){
+    tgc_list_t list=NULL;
+    if(!ptr) return;
+    for(list=blocks;list;list=list->next){
+        if(list->ptr==ptr) break;
+    }   
+    if(!list){
+        LOG("cannot find %x",ptr);
+        return;
+    }
+    _tgc_rmList(&blocks,list);
+    free(ptr);
+}
+
 void tgc_gcollect(){
     tgc_list_t list=NULL;
     for(list=blocks;list;list=list->next){
