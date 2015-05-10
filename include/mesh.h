@@ -21,7 +21,6 @@ struct mesh_struct
   uint16_t port_local, port_public;
   char *ipv4_local, *ipv4_public;
   lob_t handshakes, cached; // handshakes
-  int useGC;
 };
 
 // pass in a prime for the main index of hashnames+links+channels, 0 to use compiled default
