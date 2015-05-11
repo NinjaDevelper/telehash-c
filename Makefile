@@ -10,7 +10,7 @@ test: MessagingTelehash/MessagingTelehash.cpp tests/test.c
 	cd libtap;make
 	$(CPP) $(INCLUDE) ${CFLAGS}  ${TEST_CPPFLAGS} -o $@ $^  ${LDFLAGS}   ${TEST_LDFLAGS} -std=c++11 -pthread
 
-python: ${FILES} MessagingTelehash/TelehashBinder_python.cpp
+python: ${FILES} MessagingTelehash/TelehashBinder_python.cpp MessagingTelehash/MessagingTelehash.cpp
 	cd telehash-c;make
 	python setup.py build_ext -i
 

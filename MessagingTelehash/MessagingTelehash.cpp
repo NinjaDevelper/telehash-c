@@ -38,7 +38,6 @@
 #include <netdb.h>
 
 #include <string> 
-#include <algorithm> 
 #include "MessagingTelehash.h"
 
 int MessagingTelehash::status=0;
@@ -81,7 +80,7 @@ char *MessagingTelehash::getGlobalIP(char *ip){
         ioctl(fd, SIOCGIFADDR, &ifr[i]);
         char *adr=inet_ntoa(((struct sockaddr_in *)&ifr[i].ifr_addr)
                               ->sin_addr);
-        if(!isLocal(ip)){
+        if(!isLocal(adr)){
             LOG("found global IP address %s", adr);
             strcpy(ip,adr);
         }
@@ -104,8 +103,9 @@ char *MessagingTelehash::getMyLocation(){
     lob_t json, path;
 
     getGlobalIP(ip);
-    if(ip[0]!='\0') strcpy(globalIP,ip);
-
+    if(ip[0]!='\0'){
+        strcpy(globalIP,ip);
+    }
     json = lob_new();
     lob_set(json,(char*)"hashname",mesh->id->hashname);
     lob_set_raw(json,(char*)"keys",0,
@@ -169,7 +169,9 @@ void MessagingTelehash::onLink(link_t link){
 void MessagingTelehash::sendOnChannel(link_t link, e3x_channel_t chan,
                                       lob_t packet,ChannelHandler *ch){
     if(!lob_get_cmp(packet,(char *)"end",(char *)"true")) {
+        LOG("pointer delteted=%p",ch);
         delete(ch);
+
         return;
     }
     lob_t data=lob_get_json(packet,(char *)"data");
@@ -180,6 +182,7 @@ void MessagingTelehash::sendOnChannel(link_t link, e3x_channel_t chan,
         lob_set_raw(tmp,(char *)"data",4,json,strlen(json));
     }else{
         lob_set(tmp,(char *)"end",(char *)"true");
+        LOG("pointer delteted=%p",ch);
         delete(ch);
     }
     link_direct(link,tmp,NULL);
@@ -202,6 +205,7 @@ lob_t MessagingTelehash::serviceOnOpen(link_t link,lob_t open){
     char *type=(char *)lob_get(open,(char *)"type");
     ChannelHandler *c=factory->createInstance(type);
     if(!c) return open;
+    LOG("pointer=%p",c);
 
     LOG("openning channel in link_handler() with %s",lob_json(open));
     e3x_channel_t chan=link_channel(link,open);
@@ -285,8 +289,8 @@ lob_t MessagingTelehash::broadcastOnOpen(link_t link,lob_t open){
 MessagingTelehash::MessagingTelehash(int port ,
     ChannelHandlerFactory &factory){
 
-    this->factory = &factory;
     globalIP[0]='\0';
+    this->factory = &factory;
     lob_t id = util_fjson((char *)"id.json");
     if(!id){
         writeID();
@@ -323,6 +327,9 @@ MessagingTelehash::MessagingTelehash(int port ,
     count++;
 }
 
+ChannelHandlerFactory* MessagingTelehash::getChannelHandlerFactory(){
+    return factory;
+}
 /*
  * location={"keys":{"1a":"aif6foqaligryvtbh4xjomjdcewgt53r3m"},
  *           "paths":[{"type":"udp4","ip":"127.0.0.1","port":45449}]}
@@ -400,11 +407,10 @@ void MessagingTelehash::broadcast(char *location, char *json){
     //options is freed in link_flush
 }
 
-void MessagingTelehash::stop(){
-    stopFlag=1;
+void MessagingTelehash::setStopFlag(int flag){
+    stopFlag=flag;
 }
 void MessagingTelehash::start(){
-    stopFlag=0;
     while(!stopFlag && net_udp4_receive(udp4));
 }	
 

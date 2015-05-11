@@ -60,7 +60,8 @@ public:
      * handle one packet.
      * 
      * @param json one packet described in json.
-     * @return a json packet that should be sent back. not be sent if NULL.
+     * @return a json packet that should be sent back. If NULL, no packets 
+     *          are sent back.
      */
 	virtual char* handle(char *json)=0;
     
@@ -71,15 +72,12 @@ public:
 };
 
 /**
- * Class for handling  received packets in telehash-c channel.
- * 
- * stores all handlers associated with the channel name, and 
- * call one handler incrementally per one packet.
+ * Class for creating ChannelFactory.
  */
 class ChannelHandlerFactory{
 public:
     /**
-     * return ChannelHandler instance which is associated channel name.
+     * return a ChannelHandler instance which is associated channel name.
      * 
      * @param name channel name.
      * @return ChannelHandler instance associated the channel name.
@@ -96,11 +94,15 @@ public:
 
  /**
   * class for managing telehash-c.
+  * 
+  * Make sure not to make more than one instance. These would not work fine 
+  * because most of informations are shared among these insntances. Many
+  * nasty hacks are needed to handle multi instnaces.
   */
 class MessagingTelehash{
 private:
     /**
-     * factory instance that creates ChannelHander instance.
+     * registered factory instance that creates ChannelHander instance.
      */
     static ChannelHandlerFactory *factory;
 
@@ -261,9 +263,17 @@ public:
      * constructor.
      * 
      * @param port port number to be listened packets.
-     * @param factory ChannelHanderFactory instance to be set.
+     * @param factory ChannelHanderFactory instance.
      */
     MessagingTelehash(int port,ChannelHandlerFactory &factory);
+
+    /**
+     * get registered ChannelHandlerFactory.
+     * 
+     * @return registered ChannelHandlerFactory
+     */
+    ChannelHandlerFactory* getChannelHandlerFactory();
+
 
     /**
      * destructor.
@@ -284,6 +294,8 @@ public:
      * open a channel associated a channel name.
      * it calls _link(), and net_udp4_received() is looped.
      * be careful when threading not to be reentrance.
+     * 
+     * ChannelHandler &h will be deleted in this function.
      * 
      * @param location destination to be linked.
      * @param name channel name associated to channel.
@@ -319,15 +331,15 @@ public:
 
     /**
      * start receiving packet loop.
-     * call stop() when you want to stop.
+     * call setStopFlag(1) when you want to stop.
      * 
      */
     void start();
 
     /**
-     * stop start() loop.
+     * set stopFlag that stop/continue a loop..
      */
-    void stop();
+    void setStopFlag(int flag);
 
     /**
      * run force GC . test use only. don't use it.
@@ -335,7 +347,7 @@ public:
     static void gcollect();
 
     /**
-     * stop GC. test use only. don't use it.
+     * set  GC to stop or not. test use only. don't use it.
      * @param use  0 if you do not want to use. others if not.
      */
     static void setGC(int use);

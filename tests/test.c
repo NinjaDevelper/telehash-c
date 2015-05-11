@@ -231,18 +231,20 @@ void locationTest(){
 
 void singleBroadcasteeTest(){
     
+    m2.setStopFlag(0);
     t_daemon1=std::thread([&](){
         m2.start();
     });
     LOG("location=%s",location);
     m3.addBroadcaster(location,1);
     LOG("location=%s",location);
+    m3.setStopFlag(0);
     t_daemon2=std::thread([&](){
         m3.start();
     });
     sleep(2);
-    m2.stop();
-    m3.stop();
+    m2.setStopFlag(1);
+    m3.setStopFlag(1);
     t_daemon1.join();
     t_daemon2.join();
     LOG("global IP=%s",m3.globalIP);
@@ -251,17 +253,19 @@ void singleBroadcasteeTest(){
 
     m3.setBroadcastHandler(broadcastHandler);
     
+    m2.setStopFlag(0);
     t_daemon1=std::thread([&](){
         m2.start();
     });
     status=0;
     m3.broadcast((char *)location,(char *)"{\"service\":\"farming\"}");
+    m3.setStopFlag(0);
     t_daemon2=std::thread([&](){
         m3.start();
     });
     sleep(2);
-    m2.stop();
-    m3.stop();
+    m2.setStopFlag(1);
+    m3.setStopFlag(1);
     t_daemon1.join();
     t_daemon2.join();
     ok( status==1,"broadcaster does not receive his json check.");
@@ -272,35 +276,40 @@ void singleBroadcasteeTest(){
 void multiBroadcasteeTest(int add){
     m4.setBroadcastHandler(broadcastHandler);
 
+    m2.setStopFlag(0);
     t_daemon1=std::thread([&](){
             m2.start();
     });
     m4.addBroadcaster((char *)location,add);
+    m4.setStopFlag(0);
     t_daemon2=std::thread([&](){
         m4.start();
     });
     sleep(2);
-    m2.stop();
-    m4.stop();
+    m2.setStopFlag(1);
+    m4.setStopFlag(1);
     t_daemon1.join();
     t_daemon2.join();
     MessagingTelehash::gcollect();
 
+    m4.setStopFlag(0);
     t_daemon1=std::thread([&](){
         m4.start();
     });
+    m2.setStopFlag(0);
     t_daemon3=std::thread([&](){
         m2.start();
     });
     status=0;
     m3.broadcast((char *)location,(char *)"{\"service\":\"farming\"}");
+    m3.setStopFlag(0);
     t_daemon2=std::thread([&](){
         m3.start();
     });
     sleep(2);
-    m2.stop();
-    m3.stop();
-    m4.stop();
+    m2.setStopFlag(1);
+    m3.setStopFlag(1);
+    m4.setStopFlag(1);
     t_daemon1.join();
     t_daemon2.join();
     t_daemon3.join();
@@ -322,17 +331,19 @@ void channelTest(){
     factory.addChannelHandlers((char *)"counter_test",h);
 
     status=0;
+    m2.setStopFlag(0);
     t_daemon1=std::thread([&](){
         m2.start();
     });
     m3.openChannel((char *)location,(char *)"counter_test", 
                                     *factory.createInstance("counter_test"));
+    m3.setStopFlag(0);
     t_daemon2=std::thread([&](){
         m3.start();
     });
     sleep(2);
-    m2.stop();
-    m3.stop();
+    m2.setStopFlag(1);
+    m3.setStopFlag(1);
     t_daemon1.join();
     t_daemon2.join();
     LOG("status=%d",status);

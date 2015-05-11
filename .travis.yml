@@ -10,12 +10,11 @@ before_install:
   - sudo apt-get install valgrind
   - git submodule update --init --recursive
   - make test
-#  - make python
+  - make python
   - sudo pip install cpp-coveralls coverage 
 
 script:
   - LD_LIBRARY_PATH=libtap ./test
-#  - PYTHONPATH=. python tests/test.py
   - coverage run setup.py test -a "--doctest-modules --pep8 -v tests/ MessagingTelehash/"
 
 after_success:
