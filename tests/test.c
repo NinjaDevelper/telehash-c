@@ -265,6 +265,9 @@ char *location=NULL;
 
 
 void locationTest(){
+    ChannelHandlerFactory *h=m1.getChannelHandlerFactory();
+    ok( h==&factory,"getChannelHandlerFactory check.");
+    
     //stop GC to use thread. GC is thread-unsafe.
     StorjTelehash::setGC(0);
     char *info1=m1.getMyLocation();

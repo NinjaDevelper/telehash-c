@@ -97,7 +97,6 @@ public:
      * @return a json packet that should be sent back. not be sent if NULL.
      */
 	char* handle(char *json){
-        LOG("called ch in C\n");
         return EvaluatePyObject(pyHandler, json);
 	}
     
@@ -111,7 +110,6 @@ private:
     PyObject *pyFactory = NULL;
 public:
     ChannelHandlerFactoryImpl(PyObject *pyFactory){
-        LOG("creating self\n");
         Py_XINCREF(pyFactory); 
         this->pyFactory=pyFactory;
     }
@@ -126,7 +124,6 @@ public:
         if(!PyCallable_Check(pyFactory)){
             LOG("factory is not callable object\n");
         } else {
-            LOG("creating instance\n");
             PyObject *arglist = Py_BuildValue("(s)", name.c_str());
             PyObject *pyHandler = PyObject_CallObject(pyFactory, arglist);
             Py_XDECREF(arglist); 
@@ -336,9 +333,9 @@ PyMODINIT_FUNC PyInit_telehashbinder(void){
 }
 
 #else
-
-void inittelehashbinder(void) {
-    Py_InitModule("telehashbinder", methods);
+PyMODINIT_FUNC
+inittelehashbinder(void) {
+    (void) Py_InitModule("telehashbinder", methods);
 }
 
 #endif

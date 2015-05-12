@@ -334,6 +334,7 @@ StorjTelehash::StorjTelehash(int port ,
 ChannelHandlerFactory* StorjTelehash::getChannelHandlerFactory(){
     return factories[mesh->id->hashname];
 }
+
 /*
  * location={"keys":{"1a":"aif6foqaligryvtbh4xjomjdcewgt53r3m"},
  *           "paths":[{"type":"udp4","ip":"127.0.0.1","port":45449}]}
