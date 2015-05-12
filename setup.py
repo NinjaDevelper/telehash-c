@@ -92,5 +92,5 @@ setup(
     ext_modules=[module],
     install_requires=install_requirements,
     tests_require=test_requirements,
-    keywords=['storj', 'storj-jp', 'utamaro', 'telehash']
+    keywords=['storj', 'storj platform', 'messaging layer', 'telehash']
 )
