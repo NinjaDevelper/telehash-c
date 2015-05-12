@@ -5,7 +5,7 @@ Massaging Layer in Storj Platform is used for communication between two
 parties,  e.g. sending/receiving broadcast messages, negotiating 
 service conditions, etc. Messaging layer is abstracted because many 
 communication implemenations would be usable in Storj Platform. 
-For now there is telehash-c](https://github.com/telehash/telehash-c)
+For now there is [telehash-c](https://github.com/telehash/telehash-c)
 implementation for the underlying layer.
 
 All messages are formated in JSON.
