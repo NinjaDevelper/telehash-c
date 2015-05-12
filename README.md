@@ -26,11 +26,11 @@ To run the associated tests for python:
 
 ## Usage
 
-Document for messaging layer is [here](https://rawgit.com/StorjPlatform/StorjTelehash/master/doc/html/messaging.html)
+Document for messaging layer is [here](https://rawgit.com/StorjPlatform/StorjTelehash/master/docs/html/messaging.html)
 
-Document for storjtelehash is [here](https://rawgit.com/StorjPlatform/StorjTelehash/master/doc/html/storjtelehash.html)
+Document for storjtelehash is [here](https://rawgit.com/StorjPlatform/StorjTelehash/master/docs/html/storjtelehash.html)
 
-Document for telehashbinder is [here](https://rawgit.com/StorjPlatform/StorjTelehash/master/doc/html/telehashbinder.html)
+Document for telehashbinder is [here](https://rawgit.com/StorjPlatform/StorjTelehash/master/docs/html/telehashbinder.html)
 
 # Contribution
 Improvements to the codebase and pull requests are encouraged.

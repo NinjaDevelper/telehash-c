@@ -64,6 +64,7 @@ class ChannelOpener(ChannelHandler):
         counter_opener = 9999
         return packet
 
+
 class ChannelReceiver(ChannelHandler):
 
     def seqA(self, packet):
@@ -84,6 +85,7 @@ class ChannelReceiver(ChannelHandler):
         counter_receiver = 9999
         return packet
 
+
 class TestStorjTelehash(object):
 
     def setup(self):
@@ -94,7 +96,7 @@ class TestStorjTelehash(object):
 
         loc = self.m2.get_my_location()
         self.location =  \
-            '{"keys":{"1a\":"' + json.loads(loc)['keys']['1a']  + '"},' \
+            '{"keys":{"1a\":"' + json.loads(loc)['keys']['1a'] + '"},' \
             '"paths\":[{"type":"udp4","ip":"127.0.0.1","port":1234}]}'
         logging.debug("location=" + self.location)
 

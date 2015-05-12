@@ -87,7 +87,7 @@ setup(
     author_email='utamaro.sisho@gmail.com',
     description='Messaging Layer in Telehash.',
     long_description=LONG_DESCRIPTION,
-    packages=['storjtelehash'],
+    packages=['storjtelehash', 'storj'],
     cmdclass={'test': PyTest},
     ext_modules=[module],
     install_requires=install_requirements,

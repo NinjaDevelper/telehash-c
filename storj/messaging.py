@@ -62,16 +62,16 @@ class ChannelHandler(object):
     def handle(self, packet):
         """
         call one seq* method incrementally per one packet
-        
+
         :param string packet: a received packet to be handled.
-        :return: packets to be send back. not sent if None 
+        :return: packets to be send back. not sent if None
         """
         if self.n == -1:
             return None
 
         self.next = None
         r = self.mlist[self.n](packet)
-        if self.next == None:
+        if self.next is None:
             self.n = self.n + 1
             if self.n >= len(self.mlist):
                 self.n = -1
@@ -114,7 +114,7 @@ class Messaging(object):
         get ChannelHandler instance that is associate it with a channel_name.
         This method is called when receviing channel requests.
 
-        :param str channel_name: channel name 
+        :param str channel_name: channel name
         """
         if channel_name not in self.channels.keys():
             logging.info(channel_name + ' not found')
@@ -142,7 +142,7 @@ class Messaging(object):
         This method must be overwritten.
 
         :param str location: json str where you want to request a broadcast.
-        :param  int add: if 0, request to not to  broadcast. request to 
+        :param  int add: if 0, request to not to broadcast. request to
                           broaadcast if others.
         """
         pass
