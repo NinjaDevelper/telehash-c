@@ -27,55 +27,56 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-import Messaging
-import TelehashBinder
+from storj.messaging import Messaging
+from storj.messaging import ChannelHandler
+from storjtelehash import telehashbinder
 import threading
 
 import logging
 log_fmt = '%(filename)s:%(lineno)d %(funcName)s() %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=log_fmt)
 
-class MessagingTelehash(Messaging.Messaging):
+class StorjTelehash(Messaging):
 
-    def __init__(self, broadcastHandler, port):
-        Messaging.Messaging.__init__(self, broadcastHandler)
-        self.cobj = TelehashBinder.init(port, self.getChannelHandler,
-                                        broadcastHandler)
-        self.startThread()
+    def __init__(self, broadcast_handler, port):
+        Messaging.__init__(self, broadcast_handler)
+        self.cobj = telehashbinder.init(port, self.get_channel_handler,
+                                        broadcast_handler)
+        self.start_thread()
 
-    def getMyLocation(self):
-        return TelehashBinder.getMyLocation(self.cobj)
+    def get_my_location(self):
+        return telehashbinder.get_my_location(self.cobj)
 
-    def startThread(self):
-        TelehashBinder.setStopFlag(self.cobj, 0)
+    def start_thread(self):
+        telehashbinder.set_stopflag(self.cobj, 0)
         self.thread = threading.Thread(
-            target=lambda: TelehashBinder.start(self.cobj))
+            target=lambda: telehashbinder.start(self.cobj))
         self.thread.setDaemon(True)
         self.thread.start()
 
-    def openChannel(self, location, name, handler):
-        if isinstance(handler, Messaging.ChannelHandler):
-            TelehashBinder.setStopFlag(self.cobj, 1)
+    def open_channel(self, location, name, handler):
+        if isinstance(handler, ChannelHandler):
+            telehashbinder.set_stopflag(self.cobj, 1)
             self.thread.join()
-            TelehashBinder.openChannel(self.cobj, location, name,
+            telehashbinder.open_channel(self.cobj, location, name,
                                        handler.handle)
-            self.startThread()
+            self.start_thread()
         else:
             logging.error("cannot add non ChannelHandler instance")
 
-    def addBroadcaster(self, location, add):
-        TelehashBinder.setStopFlag(self.cobj, 1)
+    def add_broadcaster(self, location, add):
+        telehashbinder.set_stopflag(self.cobj, 1)
         self.thread.join()
-        TelehashBinder.addBroadcaster(self.cobj, location, add)
-        self.startThread()
+        telehashbinder.add_broadcaster(self.cobj, location, add)
+        self.start_thread()
 
     def broadcast(self, location, message):
-        TelehashBinder.setStopFlag(self.cobj, 1)
+        telehashbinder.set_stopflag(self.cobj, 1)
         self.thread.join()
-        TelehashBinder.broadcast(self.cobj, location, message)
-        self.startThread()
+        telehashbinder.broadcast(self.cobj, location, message)
+        self.start_thread()
 
     def __del__(self):
-        TelehashBinder.setStopFlag(self.cobj, 1)
+        telehashbinder.set_stopflag(self.cobj, 1)
         self.thread.join()
-        TelehashBinder.finalize(self.cobj)
+        telehashbinder.finalize(self.cobj)

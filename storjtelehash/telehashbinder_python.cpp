@@ -26,7 +26,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "MessagingTelehash.h"
+#include "StorjTelehash.h"
 #include <Python.h>
 
 #ifndef LOG
@@ -158,7 +158,7 @@ char *pyBroadcastHandler(char *message){
     return EvaluatePyObject(pyBHandler, message);
 }
 
-static PyObject *TelehashBinder_init(PyObject *self, PyObject *args){
+static PyObject *telehashbinder_init(PyObject *self, PyObject *args){
     int port=0;
     PyObject *pyFactory=NULL;
     PyObject *broadcastHandler=NULL;
@@ -174,17 +174,16 @@ static PyObject *TelehashBinder_init(PyObject *self, PyObject *args){
         return NULL;
     }
 
-    ChannelHandlerFactoryImpl *f=
-        new ChannelHandlerFactoryImpl(pyFactory);
-    MessagingTelehash *m=new MessagingTelehash(port,*f);
     pyBHandler=broadcastHandler;
     Py_XINCREF(broadcastHandler);
-    m->setBroadcastHandler(pyBroadcastHandler);
+    ChannelHandlerFactoryImpl *f=
+        new ChannelHandlerFactoryImpl(pyFactory);
+    StorjTelehash *m=new StorjTelehash(port,*f,pyBroadcastHandler);
     PyObject *p=PyCapsule_New(m, NULL,NULL);
     return p;
 }
 
-static PyObject *TelehashBinder_openChannel(PyObject *self, 
+static PyObject *telehashbinder_openChannel(PyObject *self, 
                                                 PyObject *args){
     PyObject *cobj=NULL;
     char *location=NULL;
@@ -194,12 +193,12 @@ static PyObject *TelehashBinder_openChannel(PyObject *self,
         return NULL;
     }
     ChannelHandlerImpl *h=new ChannelHandlerImpl(handler);
-    MessagingTelehash *m=(MessagingTelehash *)PyCapsule_GetPointer(cobj,NULL);
+    StorjTelehash *m=(StorjTelehash *)PyCapsule_GetPointer(cobj,NULL);
     m->openChannel(location,channelName,*h);
     Py_RETURN_NONE;
 }
 
-static PyObject *TelehashBinder_addBroadcaster(PyObject *self, 
+static PyObject *telehashbinder_addBroadcaster(PyObject *self, 
                                                    PyObject *args){
     PyObject *cobj=NULL;
     char *location=NULL;
@@ -207,12 +206,12 @@ static PyObject *TelehashBinder_addBroadcaster(PyObject *self,
     if (!PyArg_ParseTuple(args, "Osi",&cobj,&location,&add)){
         return NULL;
     }
-    MessagingTelehash *m=(MessagingTelehash *)PyCapsule_GetPointer(cobj,NULL);
+    StorjTelehash *m=(StorjTelehash *)PyCapsule_GetPointer(cobj,NULL);
     m->addBroadcaster(location,add);
     Py_RETURN_NONE;
 }
 
-static PyObject *TelehashBinder_broadcast(PyObject *self, 
+static PyObject *telehashbinder_broadcast(PyObject *self, 
                                                    PyObject *args){
     PyObject *cobj=NULL;
     char *location=NULL;
@@ -220,13 +219,13 @@ static PyObject *TelehashBinder_broadcast(PyObject *self,
     if (!PyArg_ParseTuple(args, "Oss",&cobj,&location,&message)){
         return NULL;
     }
-    MessagingTelehash *m=(MessagingTelehash *)PyCapsule_GetPointer(cobj,NULL);
+    StorjTelehash *m=(StorjTelehash *)PyCapsule_GetPointer(cobj,NULL);
     m->broadcast(location,message);
     Py_RETURN_NONE;
 }
 
 
-static PyObject *TelehashBinder_start(PyObject *self, PyObject *args){
+static PyObject *telehashbinder_start(PyObject *self, PyObject *args){
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
 
@@ -234,7 +233,7 @@ static PyObject *TelehashBinder_start(PyObject *self, PyObject *args){
     if (!PyArg_ParseTuple(args, "O",&cobj)){
         return NULL;
     }
-    MessagingTelehash *m=(MessagingTelehash *)PyCapsule_GetPointer(cobj,NULL);
+    StorjTelehash *m=(StorjTelehash *)PyCapsule_GetPointer(cobj,NULL);
     Py_BEGIN_ALLOW_THREADS
         m->start();
     Py_END_ALLOW_THREADS
@@ -242,24 +241,24 @@ static PyObject *TelehashBinder_start(PyObject *self, PyObject *args){
     Py_RETURN_NONE;
 }
 
-static PyObject *TelehashBinder_setStopFlag(PyObject *self, PyObject *args){
+static PyObject *telehashbinder_setStopFlag(PyObject *self, PyObject *args){
     PyObject *cobj=NULL;
     int flag=0;
     if (!PyArg_ParseTuple(args, "Oi",&cobj,&flag)){
         return NULL;
     }
-    MessagingTelehash *m=(MessagingTelehash *)PyCapsule_GetPointer(cobj,NULL);
+    StorjTelehash *m=(StorjTelehash *)PyCapsule_GetPointer(cobj,NULL);
     m->setStopFlag(flag);
     Py_RETURN_NONE;
 }
 
-static PyObject *TelehashBinder_finalize(PyObject *self, 
+static PyObject *telehashbinder_finalize(PyObject *self, 
                                              PyObject *args){
     PyObject *cobj=NULL;
     if (!PyArg_ParseTuple(args, "O",&cobj)){
         return NULL;
     }
-    MessagingTelehash *m=(MessagingTelehash *)PyCapsule_GetPointer(cobj,NULL);
+    StorjTelehash *m=(StorjTelehash *)PyCapsule_GetPointer(cobj,NULL);
     ChannelHandlerFactoryImpl *h=(ChannelHandlerFactoryImpl *)
                                            m->getChannelHandlerFactory();
     delete h;
@@ -268,29 +267,29 @@ static PyObject *TelehashBinder_finalize(PyObject *self,
     Py_RETURN_NONE;
 }
 
-static PyObject *TelehashBinder_setGC(PyObject *self, 
+static PyObject *telehashbinder_setGC(PyObject *self, 
                                              PyObject *args){
     int add=0;
     if (!PyArg_ParseTuple(args, "i",&add)){
         return NULL;
     }
-    MessagingTelehash::setGC(add);
+    StorjTelehash::setGC(add);
     Py_RETURN_NONE;
 }
 
-static PyObject *TelehashBinder_gcollect(PyObject *self, 
+static PyObject *telehashbinder_gcollect(PyObject *self, 
                                              PyObject *args){
-    MessagingTelehash::gcollect();
+    StorjTelehash::gcollect();
     Py_RETURN_NONE;
 }
 
-static PyObject *TelehashBinder_getMyLocation(PyObject *self, 
+static PyObject *telehashbinder_getMyLocation(PyObject *self, 
                                              PyObject *args){
     PyObject *cobj=NULL;
     if (!PyArg_ParseTuple(args, "O",&cobj)){
         return NULL;
     }
-    MessagingTelehash *m=(MessagingTelehash *)PyCapsule_GetPointer(cobj,NULL);
+    StorjTelehash *m=(StorjTelehash *)PyCapsule_GetPointer(cobj,NULL);
     char *loc=m->getMyLocation();
     PyObject *p= Py_BuildValue("s",loc);
     free(loc);
@@ -299,25 +298,25 @@ static PyObject *TelehashBinder_getMyLocation(PyObject *self,
 
 
 static PyMethodDef methods[] = {
-    {"init", TelehashBinder_init, METH_VARARGS, 
+    {"init", telehashbinder_init, METH_VARARGS, 
         "initialize"},
-    {"openChannel", TelehashBinder_openChannel, METH_VARARGS,
+    {"open_channel", telehashbinder_openChannel, METH_VARARGS,
          "open a channel"},
-    {"addBroadcaster", TelehashBinder_addBroadcaster, METH_VARARGS,
+    {"add_broadcaster", telehashbinder_addBroadcaster, METH_VARARGS,
          "add broadcaster"},
-    {"broadcast", TelehashBinder_broadcast, METH_VARARGS,
+    {"broadcast", telehashbinder_broadcast, METH_VARARGS,
          "broadcast a message"},
-    {"start", TelehashBinder_start, METH_VARARGS,
+    {"start", telehashbinder_start, METH_VARARGS,
          "start receiving loop"},
-    {"setStopFlag", TelehashBinder_setStopFlag, METH_VARARGS,
+    {"set_stopflag", telehashbinder_setStopFlag, METH_VARARGS,
          "stop receiving loop"},
-    {"finalize", TelehashBinder_finalize, METH_VARARGS
+    {"finalize", telehashbinder_finalize, METH_VARARGS
         , "finalize C object."},
-    {"setGC", TelehashBinder_setGC, METH_VARARGS
+    {"set_gc", telehashbinder_setGC, METH_VARARGS
         , "set to run GC or not."},
-    {"gcollect", TelehashBinder_gcollect, METH_VARARGS
+    {"gcollect", telehashbinder_gcollect, METH_VARARGS
         , "run force GC."},
-    {"getMyLocation", TelehashBinder_getMyLocation, METH_VARARGS
+    {"get_my_location", telehashbinder_getMyLocation, METH_VARARGS
         , "get my location."},
     {NULL, NULL, 0, NULL}
 };
@@ -325,21 +324,21 @@ static PyMethodDef methods[] = {
 #if PY_MAJOR_VERSION >= 3
 static struct PyModuleDef modules = {
    PyModuleDef_HEAD_INIT,
-   "TelehashBinder",   /* name of module */
+   "telehashbinder",   /* name of module */
    "Messaging Layer in Telehash", /* module documentation, may be NULL */
    -1,       /* size of per-interpreter state of the module,
                 or -1 if the module keeps state in global variables. */
    methods
    };
 
-PyMODINIT_FUNC PyInit_TelehashBinder(void){
+PyMODINIT_FUNC PyInit_telehashbinder(void){
      return PyModule_Create(&modules);
 }
 
 #else
 
-void initTelehashBinder(void) {
-    Py_InitModule("TelehashBinder", methods);
+void inittelehashbinder(void) {
+    Py_InitModule("telehashbinder", methods);
 }
 
 #endif

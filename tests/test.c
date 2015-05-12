@@ -26,7 +26,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "MessagingTelehash.h"
+#include "StorjTelehash.h"
 
 #include "picojson.h"
 #include <stdio.h>
@@ -116,82 +116,157 @@ public:
     }
 };
 
-int status=0;
-int status1=0;
-TestChannelHandlerFactory factory;
-//m1 cannot connect to m2 because they share a key
-MessagingTelehash m1(0,factory);
-MessagingTelehash m2(1234,factory);
-MessagingTelehash m3(-9999,factory);
-MessagingTelehash m4(-9999,factory);
-string location_;
-char *location=NULL;
-thread t_daemon1,t_daemon2,t_daemon3;
-
-char *handler1(char *json){
-    static int n=0;
+int statusO=0;
+char *openerHandler_1(char *json){
     char *message=NULL;
    
-    if(n==0){
-        message=(char *)malloc(256);
-        strcpy(message,"{\"count\":0}");
-        status++;
-        n++;
-    }else{
-        if(n==1){
-            message=(char *)malloc(256);
-            value v1;
-            parse(v1, json);
-            double count=v1.get<object>()["count"].get<double>();
-            ok(count==0,"channel message test 0");
-            strcpy(message,"{\"count\":1}");
-            status++;
-            n++;
-        }else{
-            if(n>1){
-                status=-9999;
-            }
-        }
-    }
+    message=(char *)malloc(256);
+    strcpy(message,"{\"count\":0}");
+    statusO++;
     return message;
 }
 
+char *openerHandler_2(char *json){
 
-char *handler2(char *json){
-    static int n=0;
+    value v1;
+    parse(v1, json);
+    double count=v1.get<object>()["count"].get<double>();
+    ok(count==1,"channel message test 1");
+    statusO++;
+   
+    return NULL;
+}
 
-    if(n==0){
-        value v1;
-        parse(v1, json);
-        double count=v1.get<object>()["count"].get<double>();
-        ok(count==1,"channel message test 1");
-        status++;
-        n++;
-    }else{
-        status=-9999;
-    }    
+char *openerHandler_3(char *json){
+    statusO=-9999;
    
     return NULL;
 }
 
 
+int statusR=0;
+char *receiverHandler_1(char *json){
+    char *message=NULL;
+   
+    message=(char *)malloc(256);
+    value v1;
+    parse(v1, json);
+    double count=v1.get<object>()["count"].get<double>();
+    ok(count==0,"channel message test 0");
+    strcpy(message,"{\"count\":1}");
+    statusR++;
 
+    return message;
+}
+
+char *receiverHandler_2(char *json){
+    statusR=-9999;
+   
+    return NULL;
+}
+
+
+int statusB=0;
 char *broadcastHandler(char *json){
     LOG("json in=%s",json);
-    status++;
+    statusB++;
     value v1;
     parse(v1, json);
     string service=v1.get<object>()["service"].get<string>();
     ok( service=="farming","broadcast data check.");
-    if(status>1) return NULL;
+    if(statusB>1) return NULL;
     char *r=(char *)malloc(256);
     strcpy(r,json);
     return r;
 }
 
+char *broadcastHandlerNG(char *json){
+    ok( 0,"broadcast should not be received.");
+    char *r=(char *)malloc(256);
+    strcpy(r,json);
+    return r;
+}
+
+
+class StorjTelehash2 {
+private:
+    StorjTelehash *s;
+    thread t;
+    static vector<StorjTelehash2 *> st2;
+
+public:
+    StorjTelehash2(StorjTelehash &s){
+        this->s=&s;
+        st2.push_back(this);
+    }
+
+    void startThread(){
+        s->setStopFlag(0);
+        t=std::thread([&](){
+            s->start();
+        });
+    }
+    void stopThread(){
+        s->setStopFlag(1);
+        t.join();
+    }
+
+    void addBroadcaster(char *loc,int add){
+        stopThread();
+        s->addBroadcaster(loc,add);
+        startThread();
+    }
+    void broadcast(char *loc,char *message){
+        stopThread();
+        s->broadcast(loc,message);
+        startThread();
+    }
+    void openChannel(char *loc,char *name, ChannelHandler &handler){
+        stopThread();
+        s->openChannel(loc,name,handler);
+        startThread();
+    }
+    static void stopAll(){
+        vector<StorjTelehash2 *>::iterator it = st2.begin();
+        while( it != st2.end() ){
+            (*it)->stopThread();
+            it++;
+        }
+    }
+    static void startAll(){
+        vector<StorjTelehash2 *>::iterator it = st2.begin();
+        while( it != st2.end() ){
+            (*it)->startThread();
+            it++;
+        }
+    }
+    static void gcollect(){
+        StorjTelehash2::stopAll();
+        StorjTelehash::gcollect();
+        StorjTelehash2::startAll();
+    }
+};
+
+vector<StorjTelehash2 *> StorjTelehash2::st2;
+
+TestChannelHandlerFactory factory;
+//m1 cannot connect to m2 because they share a key
+StorjTelehash m1(0,factory,broadcastHandler);
+StorjTelehash m2(1234,factory,broadcastHandler);
+StorjTelehash m3(-9999,factory,broadcastHandlerNG);
+StorjTelehash m4(-9999,factory,broadcastHandler);
+StorjTelehash2 s2(m2);
+StorjTelehash2 s3(m3);
+StorjTelehash2 s4(m4);
+
+
+string location_;
+char *location=NULL;
+
+
 void locationTest(){
     //stop GC to use thread. GC is thread-unsafe.
-    MessagingTelehash::setGC(0);
+    StorjTelehash::setGC(0);
     char *info1=m1.getMyLocation();
     char *info2=m2.getMyLocation();
     LOG("info %s",info2);
@@ -226,129 +301,71 @@ void locationTest(){
     location=(char *)location_.c_str();
     free(info1);
     free(info2);
-
 }
 
+
+
 void singleBroadcasteeTest(){
-    
-    m2.setStopFlag(0);
-    t_daemon1=std::thread([&](){
-        m2.start();
-    });
+    s2.startThread();
+    s3.startThread();
+    s4.startThread();
+
+    s3.addBroadcaster(location,1);
     LOG("location=%s",location);
-    m3.addBroadcaster(location,1);
-    LOG("location=%s",location);
-    m3.setStopFlag(0);
-    t_daemon2=std::thread([&](){
-        m3.start();
-    });
+
     sleep(2);
-    m2.setStopFlag(1);
-    m3.setStopFlag(1);
-    t_daemon1.join();
-    t_daemon2.join();
     LOG("global IP=%s",m3.globalIP);
     ok( !strcmp(m3.globalIP,"127.0.0.1"),"addBroadcaster check.");
-    MessagingTelehash::gcollect();
+    StorjTelehash2::gcollect();
 
-    m3.setBroadcastHandler(broadcastHandler);
-    
-    m2.setStopFlag(0);
-    t_daemon1=std::thread([&](){
-        m2.start();
-    });
-    status=0;
-    m3.broadcast((char *)location,(char *)"{\"service\":\"farming\"}");
-    m3.setStopFlag(0);
-    t_daemon2=std::thread([&](){
-        m3.start();
-    });
+    statusB=0;
+    s3.broadcast((char *)location,(char *)"{\"service\":\"farming\"}");
     sleep(2);
-    m2.setStopFlag(1);
-    m3.setStopFlag(1);
-    t_daemon1.join();
-    t_daemon2.join();
-    ok( status==1,"broadcaster does not receive his json check.");
+    ok( statusB==1,"broadcaster does not receive his json check.");
     //bacause of stopping GC, run it manually.
-    MessagingTelehash::gcollect();
+    StorjTelehash2::gcollect();
 }
 
 void multiBroadcasteeTest(int add){
-    m4.setBroadcastHandler(broadcastHandler);
-
-    m2.setStopFlag(0);
-    t_daemon1=std::thread([&](){
-            m2.start();
-    });
-    m4.addBroadcaster((char *)location,add);
-    m4.setStopFlag(0);
-    t_daemon2=std::thread([&](){
-        m4.start();
-    });
+    s4.addBroadcaster((char *)location,add);
     sleep(2);
-    m2.setStopFlag(1);
-    m4.setStopFlag(1);
-    t_daemon1.join();
-    t_daemon2.join();
-    MessagingTelehash::gcollect();
+    StorjTelehash2::gcollect();
 
-    m4.setStopFlag(0);
-    t_daemon1=std::thread([&](){
-        m4.start();
-    });
-    m2.setStopFlag(0);
-    t_daemon3=std::thread([&](){
-        m2.start();
-    });
-    status=0;
-    m3.broadcast((char *)location,(char *)"{\"service\":\"farming\"}");
-    m3.setStopFlag(0);
-    t_daemon2=std::thread([&](){
-        m3.start();
-    });
+    statusB=0;
+    s3.broadcast((char *)location,(char *)"{\"service\":\"farming\"}");
     sleep(2);
-    m2.setStopFlag(1);
-    m3.setStopFlag(1);
-    m4.setStopFlag(1);
-    t_daemon1.join();
-    t_daemon2.join();
-    t_daemon3.join();
     if(add){
-        ok( status==2,"broadcastee received another's json check.");
+        ok( statusB==2,"broadcastee received another's json check.");
     }else{
-        ok( status==1,"broadcastee didn't receive another's json check"
+        ok( statusB==1,"broadcastee didn't receive another's json check"
                       "after removing broadcaster");
     }        
-    MessagingTelehash::gcollect();
+    StorjTelehash2::gcollect();
 }
 
 
 void channelTest(){
-    vector<CHANNEL_HANDLER> h;
-    h.push_back(handler1);
-    h.push_back(handler2);
+    vector<CHANNEL_HANDLER> h1;
+    h1.push_back(receiverHandler_1);
+    h1.push_back(receiverHandler_2);
     
-    factory.addChannelHandlers((char *)"counter_test",h);
+    factory.addChannelHandlers((char *)"counter_test",h1);
 
-    status=0;
-    m2.setStopFlag(0);
-    t_daemon1=std::thread([&](){
-        m2.start();
-    });
-    m3.openChannel((char *)location,(char *)"counter_test", 
-                                    *factory.createInstance("counter_test"));
-    m3.setStopFlag(0);
-    t_daemon2=std::thread([&](){
-        m3.start();
-    });
+    vector<CHANNEL_HANDLER> h2;
+    h2.push_back(openerHandler_1);
+    h2.push_back(openerHandler_2);
+    h2.push_back(openerHandler_3);
+    TestChannelHandler *tch=new TestChannelHandler(h2);
+
+    statusO=0;
+    statusR=0;
+    s3.openChannel((char *)location,(char *)"counter_test", *tch);
     sleep(2);
-    m2.setStopFlag(1);
-    m3.setStopFlag(1);
-    t_daemon1.join();
-    t_daemon2.join();
-    LOG("status=%d",status);
-    ok( status==3,"channel check.");
-    MessagingTelehash::gcollect();
+    LOG("receiver status=%d",statusR);
+    LOG("opener status=%d",statusO);
+    ok( statusO==2,"channel opener check.");
+    ok( statusR==1,"channel reciever check.");
+    StorjTelehash2::gcollect();
 }
 
 int main (int argc, char *argv[]) {
@@ -358,7 +375,10 @@ int main (int argc, char *argv[]) {
     multiBroadcasteeTest(1);
     multiBroadcasteeTest(0);
     channelTest();
-    MessagingTelehash::setGC(1);
+
+    StorjTelehash2::stopAll();
+
+    StorjTelehash::setGC(1);
 
     done_testing();
 

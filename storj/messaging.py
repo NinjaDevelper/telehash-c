@@ -42,9 +42,9 @@ class ChannelHandler(object):
         self.next = None
         self.mlist = []
         self.n = 0
-        self.getSequences()
+        self.get_sequences()
 
-    def getSequences(self):
+    def get_sequences(self):
         for name in dir(self):
             if name.startswith("seq"):
                 seq = getattr(self, name)
@@ -72,25 +72,25 @@ class Messaging(object):
     def __init__(self, broadcastHandler):
         self.channels = {}
 
-    def addChannelHandler(self, channelName, handlerClass):
-        if issubclass(handlerClass, ChannelHandler):
-            self.channels[channelName] = handlerClass
+    def add_channel_handler(self, channel_name, handler_class):
+        if issubclass(handler_class, ChannelHandler):
+            self.channels[channel_name] = handler_class
         else:
             logging.error("cannot add non ChannelHandler subclass")
 
-    def getChannelHandler(self, channelName):
-        if channelName not in self.channels.keys():
-            logging.info(channelName + ' not found')
+    def get_channel_handler(self, channel_name):
+        if channel_name not in self.channels.keys():
+            logging.info(channel_name + ' not found')
             return None
 
-        return self.channels[channelName]().handle
+        return self.channels[channel_name]().handle
 
     @abstractmethod
-    def openChannel(self, location, name, handler):
+    def open_channel(self, location, name, handler):
         pass
 
     @abstractmethod
-    def addBroadcaster(self, location, add):
+    def add_broadcaster(self, location, add):
         pass
 
     @abstractmethod
@@ -98,5 +98,5 @@ class Messaging(object):
         pass
 
     @abstractmethod
-    def getMyLocation(serl):
+    def get_my_location(serl):
         pass

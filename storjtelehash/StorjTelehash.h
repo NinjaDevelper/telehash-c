@@ -26,8 +26,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _MESSAGINGTELEHASH_H_
-#define _MESSAGINGTELEHASH_H_
+#ifndef _StorjTelehash_H_
+#define _StorjTelehash_H_
 
 #include <vector>  
 #include <string>  
@@ -47,6 +47,8 @@ extern "C"{
 #endif
 
 using namespace std;
+
+typedef char * (*CHANNEL_HANDLER)(char *json);
 
 /**
  * Class for handling  received packets in telehash-c channel.
@@ -95,16 +97,17 @@ public:
  /**
   * class for managing telehash-c.
   * 
-  * Make sure not to make more than one instance. These would not work fine 
-  * because most of informations are shared among these insntances. Many
-  * nasty hacks are needed to handle multi instnaces.
+  * Everything is not thread safe. Call a function after stopoping
+  *  start() loop by setStopFlag(1).
+  * It is NOT recommended to make more than one instance. If you want to do so
+  * (e.g. for test use), use setGC(0) to stop GC.
   */
-class MessagingTelehash{
+class StorjTelehash{
 private:
     /**
      * registered factory instance that creates ChannelHander instance.
      */
-    static ChannelHandlerFactory *factory;
+    static map<string,ChannelHandlerFactory*> factories;
 
     /**
      * telehash-c mesh.
@@ -144,7 +147,7 @@ private:
     /**
      * handler when receving a broadcast.
      */
-    static char * (*broadcastHandler)(char *json) ;
+    static map<string, CHANNEL_HANDLER> broadcastHandlers ;
     
     /**
      * determin whethere adr is local or not.
@@ -262,10 +265,17 @@ public:
     /**
      * constructor.
      * 
-     * @param port port number to be listened packets.
+     * If id.json including hashname is not existed,it will be created.
+     * Instances are always created based on id.json except port=-9999.
+     * Never use port=-9999 except for test use.
+     * 
+     * @param port port number to be listened packets. if 0, port number is 
+     *         selected randomly.
      * @param factory ChannelHanderFactory instance.
+     * @param broadcastHandler handler method for broadcasts 
      */
-    MessagingTelehash(int port,ChannelHandlerFactory &factory);
+    StorjTelehash(int port,ChannelHandlerFactory &factory, 
+                       char *(* broadcastHandler)(char *json));
 
     /**
      * get registered ChannelHandlerFactory.
@@ -279,7 +289,7 @@ public:
      * destructor.
      * free some telehash-c stuffs.
      */
-    ~MessagingTelehash();
+    ~StorjTelehash();
 
     /**
      * return my location information. format is:
@@ -313,13 +323,6 @@ public:
      * @param add 0 if removing. others if adding.
      */
     void addBroadcaster(char *location,int add);
-
-    /**
-     * set a handler that handles messages when receiving broadcasts.
-     * 
-     * @param json broadcasted message.
-     */
-    void setBroadcastHandler(char * (&bc)(char *json) );
 
     /**
      * broadcast a packet.

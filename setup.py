@@ -47,19 +47,14 @@ test_requirements = [
 ]
 
 
-module = Extension('TelehashBinder',
-                   ['MessagingTelehash/TelehashBinder_python.cpp',
-                    'MessagingTelehash/MessagingTelehash.cpp'],
+module = Extension('storjtelehash.telehashbinder',
+                   ['storjtelehash/telehashbinder_python.cpp',
+                    'storjtelehash/StorjTelehash.cpp'],
                    libraries=['telehash'],
                    include_dirs=['telehash-c/unix', 'telehash-c/include',
-                                 'MessagingTelehash'],
+                                 'storjtelehash'],
                    library_dirs=['telehash-c'],
                    )
-
-
-setup(name='TelehashBinder',
-      ext_modules=[module],
-      )
 
 
 class PyTest(TestCommand):
@@ -82,16 +77,18 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 setup(
-    name='TelehashBinder',
+    name='storjtelehash',
     version=VERSION,
-    url='https://github.com/MessagingTelehash/MessagingTelehash',
-    download_url='https://github.com/StorjPlatform/MessagingTelehash/tarball/'
+    url='https://github.com/StorjPlatform/StorjTelehash',
+    download_url='https://github.com/StorjPlatform/StorjTelehash/tarball/'
     + VERSION,
     license=open('LICENSE').read(),
-    author='Utamaro',
+    author='Shinya Yagyu',
     author_email='utamaro.sisho@gmail.com',
     description='Messaging Layer in Telehash.',
     long_description=LONG_DESCRIPTION,
+    packages=['storjtelehash'],
+    cmdclass={'test': PyTest},
     ext_modules=[module],
     install_requires=install_requirements,
     tests_require=test_requirements,

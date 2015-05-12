@@ -28,9 +28,10 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-import Messaging
-from MessagingTelehash import MessagingTelehash
-import TelehashBinder
+from storj.messaging import Messaging
+from storj.messaging import ChannelHandler
+from storjtelehash.storjtelehash import StorjTelehash
+from storjtelehash import telehashbinder
 import json
 import pytest
 import time
@@ -43,7 +44,7 @@ counter_opener = 0
 counter_receiver = 0
 
 
-class ChannelOpener(Messaging.ChannelHandler):
+class ChannelOpener(ChannelHandler):
 
     def seqA(self, packet):
         logging.debug('called openerA')
@@ -59,8 +60,11 @@ class ChannelOpener(Messaging.ChannelHandler):
         assert j['count'] == 1
         return None
 
+    def seqC(self, packet):
+        counter_opener = 9999
+        return packet
 
-class ChannelReceiver(Messaging.ChannelHandler):
+class ChannelReceiver(ChannelHandler):
 
     def seqA(self, packet):
         logging.debug('called receiverA')
@@ -74,26 +78,27 @@ class ChannelReceiver(Messaging.ChannelHandler):
         logging.debug('called receiverB message='+packet)
         global counter_receiver
         counter_receiver = counter_receiver + 1
-        counter = counter + 1
         return packet
 
+    def seqC(self, packet):
+        counter_receiver = 9999
+        return packet
 
-class TestMessagingTelehash(object):
+class TestStorjTelehash(object):
 
     def setup(self):
-        TelehashBinder.setGC(0)
-        self.m3 = MessagingTelehash(self.broadcastHandler, -9999)
-        self.m4 = MessagingTelehash(self.broadcastHandler, -9999)
-        # a channel handler will be overwritten. only last one is valid.
-        self.m2 = MessagingTelehash(self.broadcastHandler, 1234)
+        telehashbinder.set_gc(0)
+        self.m2 = StorjTelehash(self.broadcast_handler, 1234)
+        self.m3 = StorjTelehash(self.broadcast_handler, -9999)
+        self.m4 = StorjTelehash(self.broadcast_handler, -9999)
 
-        loc = self.m2.getMyLocation()
+        loc = self.m2.get_my_location()
         self.location =  \
             '{"keys":{"1a\":"' + json.loads(loc)['keys']['1a']  + '"},' \
             '"paths\":[{"type":"udp4","ip":"127.0.0.1","port":1234}]}'
         logging.debug("location=" + self.location)
 
-    def broadcastHandler(self, packet):
+    def broadcast_handler(self, packet):
         j = json.loads(packet)
         assert j['service'] == 'farming%d' % (self.status)
         self.status = self.status + 1
@@ -103,16 +108,16 @@ class TestMessagingTelehash(object):
         j['service'] = "farming%d" % (self.status)
         return json.dumps(j)
 
-    def test_MessagingTelehash(self):
+    def test_storjtelehash(self):
         self.status = 0
-        self.m4.addBroadcaster(self.location, 1)
+        self.m4.add_broadcaster(self.location, 1)
         self.m3.broadcast(self.location, '{"service":"farming0"}')
         time.sleep(2)
         assert self.status == 2
 
         self.status = 0
-        self.m2.addChannelHandler('counter_test', ChannelReceiver)
-        self.m3.openChannel(self.location, 'counter_test', ChannelOpener())
+        self.m2.add_channel_handler('counter_test', ChannelReceiver)
+        self.m3.open_channel(self.location, 'counter_test', ChannelOpener())
         time.sleep(2)
         assert counter_opener == 2
         assert counter_receiver == 1

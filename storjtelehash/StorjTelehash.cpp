@@ -38,17 +38,17 @@
 #include <netdb.h>
 
 #include <string> 
-#include "MessagingTelehash.h"
+#include "StorjTelehash.h"
 
-int MessagingTelehash::status=0;
-int MessagingTelehash::count=0;
-link_t MessagingTelehash::targetLink=NULL;
-list<link_t> MessagingTelehash::broadcastee;
-char * (*MessagingTelehash::broadcastHandler)(char *json)  ;
-char MessagingTelehash::globalIP[3*4+3+1]; ;
-ChannelHandlerFactory *MessagingTelehash::factory;
+int StorjTelehash::status=0;
+int StorjTelehash::count=0;
+link_t StorjTelehash::targetLink=NULL;
+list<link_t> StorjTelehash::broadcastee;
+map<string,CHANNEL_HANDLER> StorjTelehash::broadcastHandlers;
+char StorjTelehash::globalIP[3*4+3+1]; ;
+map<string,ChannelHandlerFactory *> StorjTelehash::factories;
 
-int MessagingTelehash::isLocal(char *adr){
+int StorjTelehash::isLocal(char *adr){
     if(!strcmp(adr,"127.0.0.1") || !strncmp(adr,"10.",3) 
         || !strncmp(adr,"192.168.",7)) return 1;
     if(!strncmp(adr,"172.",4) && adr[6]=='.'){
@@ -60,7 +60,7 @@ int MessagingTelehash::isLocal(char *adr){
     return 0;
 }
 
-char *MessagingTelehash::getGlobalIP(char *ip){
+char *StorjTelehash::getGlobalIP(char *ip){
     struct ifreq ifr[100];
     struct ifconf ifc;
     int fd;
@@ -96,7 +96,7 @@ char *MessagingTelehash::getGlobalIP(char *ip){
  * "keys":{"1a":"al45izsjxe2sikv7mc6jpnwywybbkqvsou"},
  *         "paths":[{"type":"udp4","ip":"127.0.0.1","port":1234}]}
 */
-char *MessagingTelehash::getMyLocation(){
+char *StorjTelehash::getMyLocation(){
 	char ip[3*4+3+1];
     size_t len = 3; // []\0
     char *paths;
@@ -134,7 +134,7 @@ char *MessagingTelehash::getMyLocation(){
     return info;
 }
 
-int MessagingTelehash::writeID(){
+int StorjTelehash::writeID(){
     lob_t options = lob_new();
     e3x_init(options);
 
@@ -159,14 +159,14 @@ int MessagingTelehash::writeID(){
     return 0;
 }
 
-void MessagingTelehash::onLink(link_t link){
+void StorjTelehash::onLink(link_t link){
     if(link==targetLink && link_up(link)){
         LOG("linked up");
         status=1;
     }
 }
 
-void MessagingTelehash::sendOnChannel(link_t link, e3x_channel_t chan,
+void StorjTelehash::sendOnChannel(link_t link, e3x_channel_t chan,
                                       lob_t packet,ChannelHandler *ch){
     if(!lob_get_cmp(packet,(char *)"end",(char *)"true")) {
         LOG("pointer delteted=%p",ch);
@@ -192,7 +192,7 @@ void MessagingTelehash::sendOnChannel(link_t link, e3x_channel_t chan,
     free(json);
 }                                          
 
-void MessagingTelehash::serviceOnOpenHandler(link_t link, e3x_channel_t chan,
+void StorjTelehash::serviceOnOpenHandler(link_t link, e3x_channel_t chan,
      void *arg){
     ChannelHandler* ch=(ChannelHandler *)arg;
     lob_t packet = e3x_channel_receiving(chan);
@@ -200,9 +200,10 @@ void MessagingTelehash::serviceOnOpenHandler(link_t link, e3x_channel_t chan,
     lob_free(packet);
 }
 
-lob_t MessagingTelehash::serviceOnOpen(link_t link,lob_t open){
+lob_t StorjTelehash::serviceOnOpen(link_t link,lob_t open){
     if(!link || !open) return open;
     char *type=(char *)lob_get(open,(char *)"type");
+    ChannelHandlerFactory *factory=factories[link->mesh->id->hashname];
     ChannelHandler *c=factory->createInstance(type);
     if(!c) return open;
     LOG("pointer=%p",c);
@@ -221,14 +222,14 @@ typedef struct pipe_udp4_struct
   net_udp4_t net;
 } *pipe_udp4_t;
 
-void MessagingTelehash::addBroadcasterHandler(link_t link, e3x_channel_t chan,
+void StorjTelehash::addBroadcasterHandler(link_t link, e3x_channel_t chan,
      void *arg){
     lob_t packet = e3x_channel_receiving(chan);
     strcpy(globalIP,lob_get(packet,(char *)"IP"));
     lob_free(packet);
 }
 
-lob_t MessagingTelehash::signupOnOpen(link_t link,lob_t open){
+lob_t StorjTelehash::signupOnOpen(link_t link,lob_t open){
     if(!link || !open || lob_get_cmp(open,(char *)"type",
         (char *)"signup"))
        return open;
@@ -257,12 +258,14 @@ lob_t MessagingTelehash::signupOnOpen(link_t link,lob_t open){
     return NULL;
 }
 
-lob_t MessagingTelehash::broadcastOnOpen(link_t link,lob_t open){
+lob_t StorjTelehash::broadcastOnOpen(link_t link,lob_t open){
     if(!link || !open || lob_get_cmp(open,(char *)"type",
         (char *)"broadcast"))
        return open;
     lob_t data=lob_get_json(open,(char *)"data");
     char *j=lob_json(data);
+    LOG("%p",link->mesh);
+    CHANNEL_HANDLER broadcastHandler=broadcastHandlers[link->mesh->id->hashname];
     char *json_=broadcastHandler(j);
     if(json_){
         list<link_t>::iterator it = broadcastee.begin();
@@ -286,11 +289,10 @@ lob_t MessagingTelehash::broadcastOnOpen(link_t link,lob_t open){
     return NULL;
 }
 
-MessagingTelehash::MessagingTelehash(int port ,
-    ChannelHandlerFactory &factory){
+StorjTelehash::StorjTelehash(int port ,
+    ChannelHandlerFactory &factory, char * (*broadcastHandler)(char *json)){
 
     globalIP[0]='\0';
-    this->factory = &factory;
     lob_t id = util_fjson((char *)"id.json");
     if(!id){
         writeID();
@@ -309,6 +311,8 @@ MessagingTelehash::MessagingTelehash(int port ,
         lob_free(k);
         lob_free(s);
     }
+    this->factories[mesh->id->hashname] = &factory;
+    broadcastHandlers[mesh->id->hashname]=broadcastHandler;
     mesh_on_discover(mesh,(char *)"auto",mesh_add); 
     mesh_on_link(mesh, (char *)"onLink", onLink);
     mesh_on_open(mesh,(char *)"service",serviceOnOpen);
@@ -327,14 +331,14 @@ MessagingTelehash::MessagingTelehash(int port ,
     count++;
 }
 
-ChannelHandlerFactory* MessagingTelehash::getChannelHandlerFactory(){
-    return factory;
+ChannelHandlerFactory* StorjTelehash::getChannelHandlerFactory(){
+    return factories[mesh->id->hashname];
 }
 /*
  * location={"keys":{"1a":"aif6foqaligryvtbh4xjomjdcewgt53r3m"},
  *           "paths":[{"type":"udp4","ip":"127.0.0.1","port":45449}]}
 */
-link_t MessagingTelehash::_link(char *location){
+link_t StorjTelehash::_link(char *location){
     LOG("%s",location);
     lob_t loc=lob_new();
     lob_head(loc,(uint8_t *)location,strlen(location));
@@ -360,7 +364,7 @@ link_t MessagingTelehash::_link(char *location){
     return link;
 }
 
-void MessagingTelehash::openChannel(char *location, char *name,
+void StorjTelehash::openChannel(char *location, char *name,
                                      ChannelHandler &h){
     link_t link=_link(location);
     lob_t options = lob_new();
@@ -375,7 +379,7 @@ void MessagingTelehash::openChannel(char *location, char *name,
     //options is freed in link_flush
 }
 
-void MessagingTelehash::addBroadcaster(char *location,int add){
+void StorjTelehash::addBroadcaster(char *location,int add){
     link_t link=_link(location);
     lob_t options = lob_new();
     lob_set(options,(char *)"type",(char *)"signup");
@@ -391,11 +395,8 @@ void MessagingTelehash::addBroadcaster(char *location,int add){
     //options is freed in link_flush
 }
 
-void MessagingTelehash::setBroadcastHandler(char * (&bc)(char *json) ){
-    broadcastHandler=&bc;
-}
 
-void MessagingTelehash::broadcast(char *location, char *json){
+void StorjTelehash::broadcast(char *location, char *json){
     link_t link=_link(location);
     lob_t options = lob_new();
     lob_set(options,(char *)"type",(char *)"broadcast");
@@ -407,19 +408,19 @@ void MessagingTelehash::broadcast(char *location, char *json){
     //options is freed in link_flush
 }
 
-void MessagingTelehash::setStopFlag(int flag){
+void StorjTelehash::setStopFlag(int flag){
     stopFlag=flag;
 }
-void MessagingTelehash::start(){
+void StorjTelehash::start(){
     while(!stopFlag && net_udp4_receive(udp4));
 }	
 
-int MessagingTelehash::_isLocalTest(char *adr){
+int StorjTelehash::_isLocalTest(char *adr){
     return isLocal(adr);
 }	
 
 
-MessagingTelehash::~MessagingTelehash(){
+StorjTelehash::~StorjTelehash(){
     net_udp4_free(udp4);
     mesh_free(mesh);
 #ifndef __NO_TGC__
@@ -429,13 +430,13 @@ MessagingTelehash::~MessagingTelehash(){
 #endif
 }	
 
-void MessagingTelehash::setGC(int use){
+void StorjTelehash::setGC(int use){
 #ifndef __NO_TGC__
     tgc_setGC(use);
 #endif
 }
 
-void MessagingTelehash::gcollect(){
+void StorjTelehash::gcollect(){
 #ifndef __NO_TGC__
     tgc_gcollect_force();
 #endif
