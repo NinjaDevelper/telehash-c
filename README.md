@@ -26,6 +26,8 @@ To run the associated tests for python:
 
 ## Usage
 
+Explanation about messaging layer is [here](Messaging.md).
+
 Document for messaging layer is [here](https://rawgit.com/StorjPlatform/StorjTelehash/master/docs/html/messaging.html)
 
 Document for storjtelehash is [here](https://rawgit.com/StorjPlatform/StorjTelehash/master/docs/html/storjtelehash.html)
