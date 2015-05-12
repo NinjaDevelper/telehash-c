@@ -36,8 +36,14 @@ logging.basicConfig(level=logging.DEBUG, format=log_fmt)
 
 
 class ChannelHandler(object):
+    """
+    Class for handling  received packets in channels.
+    This instance is called when receving broadcasts and channel packets.
+    """
 
     def __init__(self):
+        """init. store all seq* methods to list."""
+
         self.count = 0
         self.next = None
         self.mlist = []
@@ -45,6 +51,8 @@ class ChannelHandler(object):
         self.get_sequences()
 
     def get_sequences(self):
+        """store all seq* methods to list."""
+
         for name in dir(self):
             if name.startswith("seq"):
                 seq = getattr(self, name)
@@ -52,6 +60,12 @@ class ChannelHandler(object):
                     self.mlist.append(seq)
 
     def handle(self, packet):
+        """
+        call one seq* method incrementally per one packet
+        
+        :param string packet: a received packet to be handled.
+        :return: packets to be send back. not sent if None 
+        """
         if self.n == -1:
             return None
 
@@ -67,18 +81,41 @@ class ChannelHandler(object):
 
 
 class Messaging(object):
+    """
+    Abstract layer of Storj messaging.
+    Every class handling Storj messaging must inherit it.
+    """
     __metaclass__ = ABCMeta
 
     def __init__(self, broadcastHandler):
+        """
+   　　　　　init.
+
+       :param ChannelHandler broadcastHandler: a received packet to be handled.
+       do nothing to this parameter.
+        """
         self.channels = {}
 
     def add_channel_handler(self, channel_name, handler_class):
+        """
+        add ChannelHandler class object and associate it with a channel name.
+
+        :param Class handler_class: ChannelHandler class to be associated
+        with
+        :param str channel_name: channel name that is associated with.
+        """
         if issubclass(handler_class, ChannelHandler):
             self.channels[channel_name] = handler_class
         else:
             logging.error("cannot add non ChannelHandler subclass")
 
     def get_channel_handler(self, channel_name):
+        """
+        get ChannelHandler instance that is associate it with a channel_name.
+        This method is called when receviing channel requests.
+
+        :param str channel_name: channel name 
+        """
         if channel_name not in self.channels.keys():
             logging.info(channel_name + ' not found')
             return None
@@ -87,16 +124,47 @@ class Messaging(object):
 
     @abstractmethod
     def open_channel(self, location, name, handler):
+        """
+        open a channel with a handler.
+        This method must be overwritten.
+
+        :param str location: json str where you want to open a channel.
+        :param str name: channel name that you want to open .
+        :param ChannelHandler handler: channel handler.
+        """
         pass
 
     @abstractmethod
     def add_broadcaster(self, location, add):
+        """
+        send a broadcast request to broadcaster.
+        After calling this method, broadcast messages will be send continually.
+        This method must be overwritten.
+
+        :param str location: json str where you want to request a broadcast.
+        :param  int add: if 0, request to not to  broadcast. request to 
+                          broaadcast if others.
+        """
         pass
 
     @abstractmethod
-    def broadcast(serl, location, message):
+    def broadcast(self, location, message):
+        """
+        broadcast a message. This method must be overwritten.
+
+        :param str location: json str where you want to send a broadcast.
+        :param str message: broadcast message.
+        """
         pass
 
     @abstractmethod
-    def get_my_location(serl):
+    def get_my_location(self):
+        """
+        get json str that represents my location.
+        str depends on the underlaying layer.
+        This method must be overwritten.
+
+        :return: location str. format depends on underlaying layer.
+                 e.g. telehash, etc.
+        """
         pass

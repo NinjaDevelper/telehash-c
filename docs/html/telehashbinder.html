@@ -1,0 +1,296 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>telehashbinder module &mdash; .  documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title=".  documentation" href="index.html" />
+    <link rel="next" title="messaging module" href="messaging.html" />
+    <link rel="prev" title="storjtelehash module" href="storjtelehash.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="messaging.html" title="messaging module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="storjtelehash.html" title="storjtelehash module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">.  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-telehashbinder">
+<span id="telehashbinder-module"></span><h1>telehashbinder module<a class="headerlink" href="#module-telehashbinder" title="Permalink to this headline">¶</a></h1>
+<p>telehash binder implmeneted in C++.</p>
+<dl class="function">
+<dt id="telehashbinder.add_broadcaster">
+<tt class="descclassname">telehashbinder.</tt><tt class="descname">add_broadcaster</tt><big>(</big><em>cobj</em>, <em>location</em>, <em>add</em><big>)</big><a class="reference internal" href="_modules/telehashbinder.html#add_broadcaster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telehashbinder.add_broadcaster" title="Permalink to this definition">¶</a></dt>
+<dd><p>send a broadcast request to broadcaster.
+After calling this method, broadcast messages will be send continually.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>cobj</strong> (<em>Object</em>) &#8211; pointer of StorjTelehash instnace returned by init()</li>
+<li><strong>location</strong> (<em>str</em>) &#8211; json str where you want to request a broadcast.</li>
+<li><strong>add</strong> (<em>int</em>) &#8211; if 0, request to not to  broadcast. request to broaadcast
+if others.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="telehashbinder.broadcast">
+<tt class="descclassname">telehashbinder.</tt><tt class="descname">broadcast</tt><big>(</big><em>cobj</em>, <em>location</em>, <em>message</em><big>)</big><a class="reference internal" href="_modules/telehashbinder.html#broadcast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telehashbinder.broadcast" title="Permalink to this definition">¶</a></dt>
+<dd><p>broadcast a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>cobj</strong> (<em>Object</em>) &#8211; pointer of StorjTelehash instnace returned by init()</li>
+<li><strong>location</strong> (<em>str</em>) &#8211; json str where you want to send a broadcast.</li>
+<li><strong>message</strong> (<em>str</em>) &#8211; broadcast message.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="telehashbinder.finalize">
+<tt class="descclassname">telehashbinder.</tt><tt class="descname">finalize</tt><big>(</big><em>cobj</em><big>)</big><a class="reference internal" href="_modules/telehashbinder.html#finalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telehashbinder.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>destructor.
+delete factory, StorjTelehash instnace, and broadcasthandler.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cobj</strong> (<em>Object</em>) &#8211; pointer of StorjTelehash instnace returned by init()</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="telehashbinder.gcollect">
+<tt class="descclassname">telehashbinder.</tt><tt class="descname">gcollect</tt><big>(</big><em>cobj</em><big>)</big><a class="reference internal" href="_modules/telehashbinder.html#gcollect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telehashbinder.gcollect" title="Permalink to this definition">¶</a></dt>
+<dd><p>run force garbage collect.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cobj</strong> (<em>Object</em>) &#8211; pointer of StorjTelehash instnace returned by init()</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="telehashbinder.get_my_location">
+<tt class="descclassname">telehashbinder.</tt><tt class="descname">get_my_location</tt><big>(</big><em>cobj</em><big>)</big><a class="reference internal" href="_modules/telehashbinder.html#get_my_location"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telehashbinder.get_my_location" title="Permalink to this definition">¶</a></dt>
+<dd><p>return my location information. format is:</p>
+<p>{&#8220;keys&#8221;:{&#8220;1a&#8221;:&#8221;al45izsjxe2sikv7mc6jpnwywybbkqvsou&#8221;},
+paths&#8221;:[{&#8220;type&#8221;:&#8221;udp4&#8221;,&#8221;ip&#8221;:&#8221;127.0.0.1&#8221;,&#8221;port&#8221;:1234}]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cobj</strong> (<em>Object</em>) &#8211; pointer of StorjTelehash instnace returned by init()</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">location info.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="telehashbinder.init">
+<tt class="descclassname">telehashbinder.</tt><tt class="descname">init</tt><big>(</big><em>port</em>, <em>channel__handler_factory</em>, <em>broadcast_handler</em><big>)</big><a class="reference internal" href="_modules/telehashbinder.html#init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telehashbinder.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>init.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>port</strong> (<em>int</em>) &#8211; port number to be listened packets. if 0, port number is</li>
+<li><strong>channel_handler_factory</strong> (<em>Method</em>) &#8211; method for creating ChannelHandler.
+called when requested openning 
+channel.</li>
+<li><strong>broadcast_handler</strong> (<em>method</em>) &#8211; method for handling broadcasted message.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="telehashbinder.open_channel">
+<tt class="descclassname">telehashbinder.</tt><tt class="descname">open_channel</tt><big>(</big><em>cobj</em>, <em>location</em>, <em>name</em>, <em>handler</em><big>)</big><a class="reference internal" href="_modules/telehashbinder.html#open_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telehashbinder.open_channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>open a channel associated a channel name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>cobj</strong> (<em>Object</em>) &#8211; pointer of StorjTelehash instnace returned by init()</li>
+<li><strong>location</strong> (<em>str</em>) &#8211; json str where you want to open a channel.</li>
+<li><strong>name</strong> (<em>str</em>) &#8211; channel name that you want to open .</li>
+<li><strong>handler</strong> (<em>Method</em>) &#8211; method for handling channel packets. 
+called every time when receiving packets.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="telehashbinder.set_gc">
+<tt class="descclassname">telehashbinder.</tt><tt class="descname">set_gc</tt><big>(</big><em>cobj</em>, <em>use</em><big>)</big><a class="reference internal" href="_modules/telehashbinder.html#set_gc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telehashbinder.set_gc" title="Permalink to this definition">¶</a></dt>
+<dd><p>set  GC to stop or not. test use only. don&#8217;t use it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>cobj</strong> (<em>Object</em>) &#8211; pointer of StorjTelehash instnace returned by init()</li>
+<li><strong>use</strong> (<em>int</em>) &#8211; 0 if you do not want to use. others if not.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="telehashbinder.set_stopflag">
+<tt class="descclassname">telehashbinder.</tt><tt class="descname">set_stopflag</tt><big>(</big><em>cobj</em>, <em>stop</em><big>)</big><a class="reference internal" href="_modules/telehashbinder.html#set_stopflag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telehashbinder.set_stopflag" title="Permalink to this definition">¶</a></dt>
+<dd><p>set stopFlag that stop/continue to receive network packets loop..</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>cobj</strong> (<em>Object</em>) &#8211; pointer of StorjTelehash instnace returned by init()</li>
+<li><strong>flag</strong> (<em>int</em>) &#8211; 1 if to stop. others if to run.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="telehashbinder.start">
+<tt class="descclassname">telehashbinder.</tt><tt class="descname">start</tt><big>(</big><em>cobj</em><big>)</big><a class="reference internal" href="_modules/telehashbinder.html#start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telehashbinder.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>star to receive netowrk packets in the current thread..</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cobj</strong> (<em>Object</em>) &#8211; pointer of StorjTelehash instnace returned by init()</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="storjtelehash.html"
+                        title="previous chapter">storjtelehash module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="messaging.html"
+                        title="next chapter">messaging module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/telehashbinder.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="messaging.html" title="messaging module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="storjtelehash.html" title="storjtelehash module"
+             >previous</a> |</li>
+        <li><a href="index.html">.  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Author.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

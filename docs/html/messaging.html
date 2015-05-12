@@ -1,0 +1,251 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>messaging module &mdash; .  documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title=".  documentation" href="index.html" />
+    <link rel="prev" title="telehashbinder module" href="telehashbinder.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="telehashbinder.html" title="telehashbinder module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">.  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-messaging">
+<span id="messaging-module"></span><h1>messaging module<a class="headerlink" href="#module-messaging" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="messaging.ChannelHandler">
+<em class="property">class </em><tt class="descclassname">messaging.</tt><tt class="descname">ChannelHandler</tt><a class="reference internal" href="_modules/messaging.html#ChannelHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#messaging.ChannelHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<p>Class for handling  received packets in channels.
+This instance is called when receving broadcasts and channel packets.</p>
+<dl class="method">
+<dt id="messaging.ChannelHandler.get_sequences">
+<tt class="descname">get_sequences</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/messaging.html#ChannelHandler.get_sequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#messaging.ChannelHandler.get_sequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>store all seq* methods to list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="messaging.ChannelHandler.handle">
+<tt class="descname">handle</tt><big>(</big><em>packet</em><big>)</big><a class="reference internal" href="_modules/messaging.html#ChannelHandler.handle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#messaging.ChannelHandler.handle" title="Permalink to this definition">¶</a></dt>
+<dd><p>call one seq* method incrementally per one packet</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>packet</strong> (<em>string</em>) &#8211; a received packet to be handled.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">packets to be send back. not sent if None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="messaging.Messaging">
+<em class="property">class </em><tt class="descclassname">messaging.</tt><tt class="descname">Messaging</tt><big>(</big><em>broadcastHandler</em><big>)</big><a class="reference internal" href="_modules/messaging.html#Messaging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#messaging.Messaging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<p>Abstract layer of Storj messaging.
+Every class handling Storj messaging must inherit it.</p>
+<dl class="method">
+<dt id="messaging.Messaging.add_broadcaster">
+<tt class="descname">add_broadcaster</tt><big>(</big><em>location</em>, <em>add</em><big>)</big><a class="reference internal" href="_modules/messaging.html#Messaging.add_broadcaster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#messaging.Messaging.add_broadcaster" title="Permalink to this definition">¶</a></dt>
+<dd><p>send a broadcast request to broadcaster.
+After calling this method, broadcast messages will be send continually.
+This method must be overwritten.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>location</strong> (<em>str</em>) &#8211; json str where you want to request a broadcast.</li>
+<li><strong>add</strong> (<em>int</em>) &#8211; if 0, request to not to  broadcast. request to 
+broaadcast if others.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="messaging.Messaging.add_channel_handler">
+<tt class="descname">add_channel_handler</tt><big>(</big><em>channel_name</em>, <em>handler_class</em><big>)</big><a class="reference internal" href="_modules/messaging.html#Messaging.add_channel_handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#messaging.Messaging.add_channel_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>add ChannelHandler class object and associate it with a channel name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>handler_class</strong> (<em>Class</em>) &#8211; ChannelHandler class to be associated</td>
+</tr>
+</tbody>
+</table>
+<p>with
+:param str channel_name: channel name that is associated with.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="messaging.Messaging.broadcast">
+<tt class="descname">broadcast</tt><big>(</big><em>location</em>, <em>message</em><big>)</big><a class="reference internal" href="_modules/messaging.html#Messaging.broadcast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#messaging.Messaging.broadcast" title="Permalink to this definition">¶</a></dt>
+<dd><p>broadcast a message. This method must be overwritten.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>location</strong> (<em>str</em>) &#8211; json str where you want to send a broadcast.</li>
+<li><strong>message</strong> (<em>str</em>) &#8211; broadcast message.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="messaging.Messaging.get_channel_handler">
+<tt class="descname">get_channel_handler</tt><big>(</big><em>channel_name</em><big>)</big><a class="reference internal" href="_modules/messaging.html#Messaging.get_channel_handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#messaging.Messaging.get_channel_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>get ChannelHandler instance that is associate it with a channel_name.
+This method is called when receviing channel requests.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>channel_name</strong> (<em>str</em>) &#8211; channel name</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="messaging.Messaging.get_my_location">
+<tt class="descname">get_my_location</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/messaging.html#Messaging.get_my_location"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#messaging.Messaging.get_my_location" title="Permalink to this definition">¶</a></dt>
+<dd><p>get json str that represents my location.
+str depends on the underlaying layer.
+This method must be overwritten.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">location str. format depends on underlaying layer.
+e.g. telehash, etc.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="messaging.Messaging.open_channel">
+<tt class="descname">open_channel</tt><big>(</big><em>location</em>, <em>name</em>, <em>handler</em><big>)</big><a class="reference internal" href="_modules/messaging.html#Messaging.open_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#messaging.Messaging.open_channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>open a channel with a handler.
+This method must be overwritten.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>location</strong> (<em>str</em>) &#8211; json str where you want to open a channel.</li>
+<li><strong>name</strong> (<em>str</em>) &#8211; channel name that you want to open .</li>
+<li><strong>handler</strong> (<em>ChannelHandler</em>) &#8211; channel handler.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="telehashbinder.html"
+                        title="previous chapter">telehashbinder module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/messaging.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="telehashbinder.html" title="telehashbinder module"
+             >previous</a> |</li>
+        <li><a href="index.html">.  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Author.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

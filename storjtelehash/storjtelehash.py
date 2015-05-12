@@ -30,6 +30,7 @@
 from storj.messaging import Messaging
 from storj.messaging import ChannelHandler
 from storjtelehash import telehashbinder
+#import telehashbinder #for creating document
 import threading
 
 import logging
@@ -37,17 +38,37 @@ log_fmt = '%(filename)s:%(lineno)d %(funcName)s() %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=log_fmt)
 
 class StorjTelehash(Messaging):
-
+    """
+    Concrete Messaging layer for Storj Platform in Telehash.
+    Everything in telehash-C is not thread safe. So run function after 
+    stop a thread, and run a thread again in all functions.
+    """
     def __init__(self, broadcast_handler, port):
+        """
+        init
+        
+        :param ChannelHandler broadcast_handler: broadcast handler.
+        :param int port: port number to be listened packets. if 0, port number
+        is seletcted randomly.
+        """
         Messaging.__init__(self, broadcast_handler)
         self.cobj = telehashbinder.init(port, self.get_channel_handler,
                                         broadcast_handler)
         self.start_thread()
 
     def get_my_location(self):
+        """
+        return my location information. format is:
+         {"keys":{"1a":"al45izsjxe2sikv7mc6jpnwywybbkqvsou"},
+        paths":[{"type":"udp4","ip":"127.0.0.1","port":1234}]
+        
+         :return: location info.
+        """
         return telehashbinder.get_my_location(self.cobj)
 
     def start_thread(self):
+        """star to receive netowrk packets in a thread. """
+
         telehashbinder.set_stopflag(self.cobj, 0)
         self.thread = threading.Thread(
             target=lambda: telehashbinder.start(self.cobj))
@@ -55,6 +76,13 @@ class StorjTelehash(Messaging):
         self.thread.start()
 
     def open_channel(self, location, name, handler):
+        """
+        open a channel with a handler.
+
+        :param str location: json str where you want to open a channel.
+        :param str name: channel name that you want to open .
+        :param ChannelHandler handler: channel handler.
+        """
         if isinstance(handler, ChannelHandler):
             telehashbinder.set_stopflag(self.cobj, 1)
             self.thread.join()
@@ -65,18 +93,36 @@ class StorjTelehash(Messaging):
             logging.error("cannot add non ChannelHandler instance")
 
     def add_broadcaster(self, location, add):
+        """
+        send a broadcast request to broadcaster.
+        After calling this method, broadcast messages will be send continually.
+
+        :param str location: json str where you want to request a broadcast.
+        :param  int add: if 0, request to not to  broadcast. request to 
+                          broaadcast if others.
+        """
         telehashbinder.set_stopflag(self.cobj, 1)
         self.thread.join()
         telehashbinder.add_broadcaster(self.cobj, location, add)
         self.start_thread()
 
     def broadcast(self, location, message):
+        """
+        broadcast a message.
+
+        :param str location: json str where you want to send a broadcast.
+        :param str message: broadcast message.
+        """
         telehashbinder.set_stopflag(self.cobj, 1)
         self.thread.join()
         telehashbinder.broadcast(self.cobj, location, message)
         self.start_thread()
 
     def __del__(self):
+        """
+         destructor. stop a thread and call telehashbinder's finalization.
+        """
+
         telehashbinder.set_stopflag(self.cobj, 1)
         self.thread.join()
         telehashbinder.finalize(self.cobj)

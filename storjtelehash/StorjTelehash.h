@@ -341,6 +341,8 @@ public:
 
     /**
      * set stopFlag that stop/continue a loop..
+     *
+     * @param flag 1 if stop. others if run.
      */
     void setStopFlag(int flag);
 

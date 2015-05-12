@@ -1,5 +1,8 @@
-language: c++
-compiler: g++
+language: python
+python:
+  - '2.7'
+  - '3.3'
+  - '3.4'
 
 before_install:
   - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
@@ -15,10 +18,10 @@ before_install:
 
 script:
   - LD_LIBRARY_PATH=libtap ./test
-  - coverage run setup.py test -a "--doctest-modules --pep8 -v tests/ MessagingTelehash/"
+  - coverage run setup.py test -a "--doctest-modules --pep8 -v tests/ storjtelehash/"
 
 after_success:
   - coveralls --exclude tests --exclude telehash-c --exclude libtap --gcov-options '\-lp'
   - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
   - cat a.log
-  - coverage report -m --include="MessagingTelehash/*.py"
+  - coverage report -m --include="storjtelehash/*.py"
