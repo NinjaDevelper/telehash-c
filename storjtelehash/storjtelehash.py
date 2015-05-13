@@ -27,6 +27,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+import types
 from storj.messaging import Messaging
 from storj.messaging import ChannelHandler
 from . import telehashbinder
@@ -52,6 +53,9 @@ class StorjTelehash(Messaging):
         is seletcted randomly.
         """
         Messaging.__init__(self, broadcast_handler)
+        if not isinstance(broadcast_handler, types.MethodType):
+            raise TypeError("cannot add non method handler.")
+
         self.cobj = telehashbinder.init(port, self.get_channel_handler,
                                         broadcast_handler)
         self.start_thread()
@@ -64,6 +68,7 @@ class StorjTelehash(Messaging):
 
          :return: location info.
         """
+        Messaging.get_my_location(self)
         return telehashbinder.get_my_location(self.cobj)
 
     def start_thread(self):
@@ -91,7 +96,7 @@ class StorjTelehash(Messaging):
                                         handler.handle)
             self.start_thread()
         else:
-            logging.error("cannot add non ChannelHandler instance")
+            raise TypeError("cannot add non ChannelHandler instance")
 
     def add_broadcaster(self, location, add):
         """
@@ -125,7 +130,7 @@ class StorjTelehash(Messaging):
         """
          destructor. stop a thread and call telehashbinder's finalization.
         """
-
-        telehashbinder.set_stopflag(self.cobj, 1)
-        self.thread.join()
-        telehashbinder.finalize(self.cobj)
+        if hasattr(self, "cobj"):
+            telehashbinder.set_stopflag(self.cobj, 1)
+            self.thread.join()
+            telehashbinder.finalize(self.cobj)

@@ -67,7 +67,7 @@ class ChannelHandler(object):
         :return: packets to be send back. not sent if None
         """
         if self.n == -1:
-            return None
+            raise IOError("no more methods for the handler.")
 
         self.next = None
         r = self.mlist[self.n](packet)
@@ -104,10 +104,13 @@ class Messaging(object):
         with
         :param str channel_name: channel name that is associated with.
         """
-        if issubclass(handler_class, ChannelHandler):
+        if isinstance(handler_class, type) and \
+           issubclass(handler_class, ChannelHandler):
+            logging.debug("bbbb")
             self.channels[channel_name] = handler_class
         else:
-            logging.error("cannot add non ChannelHandler subclass")
+            logging.debug("aaaaaaa")
+            raise TypeError("cannot add non ChannelHandler subclass")
 
     def get_channel_handler(self, channel_name):
         """

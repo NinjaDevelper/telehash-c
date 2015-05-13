@@ -58,11 +58,11 @@ class ChannelOpener(ChannelHandler):
         counter_opener = counter_opener + 1
         j = json.loads(packet)
         assert j['count'] == 1
-        return None
+        return '{\"count\":2}'
 
-    def seqC(self, packet):
+    def seqZ(self, packet):
         counter_opener = 9999
-        return packet
+        return None
 
 
 class ChannelReceiver(ChannelHandler):
@@ -72,18 +72,32 @@ class ChannelReceiver(ChannelHandler):
         global counter_receiver
         counter_receiver = counter_receiver + 1
         j = json.loads(packet)
+        self.next = self.seqC
         assert j['count'] == 0
         return '{\"count\":1}'
 
     def seqB(self, packet):
-        logging.debug('called receiverB message='+packet)
-        global counter_receiver
-        counter_receiver = counter_receiver + 1
-        return packet
+        counter_receiver = 9999
+        return None
 
     def seqC(self, packet):
+        logging.debug('called receiverB message='+packet)
+        global counter_receiver
+        j = json.loads(packet)
+        assert j['count'] == 2
+        counter_receiver = counter_receiver + 1
+        return None
+
+    def seqZ(self, packet):
         counter_receiver = 9999
-        return packet
+        return None
+
+
+class ChannelReceiverNG(ChannelHandler):
+
+    def seqA(self, packet):
+        logging.debug('called openerNG')
+        return '{\"count\":1}'
 
 
 class TestStorjTelehash(object):
@@ -123,6 +137,15 @@ class TestStorjTelehash(object):
         return None
 
     def test_storjtelehash(self):
+        with pytest.raises(TypeError):
+            m = StorjTelehash("aaa", 1234)
+
+        with pytest.raises(TypeError):
+            self.m2.add_channel_handler('counter_test', ChannelReceiver())
+
+        with pytest.raises(TypeError):
+            self.m3.open_channel(self.location, 'counter_test', ChannelOpener)
+
         self.status = 0
         self.m4.add_broadcaster(self.location, 1)
         self.m3.broadcast(self.location, '{"service":"farming0"}')
@@ -135,4 +158,17 @@ class TestStorjTelehash(object):
         self.m3.open_channel(self.location, 'counter_test', ChannelOpener())
         time.sleep(2)
         assert counter_opener == 2
-        assert counter_receiver == 1
+        assert counter_receiver == 2
+
+#       with pytest.raises(IOError):
+        self.m2.add_channel_handler('counter_testNG', ChannelReceiverNG)
+        self.m3.open_channel(self.location, 'counter_testNG',
+                             ChannelOpener())
+        time.sleep(2)
+        logging.debug('should to raise exception in another thread,\
+         but cannot catch')
+
+        assert self.m2.get_channel_handler("nothing") is None
+        self.m2.__del__()
+        self.m3.__del__()
+        self.m4.__del__()
