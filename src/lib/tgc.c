@@ -63,6 +63,7 @@ void _tgc_rmList(tgc_list_t *top,tgc_list_t list){
         list->prev->next=list->next;
     }
     if((*top)==list) (*top)=list->next;
+    LOG("free 1");
     free(list);
 }
 
@@ -144,6 +145,7 @@ void tgc_free(void *ptr){
         return;
     }
     _tgc_rmList(&blocks,list);
+    LOG("free 2");
     free(ptr);
 }
 
@@ -162,6 +164,7 @@ void tgc_gcollect_force(){
         tgc_list_t next=list->next;
         if(!list->used){
             fcount++;
+            LOG("free 3");
             free(list->ptr);
             _tgc_rmList(&blocks,list);
         }
