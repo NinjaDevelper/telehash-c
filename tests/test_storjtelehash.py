@@ -169,6 +169,3 @@ class TestStorjTelehash(object):
          but cannot catch')
 
         assert self.m2.get_channel_handler("nothing") is None
-        self.m2.__del__()
-        self.m3.__del__()
-        self.m4.__del__()
