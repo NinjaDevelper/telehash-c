@@ -83,6 +83,7 @@ class StorjTelehash(Messaging):
         :param str name: channel name that you want to open .
         :param ChannelHandler handler: channel handler.
         """
+        Messaging.open_channel(self, location, name, handler)
         if isinstance(handler, ChannelHandler):
             telehashbinder.set_stopflag(self.cobj, 1)
             self.thread.join()
@@ -101,6 +102,7 @@ class StorjTelehash(Messaging):
         :param  int add: if 0, request to not to  broadcast. request to
                           broaadcast if others.
         """
+        Messaging.add_broadcaster(self, location, add)
         telehashbinder.set_stopflag(self.cobj, 1)
         self.thread.join()
         telehashbinder.add_broadcaster(self.cobj, location, add)
@@ -113,6 +115,7 @@ class StorjTelehash(Messaging):
         :param str location: json str where you want to send a broadcast.
         :param str message: broadcast message.
         """
+        Messaging.broadcast(self, location, message)
         telehashbinder.set_stopflag(self.cobj, 1)
         self.thread.join()
         telehashbinder.broadcast(self.cobj, location, message)

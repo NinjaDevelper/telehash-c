@@ -28,6 +28,7 @@
 
 #include "StorjTelehash.h"
 #include <Python.h>
+#include "bytesobject.h"
 
 #ifndef LOG
 void *logging(const char *file, int line, const char *function, 
@@ -58,13 +59,20 @@ char *EvaluatePyObject(PyObject *obj, char *str){
         
     char *buffer=NULL;
     char *rbuf=NULL;
+    PyObject *ascii=NULL;
     if(result){
-        PyObject * ascii=PyUnicode_AsASCIIString(result);
-        if(ascii){
+        if(PyUnicode_Check(result)){
+            ascii=PyUnicode_AsASCIIString(result);
             buffer=PyBytes_AsString(ascii);
             rbuf=(char *)malloc(strlen(buffer));
             strcpy(rbuf,buffer);
             Py_XDECREF(ascii);
+        }else{
+            if(PyBytes_Check(result)){
+                buffer=PyBytes_AsString(result);
+                rbuf=(char *)malloc(strlen(buffer));
+                strcpy(rbuf,buffer);
+            }
         }
     }else{
         PyErr_PrintEx(1);

@@ -133,6 +133,6 @@ class TestStorjTelehash(object):
         self.status = 0
         self.m2.add_channel_handler('counter_test', ChannelReceiver)
         self.m3.open_channel(self.location, 'counter_test', ChannelOpener())
-        time.sleep(10)
+        time.sleep(2)
         assert counter_opener == 2
         assert counter_receiver == 1
