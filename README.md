@@ -28,11 +28,13 @@ To run the associated tests for python:
 
 Explanation about messaging layer is [here](Messaging.md).
 
-Document for messaging layer is [here](https://rawgit.com/StorjPlatform/StorjTelehash/master/docs/html/messaging.html)
+API Document for abstract messaging layer is [here](https://rawgit.com/StorjPlatform/StorjTelehash/master/docs/html/messaging.html)
 
-Document for storjtelehash is [here](https://rawgit.com/StorjPlatform/StorjTelehash/master/docs/html/storjtelehash.html)
+API Document for storjtelehash , which is concorete implementation of abstract messaging layer by telehash-c ,
+is [here](https://rawgit.com/StorjPlatform/StorjTelehash/master/docs/html/storjtelehash.html)
 
-Document for telehashbinder is [here](https://rawgit.com/StorjPlatform/StorjTelehash/master/docs/html/telehashbinder.html)
+API Document for telehashbinder , which is classes/functions used by storjtelehash,
+is [here](https://rawgit.com/StorjPlatform/StorjTelehash/master/docs/html/telehashbinder.html)
 
 # Contribution
 Improvements to the codebase and pull requests are encouraged.
