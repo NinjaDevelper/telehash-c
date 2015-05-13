@@ -44,7 +44,7 @@ int StorjTelehash::status=0;
 int StorjTelehash::count=0;
 link_t StorjTelehash::targetLink=NULL;
 list<link_t> StorjTelehash::broadcastee;
-map<string,CHANNEL_HANDLER> StorjTelehash::broadcastHandlers;
+map<string,ChannelHandler *> StorjTelehash::broadcastHandlers;
 char StorjTelehash::globalIP[3*4+3+1]; ;
 map<string,ChannelHandlerFactory *> StorjTelehash::factories;
 
@@ -264,9 +264,9 @@ lob_t StorjTelehash::broadcastOnOpen(link_t link,lob_t open){
        return open;
     lob_t data=lob_get_json(open,(char *)"data");
     char *j=lob_json(data);
-    LOG("%p",link->mesh);
-    CHANNEL_HANDLER broadcastHandler=broadcastHandlers[link->mesh->id->hashname];
-    char *json_=broadcastHandler(j);
+    LOG("%s",link->mesh->id->hashname);
+    ChannelHandler* broadcastHandler=broadcastHandlers[link->mesh->id->hashname];
+    char *json_=broadcastHandler->handle(j);
     if(json_){
         list<link_t>::iterator it = broadcastee.begin();
         while( it != broadcastee.end() ){
@@ -290,7 +290,7 @@ lob_t StorjTelehash::broadcastOnOpen(link_t link,lob_t open){
 }
 
 StorjTelehash::StorjTelehash(int port ,
-    ChannelHandlerFactory &factory, char * (*broadcastHandler)(char *json)){
+    ChannelHandlerFactory &factory, ChannelHandler &broadcastHandler){
 
     globalIP[0]='\0';
     lob_t id = util_fjson((char *)"id.json");
@@ -312,7 +312,7 @@ StorjTelehash::StorjTelehash(int port ,
         lob_free(s);
     }
     this->factories[mesh->id->hashname] = &factory;
-    broadcastHandlers[mesh->id->hashname]=broadcastHandler;
+    broadcastHandlers[mesh->id->hashname]=&broadcastHandler;
     mesh_on_discover(mesh,(char *)"auto",mesh_add); 
     mesh_on_link(mesh, (char *)"onLink", onLink);
     mesh_on_open(mesh,(char *)"service",serviceOnOpen);
@@ -333,6 +333,10 @@ StorjTelehash::StorjTelehash(int port ,
 
 ChannelHandlerFactory* StorjTelehash::getChannelHandlerFactory(){
     return factories[mesh->id->hashname];
+}
+
+ChannelHandler* StorjTelehash::getBroadcastHandler(){
+    return broadcastHandlers[mesh->id->hashname];
 }
 
 /*

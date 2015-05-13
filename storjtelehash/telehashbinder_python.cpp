@@ -149,12 +149,6 @@ public:
     }
 };
 
-PyObject *pyBHandler=NULL;
-
-char *pyBroadcastHandler(char *message){
-    return EvaluatePyObject(pyBHandler, message);
-}
-
 static PyObject *telehashbinder_init(PyObject *self, PyObject *args){
     int port=0;
     PyObject *pyFactory=NULL;
@@ -171,11 +165,10 @@ static PyObject *telehashbinder_init(PyObject *self, PyObject *args){
         return NULL;
     }
 
-    pyBHandler=broadcastHandler;
-    Py_XINCREF(broadcastHandler);
+    ChannelHandler* pyBHandler=new ChannelHandlerImpl(broadcastHandler);
     ChannelHandlerFactoryImpl *f=
         new ChannelHandlerFactoryImpl(pyFactory);
-    StorjTelehash *m=new StorjTelehash(port,*f,pyBroadcastHandler);
+    StorjTelehash *m=new StorjTelehash(port,*f,*pyBHandler);
     PyObject *p=PyCapsule_New(m, NULL,NULL);
     return p;
 }
@@ -258,9 +251,11 @@ static PyObject *telehashbinder_finalize(PyObject *self,
     StorjTelehash *m=(StorjTelehash *)PyCapsule_GetPointer(cobj,NULL);
     ChannelHandlerFactoryImpl *h=(ChannelHandlerFactoryImpl *)
                                            m->getChannelHandlerFactory();
+    ChannelHandlerImpl *b=(ChannelHandlerImpl *)
+                                           m->getBroadcastHandler();
+    delete b;
     delete h;
     delete m;
-    Py_XDECREF(pyBHandler);
     Py_RETURN_NONE;
 }
 

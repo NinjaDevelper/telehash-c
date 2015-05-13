@@ -41,6 +41,33 @@ using namespace picojson;
 
 typedef char * (*CHANNEL_HANDLER)(char *json);
 
+class TestBroadcastHandler : public ChannelHandler{
+private:
+    char *(*bhandler)(char *json);
+
+public:
+    /**
+     * create myself with handlers.
+     * 
+     * @param h channels.
+     */
+	TestBroadcastHandler(char *(*bhandler)(char *json)){
+		this->bhandler=bhandler;
+	}
+	
+    /**
+     * handle one packet.
+     * 
+     * @param json one packet described in json.
+     * @return a json packet that should be sent back. not be sent if NULL.
+     */
+	char* handle(char *json){
+        return bhandler(json);
+	}
+    
+    ~TestBroadcastHandler(){
+    }
+};
 	
 class TestChannelHandler : public ChannelHandler{
 private:
@@ -166,25 +193,35 @@ char *receiverHandler_2(char *json){
 }
 
 
-int statusB=0;
-char *broadcastHandler(char *json){
-    LOG("json in=%s",json);
-    statusB++;
+int status2=0;
+char *broadcastHandler2(char *json){
+    LOG("json2 in=%s",json);
+    status2++;
     value v1;
     parse(v1, json);
     string service=v1.get<object>()["service"].get<string>();
-    ok( service=="farming","broadcast data check.");
-    if(statusB>1) return NULL;
+    ok( service=="farming0","broadcast data check.");
+    if(status2>1) return NULL;
     char *r=(char *)malloc(256);
-    strcpy(r,json);
+    strcpy(r,"{\"service\":\"farming1\"}");
     return r;
 }
 
-char *broadcastHandlerNG(char *json){
+int status4=0;
+char *broadcastHandler4(char *json){
+    LOG("json2 in=%s",json);
+    status4++;
+    value v1;
+    parse(v1, json);
+    string service=v1.get<object>()["service"].get<string>();
+    ok( service=="farming1","broadcast data check.");
+    return NULL;
+}
+
+
+char *broadcastHandler13(char *json){
     ok( 0,"broadcast should not be received.");
-    char *r=(char *)malloc(256);
-    strcpy(r,json);
-    return r;
+    return NULL;
 }
 
 
@@ -250,11 +287,15 @@ public:
 vector<StorjTelehash2 *> StorjTelehash2::st2;
 
 TestChannelHandlerFactory factory;
+TestBroadcastHandler bh13(broadcastHandler13);
+TestBroadcastHandler bh2(broadcastHandler2);
+TestBroadcastHandler bh4(broadcastHandler4);
+
 //m1 cannot connect to m2 because they share a key
-StorjTelehash m1(0,factory,broadcastHandler);
-StorjTelehash m2(1234,factory,broadcastHandler);
-StorjTelehash m3(-9999,factory,broadcastHandlerNG);
-StorjTelehash m4(-9999,factory,broadcastHandler);
+StorjTelehash m1(0,factory,bh13);
+StorjTelehash m2(1234,factory,bh2);
+StorjTelehash m3(-9999,factory,bh13);
+StorjTelehash m4(-9999,factory,bh4);
 StorjTelehash2 s2(m2);
 StorjTelehash2 s3(m3);
 StorjTelehash2 s4(m4);
@@ -267,6 +308,10 @@ char *location=NULL;
 void locationTest(){
     ChannelHandlerFactory *h=m1.getChannelHandlerFactory();
     ok( h==&factory,"getChannelHandlerFactory check.");
+
+    ChannelHandler *bh=m4.getBroadcastHandler();
+    ok( bh==&bh4,"getBroadcastHandler check.");
+
     
     //stop GC to use thread. GC is thread-unsafe.
     StorjTelehash::setGC(0);
@@ -321,10 +366,10 @@ void singleBroadcasteeTest(){
     ok( !strcmp(m3.globalIP,"127.0.0.1"),"addBroadcaster check.");
     StorjTelehash2::gcollect();
 
-    statusB=0;
-    s3.broadcast((char *)location,(char *)"{\"service\":\"farming\"}");
+    s3.broadcast((char *)location,(char *)"{\"service\":\"farming0\"}");
     sleep(2);
-    ok( statusB==1,"broadcaster does not receive his json check.");
+    //broadcaster does not receive his json. 
+    
     //bacause of stopping GC, run it manually.
     StorjTelehash2::gcollect();
 }
@@ -334,14 +379,14 @@ void multiBroadcasteeTest(int add){
     sleep(2);
     StorjTelehash2::gcollect();
 
-    statusB=0;
-    s3.broadcast((char *)location,(char *)"{\"service\":\"farming\"}");
+    status2=status4=0;
+    s3.broadcast((char *)location,(char *)"{\"service\":\"farming0\"}");
     sleep(2);
     if(add){
-        ok( statusB==2,"broadcastee received another's json check.");
+        ok( status2==1,"broadcastee received another's json check m2.");
+        ok( status4==1,"broadcastee received another's json check m4.");
     }else{
-        ok( statusB==1,"broadcastee didn't receive another's json check"
-                      "after removing broadcaster");
+        //broadcastee didn't receive another's json check after removing 
     }        
     StorjTelehash2::gcollect();
 }

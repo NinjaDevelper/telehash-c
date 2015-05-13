@@ -90,36 +90,49 @@ class TestStorjTelehash(object):
 
     def setup(self):
         telehashbinder.set_gc(0)
-        self.m2 = StorjTelehash(self.broadcast_handler, 1234)
-        self.m3 = StorjTelehash(self.broadcast_handler, -9999)
-        self.m4 = StorjTelehash(self.broadcast_handler, -9999)
+        self.m2 = StorjTelehash(self.broadcast_handler2, 1234)
+        self.m3 = StorjTelehash(self.broadcast_handler3, -9999)
+        self.m4 = StorjTelehash(self.broadcast_handler4, -9999)
 
         loc = self.m2.get_my_location()
         self.location =  \
             '{"keys":{"1a\":"' + json.loads(loc)['keys']['1a'] + '"},' \
             '"paths\":[{"type":"udp4","ip":"127.0.0.1","port":1234}]}'
         logging.debug("location=" + self.location)
+        self.status2 = 0
+        self.status4 = 0
 
-    def broadcast_handler(self, packet):
+    def broadcast_handler2(self, packet):
+        logging.debug("broadcast packet2=" + packet)
         j = json.loads(packet)
-        assert j['service'] == 'farming%d' % (self.status)
-        self.status = self.status + 1
-        logging.debug("packjet=" + packet)
-        if self.status == 2:
-            return None
-        j['service'] = "farming%d" % (self.status)
+        assert j['service'] == 'farming0'
+        self.status2 += 1
+        j['service'] = "farming1"
         return json.dumps(j)
+
+    def broadcast_handler3(self, packet):
+        logging.debug("broadcast packet3=" + packet)
+        assert 1 == 0
+        return None
+
+    def broadcast_handler4(self, packet):
+        logging.debug("broadcast packjet4=" + packet)
+        j = json.loads(packet)
+        assert j['service'] == 'farming1'
+        self.status4 += 1
+        return None
 
     def test_storjtelehash(self):
         self.status = 0
         self.m4.add_broadcaster(self.location, 1)
         self.m3.broadcast(self.location, '{"service":"farming0"}')
         time.sleep(2)
-        assert self.status == 2
+        assert self.status2 == 1
+        assert self.status4 == 1
 
         self.status = 0
         self.m2.add_channel_handler('counter_test', ChannelReceiver)
         self.m3.open_channel(self.location, 'counter_test', ChannelOpener())
-        time.sleep(2)
+        time.sleep(10)
         assert counter_opener == 2
         assert counter_receiver == 1

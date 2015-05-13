@@ -48,12 +48,10 @@ extern "C"{
 
 using namespace std;
 
-typedef char * (*CHANNEL_HANDLER)(char *json);
-
 /**
  * Class for handling  received packets in telehash-c channel.
  * 
- * call one handler incrementally per one packet in handle() method.
+ * handle() method is called per one packet,
  */
 class ChannelHandler{
 
@@ -147,7 +145,7 @@ private:
     /**
      * handler when receving a broadcast.
      */
-    static map<string, CHANNEL_HANDLER> broadcastHandlers ;
+    static map<string, ChannelHandler *> broadcastHandlers ;
     
     /**
      * determin whethere adr is local or not.
@@ -272,10 +270,10 @@ public:
      * @param port port number to be listened packets. if 0, port number is 
      *         selected randomly.
      * @param factory ChannelHanderFactory instance.
-     * @param broadcastHandler handler method for broadcasts 
+     * @param broadcastHandler ChannelHandler instnace for handlinkg broadcasts 
      */
     StorjTelehash(int port,ChannelHandlerFactory &factory, 
-                       char *(* broadcastHandler)(char *json));
+                      ChannelHandler& broadcastHandler);
 
     /**
      * get registered ChannelHandlerFactory.
@@ -284,6 +282,12 @@ public:
      */
     ChannelHandlerFactory* getChannelHandlerFactory();
 
+    /**
+     * get registered ChannelHandler instance for handlinb broadcast.
+     * 
+     * @return registered broadcast ChannelHandler
+     */
+    ChannelHandler* getBroadcastHandler();
 
     /**
      * destructor.
