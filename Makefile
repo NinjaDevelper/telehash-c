@@ -8,7 +8,7 @@ TEST_CPPFLAGS=-fprofile-arcs -ftest-coverage  -Ilibtap -g -ggdb3
 test: storjtelehash/StorjTelehash.cpp tests/test.c
 	cd telehash-c;make
 	cd libtap;make
-	$(CPP) $(INCLUDE) ${CFLAGS}  ${TEST_CPPFLAGS} -o $@ $^  ${LDFLAGS}   ${TEST_LDFLAGS} -std=c++11 -pthread
+	$(CPP) $(INCLUDE) ${CFLAGS}  ${TEST_CPPFLAGS}  -o $@ $^  ${LDFLAGS}   ${TEST_LDFLAGS} -std=c++11 -pthread 
 
 python: ${FILES} storjtelehash/telehashbinder_python.cpp storjtelehash/StorjTelehash.cpp
 	cd telehash-c;make
