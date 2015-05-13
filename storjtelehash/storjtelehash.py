@@ -29,10 +29,9 @@
 
 from storj.messaging import Messaging
 from storj.messaging import ChannelHandler
-from storjtelehash import telehashbinder
+from .  import telehashbinder
 # import telehashbinder #for creating document
 import threading
-
 import logging
 log_fmt = '%(filename)s:%(lineno)d %(funcName)s() %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=log_fmt)

@@ -328,12 +328,12 @@ static struct PyModuleDef modules = {
    methods
    };
 
-PyMODINIT_FUNC PyInit_telehashbinder(void){
+extern "C" PyMODINIT_FUNC PyInit_telehashbinder(void){
      return PyModule_Create(&modules);
 }
 
 #else
-PyMODINIT_FUNC
+extern "C" PyMODINIT_FUNC
 inittelehashbinder(void) {
     (void) Py_InitModule("telehashbinder", methods);
 }
