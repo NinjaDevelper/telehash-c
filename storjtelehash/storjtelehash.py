@@ -29,7 +29,7 @@
 
 from storj.messaging import Messaging
 from storj.messaging import ChannelHandler
-from .  import telehashbinder
+from . import telehashbinder
 # import telehashbinder #for creating document
 import threading
 import logging
