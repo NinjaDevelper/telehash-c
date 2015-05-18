@@ -32,7 +32,6 @@ import json
 import pytest
 import time
 import logging
-import shutil
 
 import storj.messaging
 from storj.messaging.messaging import Messaging

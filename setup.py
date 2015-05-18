@@ -92,7 +92,5 @@ setup(
     ext_modules=[module],
     install_requires=install_requirements,
     tests_require=test_requirements,
-    option_doctestmodules=True,
-    collect_ignore=["setup.py"],
     keywords=['storj', 'storj platform', 'messaging layer', 'telehash']
 )
