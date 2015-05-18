@@ -141,10 +141,6 @@ class TestStorjTelehash(object):
         return None
 
     def test_storjtelehash(self):
-        shutil.move('storj/messaging/storjtelehash', 'storj/')
-        assert storj.messaging.get_messaging_class() == None
-        shutil.move('storj/storjtelehash', 'storj/messaging/')
-
         shutil.copytree('storj/messaging/storjtelehash',
                         'storj/messaging/storjtelehash2')
         with pytest.raises(IOError):
