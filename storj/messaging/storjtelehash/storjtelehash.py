@@ -28,12 +28,14 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import types
-from storj.messaging import Messaging
-from storj.messaging import ChannelHandler
-from . import telehashbinder
-# import telehashbinder #for creating document
 import threading
 import logging
+
+from storj.messaging.messaging import Messaging
+from storj.messaging.messaging import ChannelHandler
+from . import telehashbinder
+
+# import telehashbinder #for creating document
 log_fmt = '%(filename)s:%(lineno)d %(funcName)s() %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=log_fmt)
 
@@ -44,18 +46,29 @@ class StorjTelehash(Messaging):
     Everything in telehash-C is not thread safe. So run function after
     stop a thread, and run a thread again in all functions.
     """
-    def __init__(self, broadcast_handler, port):
+
+    DESCRIPTION = 'messaging layer in telehach'
+    """ description about this messaging implementation which is
+    used in sublcass.
+    """
+
+    def __init__(self, broadcast_handler, **keywords):
         """
         init
 
         :param ChannelHandler broadcast_handler: broadcast handler.
-        :param int port: port number to be listened packets. if 0, port number
+        :param keywords keywords: 'port=int' to be listened packets.
+        if 0, port number
         is seletcted randomly.
         """
-        Messaging.__init__(self, broadcast_handler)
+        Messaging.__init__(self, broadcast_handler, **keywords)
         if not isinstance(broadcast_handler, types.MethodType):
             raise TypeError("cannot add non method handler.")
 
+        if 'port' in keywords:
+            port = keywords['port']
+        else:
+            port = 0
         self.cobj = telehashbinder.init(port, self.get_channel_handler,
                                         broadcast_handler)
         self.start_thread()
@@ -126,7 +139,7 @@ class StorjTelehash(Messaging):
         telehashbinder.broadcast(self.cobj, location, message)
         self.start_thread()
 
-    def __del__(self):
+    def finalize(self):
         """
          destructor. stop a thread and call telehashbinder's finalization.
         """

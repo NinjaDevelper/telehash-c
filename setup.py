@@ -47,12 +47,12 @@ test_requirements = [
 ]
 
 
-module = Extension('storjtelehash.telehashbinder',
-                   ['storjtelehash/telehashbinder_python.cpp',
-                    'storjtelehash/StorjTelehash.cpp'],
+module = Extension('storj.messaging.storjtelehash.telehashbinder',
+                   ['cxx/telehashbinder_python.cpp',
+                    'cxx/StorjTelehash.cpp'],
                    libraries=['telehash'],
                    include_dirs=['telehash-c/unix', 'telehash-c/include',
-                                 'storjtelehash'],
+                                 'cxx'],
                    library_dirs=['telehash-c'],
                    )
 
@@ -87,7 +87,7 @@ setup(
     author_email='utamaro.sisho@gmail.com',
     description='Messaging Layer in Telehash.',
     long_description=LONG_DESCRIPTION,
-    packages=['storjtelehash', 'storj'],
+    packages=['storj', 'storj.messaging.storjtelehash', 'storj.messaging'],
     cmdclass={'test': PyTest},
     ext_modules=[module],
     install_requires=install_requirements,

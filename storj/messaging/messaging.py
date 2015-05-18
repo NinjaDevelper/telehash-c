@@ -29,6 +29,7 @@
 
 from abc import ABCMeta, abstractmethod
 import types
+import pkgutil
 
 import logging
 log_fmt = '%(filename)s:%(lineno)d %(funcName)s() %(message)s'
@@ -87,7 +88,13 @@ class Messaging(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, broadcastHandler):
+    DESCRIPTION = ''
+    """
+    description about this messaging implementation which is
+    ued in sublcass.
+    """
+
+    def __init__(self, broadcastHandler, **keywords):
         """
    　　　　　init.
 

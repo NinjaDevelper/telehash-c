@@ -28,20 +28,24 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-from storj.messaging import Messaging
-from storj.messaging import ChannelHandler
-from storjtelehash.storjtelehash import StorjTelehash
-from storjtelehash import telehashbinder
 import json
 import pytest
 import time
-
 import logging
+import shutil
+
+import storj.messaging
+from storj.messaging.messaging import Messaging
+from storj.messaging.messaging import ChannelHandler
+from storj.messaging.storjtelehash import telehashbinder
+
 log_fmt = '%(filename)s:%(lineno)d %(funcName)s() %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=log_fmt)
 
 counter_opener = 0
 counter_receiver = 0
+
+cls = storj.messaging.get_messaging_class()
 
 
 class ChannelOpener(ChannelHandler):
@@ -104,14 +108,14 @@ class TestStorjTelehash(object):
 
     def setup(self):
         telehashbinder.set_gc(0)
-        self.m2 = StorjTelehash(self.broadcast_handler2, 1234)
-        self.m3 = StorjTelehash(self.broadcast_handler3, -9999)
-        self.m4 = StorjTelehash(self.broadcast_handler4, -9999)
+        self.m2 = cls(self.broadcast_handler2)
+        self.m3 = cls(self.broadcast_handler3, port=-9999)
+        self.m4 = cls(self.broadcast_handler4, port=-9999)
 
-        loc = self.m2.get_my_location()
-        self.location =  \
-            '{"keys":{"1a\":"' + json.loads(loc)['keys']['1a'] + '"},' \
-            '"paths\":[{"type":"udp4","ip":"127.0.0.1","port":1234}]}'
+        self.location = self.m2.get_my_location()
+#        self.location =  \
+#            '{"keys":{"1a\":"' + json.loads(loc)['keys']['1a'] + '"},' \
+#            '"paths\":[{"type":"udp4","ip":"127.0.0.1","port":1234}]}'
         logging.debug("location=" + self.location)
         self.status2 = 0
         self.status4 = 0
@@ -137,8 +141,18 @@ class TestStorjTelehash(object):
         return None
 
     def test_storjtelehash(self):
+        shutil.move('storj/messaging/storjtelehash', 'storj/')
+        assert storj.messaging.get_messaging_class() == None
+        shutil.move('storj/storjtelehash', 'storj/messaging/')
+
+        shutil.copytree('storj/messaging/storjtelehash',
+                        'storj/messaging/storjtelehash2')
+        with pytest.raises(IOError):
+            storj.messaging.get_messaging_class()
+        shutil.rmtree('storj/messaging/storjtelehash2')
+
         with pytest.raises(TypeError):
-            m = StorjTelehash("aaa", 1234)
+            m = cls("aaa", port=1234)
 
         with pytest.raises(TypeError):
             self.m2.add_channel_handler('counter_test', ChannelReceiver())
@@ -169,3 +183,7 @@ class TestStorjTelehash(object):
          but cannot catch')
 
         assert self.m2.get_channel_handler("nothing") is None
+
+        self.m2.finalize()
+        self.m3.finalize()
+        self.m4.finalize()

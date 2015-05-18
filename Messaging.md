@@ -12,38 +12,41 @@ All messages are formated in JSON.
 
 ## Messages in  Messaging Layer
 Every communications in messaging layer works in event-driven manner. i.e.
-you must register handlers for them to act to received messages because
-you don't know when messages come in. 
+recievers must register handlers for them to act to received messages because
+they don't know when messages come in. 
+So there is no functions to send() and recv() directly.
 
 There are two types of message in Messaging layer. One is broadcast, another
 is channel message.
 
 ### Broadcast
-There are two types of message in Messaging layer. One is broadcast. You must
-specify broadcast handler when you initiate messaging function. 
-First he would call add_broadcaster(receiver) so that receiver would register
-him to send broadcasted messages.
+Everyone who use messaging layer must
+specify a broadcast handler when initialing messaging class. 
+First he would call ```add_broadcaster(receiver)``` function so that the ```receiver```
+would register him to send messages that someone broadcasted.
 
 When you 
 broadcast a message, receiver of this message would analyze this message by 
-this handler atf irst. Receiver would check this message, e.g. cheking sender 
-didn't send messages too much, or the message is what receiver wants 
-to know or not, etc. If receiver thinks it should be broadcasted, the handler
-would return string , and he would broadcast this string to registered member.
+the handler at first. Receiver would check this message, e.g. that sender 
+didn't send messages too much, or  that this message is what receiver wants 
+to know, etc. If the receiver thinks it should be broadcasted, the handler
+would return a string , and messaging layer would broadcast this string to registered member.
 
 ### Channel Message
 
 Channel message is used for general purpose. 
-Recevier must register handler for a channel handler with a channel name
-if he want to act to messages on the channel. At first sender send a message 
-with a channel name and handler for responses. 
-After sending it, messages are sent and received after reading message 
-by the registered handler. When he wants to stop messaging, he would send
+Recevier must register a handler as a channel handler with a channel name
+if he want to act to a messages on the channel. Channel name is like a
+_port number_ in TCP/IP, where receiver listen. At first the sender 
+register a handler for responses and send a message 
+with a channel name to a receiver. 
+After sending messages, a reciever receives and read the message 
+by a registered handler. When he wants to stop messaging, he would send
 nothing.
 
 ### Handler for messages
-Handler must implements Messaing.ChannelHander class. All methods that
-start with seq* would be run one by one when receiving messages.
+Handler must implements ```Messaing.ChannelHander``` class. All methods that
+starts with seq* would be run one by one when receiving messages.
 The order of calling method is alphabeetic order.
 
 ## Example
