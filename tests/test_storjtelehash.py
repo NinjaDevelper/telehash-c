@@ -45,7 +45,7 @@ logging.basicConfig(level=logging.DEBUG, format=log_fmt)
 counter_opener = 0
 counter_receiver = 0
 
-cls = storj.messaging.get_messaging_class()
+cls = storj.messaging.get_messaging_classes()[0]
 
 
 class ChannelOpener(ChannelHandler):
@@ -113,9 +113,6 @@ class TestStorjTelehash(object):
         self.m4 = cls(self.broadcast_handler4, port=-9999)
 
         self.location = self.m2.get_my_location()
-#        self.location =  \
-#            '{"keys":{"1a\":"' + json.loads(loc)['keys']['1a'] + '"},' \
-#            '"paths\":[{"type":"udp4","ip":"127.0.0.1","port":1234}]}'
         logging.debug("location=" + self.location)
         self.status2 = 0
         self.status4 = 0
@@ -141,12 +138,6 @@ class TestStorjTelehash(object):
         return None
 
     def test_storjtelehash(self):
-        shutil.copytree('storj/messaging/storjtelehash',
-                        'storj/messaging/storjtelehash2')
-        with pytest.raises(IOError):
-            storj.messaging.get_messaging_class()
-        shutil.rmtree('storj/messaging/storjtelehash2')
-
         with pytest.raises(TypeError):
             m = cls("aaa", port=1234)
 
