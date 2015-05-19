@@ -19,6 +19,58 @@ before_install:
 
 script:
   - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
+  - LD_LIBRARY_PATH=libtap ./test
   - coverage run setup.py test -a "--doctest-modules --pep8 -v tests/ storj/messaging/ storj/messaging/storjtelehash/"
 
 after_success:
@@ -26,278 +78,4 @@ after_success:
   - pip install cpp-coveralls
   - coveralls --exclude tests --exclude telehash-c --exclude libtap --exclude cxx/telehashbinder_python.cpp --gcov-options '\-lp'
   - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
-  - cat a.log
-  - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
-  - grep free a.log
   - cat a.log
