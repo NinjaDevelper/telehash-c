@@ -34,6 +34,7 @@ import time
 import logging
 
 import storj.messaging
+import storj.messaging.plugin
 from storj.messaging.messaging import Messaging
 from storj.messaging.messaging import ChannelHandler
 from storj.messaging.storjtelehash import telehashbinder
@@ -44,7 +45,7 @@ logging.basicConfig(level=logging.DEBUG, format=log_fmt)
 counter_opener = 0
 counter_receiver = 0
 
-cls = storj.messaging.get_messaging_classes()[0]
+cls = storj.messaging.plugin.get_messaging_classes()[0]
 
 
 class ChannelOpener(ChannelHandler):
