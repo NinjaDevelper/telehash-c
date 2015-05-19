@@ -92,6 +92,6 @@ setup(
     ext_modules=[module],
     install_requires=install_requirements,
     tests_require=test_requirements,
-    namespace_packages=['storj'],
+    namespace_packages=['storj', 'storj.messaging'],
     keywords=['storj', 'storj platform', 'messaging layer', 'telehash']
 )
