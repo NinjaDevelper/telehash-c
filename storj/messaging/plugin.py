@@ -5,6 +5,9 @@ from storj.messaging.messaging import Messaging
 
 
 def get_messaging_classes():
+    """
+    get class which implements Messaging methods.
+    """
     count = 0
     cls = []
     import storj.messaging

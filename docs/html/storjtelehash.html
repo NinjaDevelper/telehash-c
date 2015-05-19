@@ -1,5 +1,6 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<!doctype html>
 
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -8,7 +9,7 @@
     
     <title>storjtelehash module &mdash; .  documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -23,12 +24,17 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/bizstyle.js"></script>
     <link rel="top" title=".  documentation" href="index.html" />
     <link rel="next" title="telehashbinder module" href="telehashbinder.html" />
-    <link rel="prev" title="Welcome to .’s documentation!" href="index.html" /> 
+    <link rel="prev" title="Welcome to .’s documentation!" href="index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -43,27 +49,64 @@
         <li class="right" >
           <a href="index.html" title="Welcome to .’s documentation!"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">.  documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">.  documentation</a> &raquo;</li> 
       </ul>
-    </div>  
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to .&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="telehashbinder.html"
+                        title="next chapter">telehashbinder module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/storjtelehash.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-storjtelehash">
 <span id="storjtelehash-module"></span><h1>storjtelehash module<a class="headerlink" href="#module-storjtelehash" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="storjtelehash.StorjTelehash">
-<em class="property">class </em><tt class="descclassname">storjtelehash.</tt><tt class="descname">StorjTelehash</tt><big>(</big><em>broadcast_handler</em>, <em>port</em><big>)</big><a class="reference internal" href="_modules/storjtelehash.html#StorjTelehash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#storjtelehash.StorjTelehash" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">storj.messaging.Messaging</span></tt></p>
+<em class="property">class </em><code class="descclassname">storjtelehash.</code><code class="descname">StorjTelehash</code><span class="sig-paren">(</span><em>broadcast_handler</em>, <em>**keywords</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/storjtelehash.html#StorjTelehash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#storjtelehash.StorjTelehash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">storj.messaging.messaging.Messaging</span></code></p>
 <p>Concrete Messaging layer for Storj Platform in Telehash.
-Everything in telehash-C is not thread safe. So run function after 
+Everything in telehash-C is not thread safe. So run function after
 stop a thread, and run a thread again in all functions.</p>
+<dl class="attribute">
+<dt id="storjtelehash.StorjTelehash.DESCRIPTION">
+<code class="descname">DESCRIPTION</code><em class="property"> = 'messaging layer in telehach'</em><a class="headerlink" href="#storjtelehash.StorjTelehash.DESCRIPTION" title="Permalink to this definition">¶</a></dt>
+<dd><p>description about this messaging implementation which is
+used in sublcass.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="storjtelehash.StorjTelehash.add_broadcaster">
-<tt class="descname">add_broadcaster</tt><big>(</big><em>location</em>, <em>add</em><big>)</big><a class="reference internal" href="_modules/storjtelehash.html#StorjTelehash.add_broadcaster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#storjtelehash.StorjTelehash.add_broadcaster" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_broadcaster</code><span class="sig-paren">(</span><em>location</em>, <em>add</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/storjtelehash.html#StorjTelehash.add_broadcaster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#storjtelehash.StorjTelehash.add_broadcaster" title="Permalink to this definition">¶</a></dt>
 <dd><p>send a broadcast request to broadcaster.
 After calling this method, broadcast messages will be send continually.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -72,7 +115,7 @@ After calling this method, broadcast messages will be send continually.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>location</strong> (<em>str</em>) &#8211; json str where you want to request a broadcast.</li>
-<li><strong>add</strong> (<em>int</em>) &#8211; if 0, request to not to  broadcast. request to 
+<li><strong>add</strong> (<em>int</em>) &#8211; if 0, request to not to  broadcast. request to
 broaadcast if others.</li>
 </ul>
 </td>
@@ -83,7 +126,7 @@ broaadcast if others.</li>
 
 <dl class="method">
 <dt id="storjtelehash.StorjTelehash.broadcast">
-<tt class="descname">broadcast</tt><big>(</big><em>location</em>, <em>message</em><big>)</big><a class="reference internal" href="_modules/storjtelehash.html#StorjTelehash.broadcast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#storjtelehash.StorjTelehash.broadcast" title="Permalink to this definition">¶</a></dt>
+<code class="descname">broadcast</code><span class="sig-paren">(</span><em>location</em>, <em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/storjtelehash.html#StorjTelehash.broadcast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#storjtelehash.StorjTelehash.broadcast" title="Permalink to this definition">¶</a></dt>
 <dd><p>broadcast a message.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -100,8 +143,14 @@ broaadcast if others.</li>
 </dd></dl>
 
 <dl class="method">
+<dt id="storjtelehash.StorjTelehash.finalize">
+<code class="descname">finalize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/storjtelehash.html#StorjTelehash.finalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#storjtelehash.StorjTelehash.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>destructor. stop a thread and call telehashbinder&#8217;s finalization.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="storjtelehash.StorjTelehash.get_my_location">
-<tt class="descname">get_my_location</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/storjtelehash.html#StorjTelehash.get_my_location"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#storjtelehash.StorjTelehash.get_my_location" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_my_location</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/storjtelehash.html#StorjTelehash.get_my_location"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#storjtelehash.StorjTelehash.get_my_location" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>return my location information. format is:</dt>
 <dd>{&#8220;keys&#8221;:{&#8220;1a&#8221;:&#8221;al45izsjxe2sikv7mc6jpnwywybbkqvsou&#8221;},</dd>
@@ -121,7 +170,7 @@ broaadcast if others.</li>
 
 <dl class="method">
 <dt id="storjtelehash.StorjTelehash.open_channel">
-<tt class="descname">open_channel</tt><big>(</big><em>location</em>, <em>name</em>, <em>handler</em><big>)</big><a class="reference internal" href="_modules/storjtelehash.html#StorjTelehash.open_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#storjtelehash.StorjTelehash.open_channel" title="Permalink to this definition">¶</a></dt>
+<code class="descname">open_channel</code><span class="sig-paren">(</span><em>location</em>, <em>name</em>, <em>handler</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/storjtelehash.html#StorjTelehash.open_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#storjtelehash.StorjTelehash.open_channel" title="Permalink to this definition">¶</a></dt>
 <dd><p>open a channel with a handler.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -130,7 +179,7 @@ broaadcast if others.</li>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>location</strong> (<em>str</em>) &#8211; json str where you want to open a channel.</li>
 <li><strong>name</strong> (<em>str</em>) &#8211; channel name that you want to open .</li>
-<li><strong>handler</strong> (<em>ChannelHandler</em>) &#8211; channel handler.</li>
+<li><strong>handler</strong> (<a class="reference internal" href="messaging.html#messaging.ChannelHandler" title="messaging.ChannelHandler"><em>ChannelHandler</em></a>) &#8211; channel handler.</li>
 </ul>
 </td>
 </tr>
@@ -140,7 +189,7 @@ broaadcast if others.</li>
 
 <dl class="method">
 <dt id="storjtelehash.StorjTelehash.start_thread">
-<tt class="descname">start_thread</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/storjtelehash.html#StorjTelehash.start_thread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#storjtelehash.StorjTelehash.start_thread" title="Permalink to this definition">¶</a></dt>
+<code class="descname">start_thread</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/storjtelehash.html#StorjTelehash.start_thread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#storjtelehash.StorjTelehash.start_thread" title="Permalink to this definition">¶</a></dt>
 <dd><p>star to receive netowrk packets in a thread.</p>
 </dd></dl>
 
@@ -152,37 +201,9 @@ broaadcast if others.</li>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">Welcome to .&#8217;s documentation!</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="telehashbinder.html"
-                        title="next chapter">telehashbinder module</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/storjtelehash.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -197,12 +218,12 @@ broaadcast if others.</li>
         <li class="right" >
           <a href="index.html" title="Welcome to .’s documentation!"
              >previous</a> |</li>
-        <li><a href="index.html">.  documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">.  documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Author.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

@@ -14,6 +14,7 @@ Contents:
    storjtelehash
    telehashbinder
    messaging
+   plugin
 
 
 Indices and tables
