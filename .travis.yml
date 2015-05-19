@@ -22,7 +22,7 @@ script:
   - coverage run setup.py test -a "--doctest-modules --pep8 -v tests/ storj/messaging/ storj/messaging/storjtelehash/"
 
 after_success:
-  - coverage report -m --include="storj/messaging/storjtelehash/*.py,storj/messaging/*.py" --omit="storj/messaging/storjtelehash2/*.py"
+  - coverage report -m --include="storj/messaging/storjtelehash/*.py,storj/messaging/*.py"
   - pip install cpp-coveralls
   - coveralls --exclude tests --exclude telehash-c --exclude libtap --exclude cxx/telehashbinder_python.cpp --gcov-options '\-lp'
   - LD_LIBRARY_PATH=libtap G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=a.log --num-callers=40 ./test
