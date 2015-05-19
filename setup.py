@@ -40,7 +40,7 @@ os.environ['CC'] = 'g++'
 install_requirements = []
 
 test_requirements = [
-    'pytest>=2.6.4',
+    'pytest>=2.7.0',
     'pytest-pep8',
     'pytest-cache',
     'coveralls'

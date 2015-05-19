@@ -19,8 +19,7 @@ before_install:
 
 script:
   - LD_LIBRARY_PATH=libtap ./test
-#  - coverage run setup.py test -a "--doctest-modules --pep8 -v tests/ storj/messaging/ storj/messaging/storjtelehash/"
-  - coverage run setup.py test -a "--doctest-modules --pep8 -v tests/"
+  - coverage run setup.py test -a "--doctest-modules --pep8 -v tests/ storj/messaging/ storj/messaging/storjtelehash/"
 
 after_success:
   - coverage report -m --include="storj/messaging/storjtelehash/*.py,storj/messaging/*.py" --omit="storj/messaging/storjtelehash2/*.py"
