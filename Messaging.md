@@ -53,7 +53,7 @@ The order of calling method is alphabeetic order.
 
 The sample Python program  is below.
 
-```
+```python
 from storj.messaging import ChannelHandler
 from storjtelehash.storjtelehash import StorjTelehash
 
@@ -61,6 +61,9 @@ class ChannelOpener(ChannelHandler):
     """
     Channel handler for channel opener.
     Methods below would be called in alphabetic order.
+    When you want to jump, e.g. to seqC(), use self.next = seqC
+    When you want to call another ChannelHanlder instance, e.g. to handler,
+    use self.call = handler
     """
     def seqA(self, packet):
         """"
