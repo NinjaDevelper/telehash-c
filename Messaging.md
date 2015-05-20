@@ -66,7 +66,6 @@ class ChannelOpener(ChannelHandler):
     use self.call = handler
     """
     def seqA(self, packet):
-        """"
         packet: recevied message 
         logging.debug('called by opener at 1st, i.e. when opening a  channel')
         return '{\"count\":0}'
