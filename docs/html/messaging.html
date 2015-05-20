@@ -105,7 +105,10 @@ This instance is called when receving broadcasts and channel packets.</p>
 <dl class="method">
 <dt id="messaging.ChannelHandler.handle">
 <code class="descname">handle</code><span class="sig-paren">(</span><em>packet</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/messaging.html#ChannelHandler.handle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#messaging.ChannelHandler.handle" title="Permalink to this definition">¶</a></dt>
-<dd><p>call one seq* method incrementally per one packet</p>
+<dd><p>call one seq* method incrementally per one packet.
+In seq* methods, you can use
+self.call to call another ClassHandler instance,
+self.next to jump to another seq* methods.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -240,6 +243,14 @@ This method must be overwritten.</p>
 </table>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="exception">
+<dt id="messaging.NoSeqError">
+<em class="property">exception </em><code class="descclassname">messaging.</code><code class="descname">NoSeqError</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/messaging.html#NoSeqError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#messaging.NoSeqError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+<p>Exception Class thrown when no seq is remaiend.
+This instance is called when receving broadcasts and channel packets.</p>
 </dd></dl>
 
 </div>

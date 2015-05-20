@@ -34,10 +34,10 @@ import time
 import logging
 
 import storj.messaging
-import storj.messaging.plugin
 from storj.messaging.messaging import Messaging
 from storj.messaging.messaging import ChannelHandler
 from storj.messaging.storjtelehash import telehashbinder
+import storj.messaging.storjtelehash
 
 log_fmt = '%(filename)s:%(lineno)d %(funcName)s() %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=log_fmt)
@@ -45,7 +45,18 @@ logging.basicConfig(level=logging.DEBUG, format=log_fmt)
 counter_opener = 0
 counter_receiver = 0
 
-cls = storj.messaging.plugin.get_messaging_classes()[0]
+cls = storj.messaging.storjtelehash.StorjTelehash
+
+
+class CalledChannel(ChannelHandler):
+
+    def seqA(self, packet):
+        logging.debug('called channel packet=' + packet)
+        global counter_opener
+        j = json.loads(packet)
+        assert j['count'] == 3
+        counter_opener = counter_opener + 1
+        return '{\"count\":4}'
 
 
 class ChannelOpener(ChannelHandler):
@@ -62,7 +73,17 @@ class ChannelOpener(ChannelHandler):
         counter_opener = counter_opener + 1
         j = json.loads(packet)
         assert j['count'] == 1
+        self.call = CalledChannel()
         return '{\"count\":2}'
+
+    def seqC(self, packet):
+        logging.debug('called openerC')
+        global counter_opener
+        counter_opener = counter_opener + 1
+        j = json.loads(packet)
+        assert j['count'] == 5
+        self.call = CalledChannel()
+        return None
 
     def seqZ(self, packet):
         counter_opener = 9999
@@ -90,7 +111,15 @@ class ChannelReceiver(ChannelHandler):
         j = json.loads(packet)
         assert j['count'] == 2
         counter_receiver = counter_receiver + 1
-        return None
+        return '{\"count\":3}'
+
+    def seqD(self, packet):
+        logging.debug('called receiverB message='+packet)
+        global counter_receiver
+        j = json.loads(packet)
+        assert j['count'] == 4
+        counter_receiver = counter_receiver + 1
+        return '{\"count\":5}'
 
     def seqZ(self, packet):
         counter_receiver = 9999
@@ -158,8 +187,8 @@ class TestStorjTelehash(object):
         self.m2.add_channel_handler('counter_test', ChannelReceiver)
         self.m3.open_channel(self.location, 'counter_test', ChannelOpener())
         time.sleep(2)
-        assert counter_opener == 2
-        assert counter_receiver == 2
+        assert counter_opener == 4
+        assert counter_receiver == 3
 
 #       with pytest.raises(IOError):
         self.m2.add_channel_handler('counter_testNG', ChannelReceiverNG)

@@ -36,6 +36,25 @@ log_fmt = '%(filename)s:%(lineno)d %(funcName)s() %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=log_fmt)
 
 
+class NoSeqError(Exception):
+    """
+    Exception Class thrown when no seq is remaiend.
+    This instance is called when receving broadcasts and channel packets.
+    """
+    def __init__(self, value):
+        """
+        init.
+        :param str value: description about this exception
+        """
+        self.value = value
+
+    def __str__(self):
+        """
+        return description about this exception when str()
+        """
+        return repr(self.value)
+
+
 class ChannelHandler(object):
     """
     Class for handling  received packets in channels.
@@ -50,6 +69,7 @@ class ChannelHandler(object):
         self.mlist = []
         self.n = 0
         self.get_sequences()
+        self.call = None
 
     def get_sequences(self):
         """store all seq* methods to list."""
@@ -60,16 +80,7 @@ class ChannelHandler(object):
                 if isinstance(seq, types.MethodType):
                     self.mlist.append(seq)
 
-    def handle(self, packet):
-        """
-        call one seq* method incrementally per one packet
-
-        :param string packet: a received packet to be handled.
-        :return: packets to be send back. not sent if None
-        """
-        if self.n == -1:
-            raise IOError("no more methods for the handler.")
-
+    def _handle(self, packet):
         self.next = None
         r = self.mlist[self.n](packet)
         if self.next is None:
@@ -78,6 +89,29 @@ class ChannelHandler(object):
                 self.n = -1
         else:
             self.n = self.mlist.index(self.next)
+        return r
+
+    def handle(self, packet):
+        """
+        call one seq* method incrementally per one packet.
+        In seq* methods, you can use
+        self.call to call another ClassHandler instance,
+        self.next to jump to another seq* methods.
+
+        :param string packet: a received packet to be handled.
+        :return: packets to be send back. not sent if None
+        """
+        if self.n == -1:
+            raise NoSeqError("no more methods for the handler.")
+
+        if self.call is not None:
+            try:
+                r = self.call.handle(packet)
+            except NoSeqError:
+                self.call = None
+                r = self._handle(packet)
+        else:
+                r = self._handle(packet)
         return r
 
 
