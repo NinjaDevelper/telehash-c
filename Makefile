@@ -1,9 +1,9 @@
 CPP=g++
-CFLAGS+=-g -Wall -Wextra -Wno-unused-parameter -DDEBUG
+CFLAGS+=-g  -ggdb3 -Wall -Wextra -Wno-unused-parameter -DDEBUG -fstack-check
 INCLUDE+=-Itelehash-c/unix -Itelehash-c/include -Itelehash-c/include/lib -Icxx
 LDFLAGS += telehash-c/libtelehash.a
 TEST_LDFLAGS= -Llibtap -ltap 
-TEST_CPPFLAGS=-fprofile-arcs -ftest-coverage  -Ilibtap -g -ggdb3
+TEST_CPPFLAGS=-fprofile-arcs -ftest-coverage  -Ilibtap
 
 test: cxx/StorjTelehash.cpp tests/test.c
 	cd telehash-c;make

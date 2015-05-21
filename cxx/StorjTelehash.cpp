@@ -44,9 +44,25 @@ int StorjTelehash::status=0;
 int StorjTelehash::count=0;
 link_t StorjTelehash::targetLink=NULL;
 list<link_t> StorjTelehash::broadcastee;
-map<string,ChannelHandler *> StorjTelehash::broadcastHandlers;
 char StorjTelehash::globalIP[3*4+3+1]; ;
-map<string,ChannelHandlerFactory *> StorjTelehash::factories;
+static list<link_t> broadcastee;
+/**
+ * registered factory instance that creates ChannelHander instance.
+ * Construct On First Us
+ */
+map<string,ChannelHandlerFactory *> &factories(){
+    static map<string,ChannelHandlerFactory *> _factories;
+    return _factories;
+}
+
+/**
+ * handler when receving a broadcast.
+ * Construct On First Us
+ */
+map<string,ChannelHandler *>& broadcastHandlers(){
+    static map<string,ChannelHandler *> _broadcastHandlers;
+    return _broadcastHandlers;
+}
 
 int StorjTelehash::isLocal(char *adr){
     if(!strcmp(adr,"127.0.0.1") || !strncmp(adr,"10.",3) 
@@ -203,7 +219,7 @@ void StorjTelehash::serviceOnOpenHandler(link_t link, e3x_channel_t chan,
 lob_t StorjTelehash::serviceOnOpen(link_t link,lob_t open){
     if(!link || !open) return open;
     char *type=(char *)lob_get(open,(char *)"type");
-    ChannelHandlerFactory *factory=factories[link->mesh->id->hashname];
+    ChannelHandlerFactory *factory=factories()[link->mesh->id->hashname];
     ChannelHandler *c=factory->createInstance(type);
     if(!c) return open;
     LOG("pointer=%p",c);
@@ -265,7 +281,8 @@ lob_t StorjTelehash::broadcastOnOpen(link_t link,lob_t open){
     lob_t data=lob_get_json(open,(char *)"data");
     char *j=lob_json(data);
     LOG("%s",link->mesh->id->hashname);
-    ChannelHandler* broadcastHandler=broadcastHandlers[link->mesh->id->hashname];
+    ChannelHandler* broadcastHandler=
+        broadcastHandlers()[link->mesh->id->hashname];
     char *json_=broadcastHandler->handle(j);
     if(json_){
         list<link_t>::iterator it = broadcastee.begin();
@@ -291,8 +308,10 @@ lob_t StorjTelehash::broadcastOnOpen(link_t link,lob_t open){
 
 StorjTelehash::StorjTelehash(int port ,
     ChannelHandlerFactory &factory, ChannelHandler &broadcastHandler){
-
-    globalIP[0]='\0';
+/*
+ * must not use static variables! if not, it crashes 
+ * if object would be created globaly.
+ */
     lob_t id = util_fjson((char *)"id.json");
     if(!id){
         writeID();
@@ -311,8 +330,8 @@ StorjTelehash::StorjTelehash(int port ,
         lob_free(k);
         lob_free(s);
     }
-    this->factories[mesh->id->hashname] = &factory;
-    broadcastHandlers[mesh->id->hashname]=&broadcastHandler;
+    factories()[mesh->id->hashname] = &factory;
+    broadcastHandlers()[mesh->id->hashname]=&broadcastHandler;
     mesh_on_discover(mesh,(char *)"auto",mesh_add); 
     mesh_on_link(mesh, (char *)"onLink", onLink);
     mesh_on_open(mesh,(char *)"service",serviceOnOpen);
@@ -332,11 +351,11 @@ StorjTelehash::StorjTelehash(int port ,
 }
 
 ChannelHandlerFactory* StorjTelehash::getChannelHandlerFactory(){
-    return factories[mesh->id->hashname];
+    return factories()[mesh->id->hashname];
 }
 
 ChannelHandler* StorjTelehash::getBroadcastHandler(){
-    return broadcastHandlers[mesh->id->hashname];
+    return broadcastHandlers()[mesh->id->hashname];
 }
 
 /*

@@ -103,11 +103,6 @@ public:
 class StorjTelehash{
 private:
     /**
-     * registered factory instance that creates ChannelHander instance.
-     */
-    static map<string,ChannelHandlerFactory*> factories;
-
-    /**
      * telehash-c mesh.
      */
     mesh_t mesh;
@@ -141,11 +136,6 @@ private:
      * links needed to broadcast.
      */
     static list<link_t> broadcastee;
-
-    /**
-     * handler when receving a broadcast.
-     */
-    static map<string, ChannelHandler *> broadcastHandlers ;
     
     /**
      * determin whethere adr is local or not.

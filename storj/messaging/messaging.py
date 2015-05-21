@@ -147,10 +147,8 @@ class Messaging(object):
         """
         if isinstance(handler_class, type) and \
            issubclass(handler_class, ChannelHandler):
-            logging.debug("bbbb")
             self.channels[channel_name] = handler_class
         else:
-            logging.debug("aaaaaaa")
             raise TypeError("cannot add non ChannelHandler subclass")
 
     def get_channel_handler(self, channel_name):
