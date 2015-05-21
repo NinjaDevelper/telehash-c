@@ -3,6 +3,8 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+#include <poll.h>
+
 #include "net_udp4.h"
 #include "tgc.h"
 
@@ -121,7 +123,13 @@ net_udp4_t net_udp4_new(mesh_t mesh, lob_t options)
   lob_set_int(net->path,"port",net->port);
   mesh->paths = lob_push(mesh->paths, net->path);
 
+  net->timeout = -1;
   return net;
+}
+
+void net_udp4_timeout(net_udp4_t net, int timeout)
+{
+  net->timeout = timeout;
 }
 
 void net_udp4_free(net_udp4_t net)
@@ -142,15 +150,28 @@ net_udp4_t net_udp4_receive(net_udp4_t net)
   size_t salen;
   lob_t packet;
   pipe_t pipe;
+  struct pollfd fds[1];
+
+  fds[0].fd = net->server;
+  fds[0].events = POLLIN | POLLERR;
   
   if(!net) return LOG("bad args");
 
   salen = sizeof(sa);
   memset(&sa,0,salen);
-  len = recvfrom(net->server, buf, sizeof(buf), 0, (struct sockaddr *)&sa, (socklen_t *)&salen);
-
+  if(net->timeout > 0){
+      poll(fds, 1, net->timeout);
+      if (fds[0].revents & POLLIN) {
+          len = recvfrom(net->server, buf, sizeof(buf), 0, (struct sockaddr *)&sa, (socklen_t *)&salen);
+      }else{
+          return net;
+      }
+  } else {
+      len = recvfrom(net->server, buf, sizeof(buf), 0, (struct sockaddr *)&sa, (socklen_t *)&salen);
+  }
   if(len < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) return net;
   if(len <= 0) return LOG("recvfrom error %s",strerror(errno));
+
 
   packet = lob_decloak(buf, (size_t)len);
   if(!packet)

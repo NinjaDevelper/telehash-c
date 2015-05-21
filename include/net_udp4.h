@@ -18,6 +18,7 @@ typedef struct net_udp4_struct
   mesh_t mesh;
   xht_t pipes;
   lob_t path; // to us
+  int timeout;
 } *net_udp4_t;
 
 // create a new listening udp server
@@ -26,6 +27,10 @@ void net_udp4_free(net_udp4_t net);
 
 // receive a packet into this mesh
 net_udp4_t net_udp4_receive(net_udp4_t net);
+
+// set timeout when polling
+void net_udp4_timeout(net_udp4_t net, int timeout);
+
 
 #endif
 

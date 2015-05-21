@@ -62,7 +62,7 @@ int util_sock_timeout(int sock, uint32_t ms)
     LOG("timeout setsockopt error %s",strerror(errno));
     return -1;
   }
-
+    
   return sock;
 }
 
