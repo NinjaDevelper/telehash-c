@@ -1,5 +1,9 @@
 CC=gcc
-CFLAGS+=-g -Wall -Wextra -Wno-unused-parameter -DDEBUG -fPIC
+ifeq ($(OS),Windows_NT)
+	CFLAGS+=-g -Wall -Wextra -Wno-unused-parameter -DDEBUG
+else
+	CFLAGS+=-g -Wall -Wextra -Wno-unused-parameter -DDEBUG -fPIC
+endif
 #CFLAGS+=-Weverything -Wno-unused-macros -Wno-undef -Wno-gnu-zero-variadic-macro-arguments -Wno-padded -Wno-gnu-label-as-value -Wno-gnu-designator -Wno-missing-prototypes -Wno-format-nonliteral
 INCLUDE+=-Iinclude -Iinclude/lib -Iunix
 
