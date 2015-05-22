@@ -343,7 +343,9 @@ StorjTelehash::StorjTelehash(int port ,
         lob_set_int(p,(char *)"port",port);
     }
     udp4 = net_udp4_new(mesh, p);
-    util_sock_timeout(udp4->server,100);
+    net_udp4_timeout(udp4,100);
+//    util_sock_timeout(udp4->server,100);
+// cygwin cannot use SO_RCVTIMEO.
     lob_free(p);
     lob_free(id);
     
