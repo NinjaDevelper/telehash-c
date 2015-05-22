@@ -42,6 +42,8 @@ under Python category:
 1. python-setuptools
 1. python3-setuptools
 
+After that run c:\cygwin\cygwin.bat, where you can install and run StorjTelehash.
+
 ## Usage
 
 Explanation about messaging layer is [here](Messaging.md).
