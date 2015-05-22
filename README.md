@@ -25,18 +25,23 @@ To run the associated tests for python:
 
 
 for Windows OS, [Cygwin](https://www.cygwin.com/) must be installed first.
+
 1. download cygwin installer from [here](https://www.cygwin.com/setup-x86.exe) and run it.
-1. go forward to package selection, and select
-    under devel category:
-    1. gcc-g++
-    1. make
-    2. git
-    under Python category:
-    1. python
-    1. python3
-    1. python-setuptools
-    1. python3-setuptools
-    1. setuptools
+1. go forward to package selection, and select packages below, and go forward to install them.
+
+under devel category:
+
+1. gcc-g++
+1. make
+2. git
+
+under Python category:
+
+1. python
+1. python3
+1. python-setuptools
+1. python3-setuptools
+1. setuptools
 
 ## Usage
 
