@@ -41,7 +41,6 @@ under Python category:
 1. python3
 1. python-setuptools
 1. python3-setuptools
-1. setuptools
 
 ## Usage
 
