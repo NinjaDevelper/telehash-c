@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <poll.h>
+#include <sys/ioctl.h>
 
 #include "net_udp4.h"
 #include "tgc.h"
@@ -129,6 +130,8 @@ net_udp4_t net_udp4_new(mesh_t mesh, lob_t options)
 
 void net_udp4_timeout(net_udp4_t net, int timeout)
 {
+  int val = 1;
+  ioctl(net->server, FIONBIO, &val);
   net->timeout = timeout;
 }
 
