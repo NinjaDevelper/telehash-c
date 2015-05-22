@@ -290,9 +290,10 @@ public:
      * {"keys":{"1a":"al45izsjxe2sikv7mc6jpnwywybbkqvsou"},
      * "paths":[{"type":"udp4","ip":"127.0.0.1","port":1234}]
      * 
+     * @param location wherere location info is stored.
      * @return location info.
      */
-    char *getMyLocation();
+    string &getMyLocation(string &location);
 
     /**
      * open a channel associated a channel name.

@@ -315,9 +315,10 @@ void locationTest(){
     
     //stop GC to use thread. GC is thread-unsafe.
     StorjTelehash::setGC(0);
-    char *info1=m1.getMyLocation();
-    char *info2=m2.getMyLocation();
-    LOG("info %s",info2);
+    string info1,info2;
+    m1.getMyLocation(info1);
+    m2.getMyLocation(info2);
+    LOG("info %s",info2.c_str());
     value v1,v2;
     parse(v1, info1);
     parse(v2, info2);
@@ -347,8 +348,6 @@ void locationTest(){
         "{\"keys\":{\"1a\":\""+k2+"\"},\"paths\":[{\"type\":\"udp4\",\"ip\""
         ":\"127.0.0.1\",\"port\":1234}]}";
     location=(char *)location_.c_str();
-    free(info1);
-    free(info2);
 }
 
 

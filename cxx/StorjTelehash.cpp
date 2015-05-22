@@ -112,7 +112,7 @@ char *StorjTelehash::getGlobalIP(char *ip){
  * "keys":{"1a":"al45izsjxe2sikv7mc6jpnwywybbkqvsou"},
  *         "paths":[{"type":"udp4","ip":"127.0.0.1","port":1234}]}
 */
-char *StorjTelehash::getMyLocation(){
+string &StorjTelehash::getMyLocation(string &location){
 	char ip[3*4+3+1];
     size_t len = 3; // []\0
     char *paths;
@@ -143,11 +143,10 @@ char *StorjTelehash::getMyLocation(){
     sprintf(paths+(strlen(paths)-1),"]");
     lob_set_raw(json,(char *)"paths",0,paths,strlen(paths));
     char *jsonStr=lob_json(json);
-    char *info=(char *)malloc(strlen(jsonStr)+1);
-    strcpy(info,jsonStr);
+    location = jsonStr;
     free(paths);
     lob_free(json);
-    return info;
+    return location;
 }
 
 int StorjTelehash::writeID(){

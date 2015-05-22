@@ -290,9 +290,9 @@ static PyObject *telehashbinder_getMyLocation(PyObject *self,
         return NULL;
     }
     StorjTelehash *m=(StorjTelehash *)PyCapsule_GetPointer(cobj,NULL);
-    char *loc=m->getMyLocation();
-    PyObject *p= Py_BuildValue("s",loc);
-    free(loc);
+    string loc;
+    m->getMyLocation(loc);
+    PyObject *p= Py_BuildValue("s",loc.c_str());
     return p;
 }
 
