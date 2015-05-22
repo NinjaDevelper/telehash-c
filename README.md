@@ -24,6 +24,20 @@ To run the associated tests for python:
     $ PYTHONPATH=. py.test -q tests/test.py -s
 
 
+for Windows OS, [Cygwin](https://www.cygwin.com/) must be installed first.
+1. download cygwin installer from [here](https://www.cygwin.com/setup-x86.exe) and run it.
+1. go forward to package selection, and select
+    under devel category:
+    1. gcc-g++
+    1. make
+    2. git
+    under Python category:
+    1. python
+    1. python3
+    1. python-setuptools
+    1. python3-setuptools
+    1. setuptools
+
 ## Usage
 
 Explanation about messaging layer is [here](Messaging.md).
