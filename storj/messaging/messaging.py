@@ -135,21 +135,18 @@ class Messaging(object):
        :param ChannelHandler broadcastHandler: a received packet to be handled.
        do nothing to this parameter.
         """
-        self.channels = {}
+        self.channel_factories = {}
 
-    def add_channel_handler(self, channel_name, handler_class):
+    def add_channel_handler(self, channel_name, factory):
         """
         add ChannelHandler class object and associate it with a channel name.
 
         :param Class handler_class: ChannelHandler class to be associated
         with
-        :param str channel_name: channel name that is associated with.
+        :param method factory: factory method called  when creating
+                               handler_class instnace.
         """
-        if isinstance(handler_class, type) and \
-           issubclass(handler_class, ChannelHandler):
-            self.channels[channel_name] = handler_class
-        else:
-            raise TypeError("cannot add non ChannelHandler subclass")
+        self.channel_factories[channel_name] = factory
 
     def get_channel_handler(self, channel_name):
         """
@@ -158,11 +155,14 @@ class Messaging(object):
 
         :param str channel_name: channel name
         """
-        if channel_name not in self.channels.keys():
-            logging.info(channel_name + ' not found')
-            return None
+        if channel_name not in self.channel_factories.keys():
+            raise TypeError(channel_name + ' is not registered')
+        h = self.channel_factories[channel_name]()
+        if not isinstance(h, ChannelHandler):
+            raise TypeError(
+                "create non ChannelHandler instance when call factory")
 
-        return self.channels[channel_name]().handle
+        return h.handle
 
     @abstractmethod
     def open_channel(self, location, name, handler):

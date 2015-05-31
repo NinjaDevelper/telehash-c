@@ -134,7 +134,6 @@ class ChannelReceiverNG(ChannelHandler):
 
 
 class TestStorjTelehash(object):
-
     def setup(self):
         telehashbinder.set_gc(0)
         self.m2 = cls(self.broadcast_handler2)
@@ -171,10 +170,8 @@ class TestStorjTelehash(object):
             m = cls("aaa", port=1234)
 
         with pytest.raises(TypeError):
-            self.m2.add_channel_handler('counter_test', ChannelReceiver())
-
-        with pytest.raises(TypeError):
-            self.m3.open_channel(self.location, 'counter_test', ChannelOpener)
+            self.m3.open_channel(self.location, 'counter_test',
+                                 ChannelOpener)
 
         self.status = 0
         self.m4.add_broadcaster(self.location, 1)
@@ -184,7 +181,8 @@ class TestStorjTelehash(object):
         assert self.status4 == 1
 
         self.status = 0
-        self.m2.add_channel_handler('counter_test', ChannelReceiver)
+        self.m2.add_channel_handler('counter_test',
+                                    (lambda: ChannelReceiver()))
         self.m3.open_channel(self.location, 'counter_test', ChannelOpener())
         time.sleep(2)
         assert counter_opener == 4
@@ -198,7 +196,14 @@ class TestStorjTelehash(object):
         logging.debug('should to raise exception in another thread,\
          but cannot catch')
 
-        assert self.m2.get_channel_handler("nothing") is None
+        with pytest.raises(TypeError):
+            self.m2.get_channel_handler("nothing")
+
+#        with pytest.raises(TypeError):
+            self.m2.add_channel_handler('testtest', (lambda: None))
+            self.m3.open_channel(self.location, 'testtest', ChannelOpener())
+        logging.debug('should to raise exception in another thread,\
+         but cannot catch')
 
         self.m2.finalize()
         self.m3.finalize()
