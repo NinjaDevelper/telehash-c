@@ -159,18 +159,22 @@ broaadcast if others.</li>
 
 <dl class="method">
 <dt id="messaging.Messaging.add_channel_handler">
-<code class="descname">add_channel_handler</code><span class="sig-paren">(</span><em>channel_name</em>, <em>handler_class</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/messaging.html#Messaging.add_channel_handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#messaging.Messaging.add_channel_handler" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_channel_handler</code><span class="sig-paren">(</span><em>channel_name</em>, <em>factory</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/messaging.html#Messaging.add_channel_handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#messaging.Messaging.add_channel_handler" title="Permalink to this definition">¶</a></dt>
 <dd><p>add ChannelHandler class object and associate it with a channel name.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>handler_class</strong> (<em>Class</em>) &#8211; ChannelHandler class to be associated</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>handler_class</strong> (<em>Class</em>) &#8211; ChannelHandler class to be associated
+with</li>
+<li><strong>factory</strong> (<em>method</em>) &#8211; factory method called  when creating
+handler_class instnace.</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
-<p>with
-:param str channel_name: channel name that is associated with.</p>
 </dd></dl>
 
 <dl class="method">

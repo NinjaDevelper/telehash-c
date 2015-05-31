@@ -207,23 +207,18 @@
 <span class="sd">       :param ChannelHandler broadcastHandler: a received packet to be handled.</span>
 <span class="sd">       do nothing to this parameter.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">channels</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel_factories</span> <span class="o">=</span> <span class="p">{}</span>
 
-<div class="viewcode-block" id="Messaging.add_channel_handler"><a class="viewcode-back" href="../messaging.html#messaging.Messaging.add_channel_handler">[docs]</a>    <span class="k">def</span> <span class="nf">add_channel_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel_name</span><span class="p">,</span> <span class="n">handler_class</span><span class="p">):</span>
+<div class="viewcode-block" id="Messaging.add_channel_handler"><a class="viewcode-back" href="../messaging.html#messaging.Messaging.add_channel_handler">[docs]</a>    <span class="k">def</span> <span class="nf">add_channel_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel_name</span><span class="p">,</span> <span class="n">factory</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        add ChannelHandler class object and associate it with a channel name.</span>
 
 <span class="sd">        :param Class handler_class: ChannelHandler class to be associated</span>
-<span class="sd">        with</span>
-<span class="sd">        :param str channel_name: channel name that is associated with.</span>
+<span class="sd">                                    with</span>
+<span class="sd">        :param method factory: factory method called  when creating</span>
+<span class="sd">                               handler_class instnace.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">handler_class</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> \
-           <span class="nb">issubclass</span><span class="p">(</span><span class="n">handler_class</span><span class="p">,</span> <span class="n">ChannelHandler</span><span class="p">):</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;bbbb&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">[</span><span class="n">channel_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">handler_class</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;aaaaaaa&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;cannot add non ChannelHandler subclass&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel_factories</span><span class="p">[</span><span class="n">channel_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">factory</span>
 </div>
 <div class="viewcode-block" id="Messaging.get_channel_handler"><a class="viewcode-back" href="../messaging.html#messaging.Messaging.get_channel_handler">[docs]</a>    <span class="k">def</span> <span class="nf">get_channel_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -232,11 +227,14 @@
 
 <span class="sd">        :param str channel_name: channel name</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">channel_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">channel_name</span> <span class="o">+</span> <span class="s">&#39; not found&#39;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">channel_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel_factories</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">channel_name</span> <span class="o">+</span> <span class="s">&#39; is not registered&#39;</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel_factories</span><span class="p">[</span><span class="n">channel_name</span><span class="p">]()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">ChannelHandler</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s">&quot;create non ChannelHandler instance when call factory&quot;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">[</span><span class="n">channel_name</span><span class="p">]()</span><span class="o">.</span><span class="n">handle</span>
+        <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">handle</span>
 </div>
     <span class="nd">@abstractmethod</span>
 <div class="viewcode-block" id="Messaging.open_channel"><a class="viewcode-back" href="../messaging.html#messaging.Messaging.open_channel">[docs]</a>    <span class="k">def</span> <span class="nf">open_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">handler</span><span class="p">):</span>

@@ -142,7 +142,7 @@ class Messaging(object):
         add ChannelHandler class object and associate it with a channel name.
 
         :param Class handler_class: ChannelHandler class to be associated
-        with
+                                    with
         :param method factory: factory method called  when creating
                                handler_class instnace.
         """
