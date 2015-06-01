@@ -10,9 +10,9 @@ This requires
 
 ## Installation
 
-To compile 
+To install 
 
-    $ make python
+    $ python setup.py install
     
 To run the associated tests:
 
@@ -21,7 +21,7 @@ To run the associated tests:
 
 To run the associated tests for python:
 
-    $ PYTHONPATH=. py.test -q tests/test.py -s
+    $ python  setup.py test -a "--doctest-modules --pep8 -v tests/ storj/messaging/ storj/messaging/storjtelehash/"
 
 
 for Windows OS, [Cygwin](https://www.cygwin.com/) must be installed first.

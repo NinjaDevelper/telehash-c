@@ -35,6 +35,9 @@ from distutils.core import setup, Extension
 LONG_DESCRIPTION = open('README.md').read()
 VERSION = '1.0'
 
+os.environ['CC'] = 'gcc'
+os.environ['CXX'] = 'g++'
+
 install_requirements = []
 
 test_requirements = [
