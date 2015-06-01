@@ -12,8 +12,8 @@ before_install:
   - sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-4.8 90
   - sudo apt-get install valgrind
   - git submodule update --init --recursive
-  - make test
   - pip install coverage coveralls
+  - make test
   - python setup.py install
 
 script:
