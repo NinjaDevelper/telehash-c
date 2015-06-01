@@ -35,9 +35,6 @@ from distutils.core import setup, Extension
 LONG_DESCRIPTION = open('README.md').read()
 VERSION = '1.0'
 
-os.environ['CC'] = 'gcc'
-os.environ['CXX'] = 'g++'
-
 install_requirements = []
 
 test_requirements = [
@@ -90,7 +87,7 @@ telehash_src = [
 ]
 
 module = Extension('storj.messaging.storjtelehash.telehashbinder',
-                   ['cxx/telehashbinder_python.cpp',
+                   sources = ['cxx/telehashbinder_python.cpp',
                     'cxx/StorjTelehash.cpp'] + telehash_src,
                     extra_compile_args = ['-fpermissive'],
                     include_dirs=['telehash-c/unix', 'telehash-c/include',

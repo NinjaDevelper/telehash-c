@@ -86,7 +86,7 @@ char *EvaluatePyObject(PyObject *obj, char *str){
     
 class ChannelHandlerImpl : public ChannelHandler{
 private:
-    PyObject *pyHandler=NULL;
+    PyObject *pyHandler;
 public:
     /**
      * create myself with handlers.
@@ -116,7 +116,7 @@ public:
 
 class ChannelHandlerFactoryImpl : public ChannelHandlerFactory{
 private:
-    PyObject *pyFactory = NULL;
+    PyObject *pyFactory;
 public:
     ChannelHandlerFactoryImpl(PyObject *pyFactory){
         Py_XINCREF(pyFactory); 
