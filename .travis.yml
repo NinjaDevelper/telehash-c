@@ -13,7 +13,6 @@ before_install:
   - sudo apt-get install valgrind
   - git submodule update --init --recursive
   - make test
-  - make python
   - pip install coverage coveralls
   - python setup.py install
 

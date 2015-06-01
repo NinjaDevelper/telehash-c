@@ -10,10 +10,6 @@ test: cxx/StorjTelehash.cpp tests/test.c
 	cd libtap;make
 	$(CPP) $(INCLUDE) ${CFLAGS}  ${TEST_CPPFLAGS}  -o $@ $^  ${LDFLAGS}   ${TEST_LDFLAGS} -std=c++11 -pthread 
 
-python: ${FILES} cxx/telehashbinder_python.cpp cxx/StorjTelehash.cpp
-	cd telehash-c;make
-	python setup.py build_ext -i
-
 clean:
 	rm -f *.o
 	rm -f bin/*
