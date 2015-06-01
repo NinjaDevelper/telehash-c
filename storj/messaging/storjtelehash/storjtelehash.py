@@ -33,7 +33,7 @@ import logging
 
 from storj.messaging.messaging import Messaging
 from storj.messaging.messaging import ChannelHandler
-from . import telehashbinder
+#from . import telehashbinder
 # import telehashbinder #for creating document
 
 log_fmt = '%(filename)s:%(lineno)d %(funcName)s() %(message)s'
@@ -57,12 +57,13 @@ class StorjTelehash(Messaging):
         init
 
         :param ChannelHandler broadcast_handler: broadcast handler.
+                                                 can be None.
         :param keywords keywords: 'port=int' to be listened packets.
-        if 0, port number
-        is seletcted randomly.
+                                  if 0, port number is seletcted randomly.
         """
         Messaging.__init__(self, broadcast_handler, **keywords)
-        if not isinstance(broadcast_handler, types.MethodType):
+        if broadcast_handler is not None and\
+           not isinstance(broadcast_handler, types.MethodType):
             raise TypeError("cannot add non method handler.")
 
         if 'port' in keywords:

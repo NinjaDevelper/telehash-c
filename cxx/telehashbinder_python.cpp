@@ -105,6 +105,7 @@ public:
      * @return a json packet that should be sent back. not be sent if NULL.
      */
 	char* handle(char *json){
+        if(!pyHandler) return NULL;
         return EvaluatePyObject(pyHandler, json);
 	}
     
@@ -168,8 +169,13 @@ static PyObject *telehashbinder_init(PyObject *self, PyObject *args){
     if (!PyArg_ParseTuple(args, "iOO", &port,&pyFactory,&broadcastHandler)){
         return NULL;
     }
-    if (!PyCallable_Check(pyFactory) || !PyCallable_Check(broadcastHandler)) {
-        PyErr_SetString(PyExc_TypeError, "parameter must be callable");
+    if (!PyCallable_Check(pyFactory)) {
+        PyErr_SetString(PyExc_TypeError, "factory must be callable");
+        return NULL;
+    }
+    if (broadcastHandler==Py_None) broadcastHandler = NULL;
+    if (!broadcastHandler && !PyCallable_Check(broadcastHandler)) {
+        PyErr_SetString(PyExc_TypeError, "broadcastHandler must be callable");
         return NULL;
     }
 

@@ -200,8 +200,8 @@ class TestStorjTelehash(object):
             self.m2.get_channel_handler("nothing")
 
 #        with pytest.raises(TypeError):
-            self.m2.add_channel_handler('testtest', (lambda: None))
-            self.m3.open_channel(self.location, 'testtest', ChannelOpener())
+        self.m2.add_channel_handler('testtest', (lambda: None))
+        self.m3.open_channel(self.location, 'testtest', ChannelOpener())
         logging.debug('should to raise exception in another thread,\
          but cannot catch')
 

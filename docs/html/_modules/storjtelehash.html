@@ -129,12 +129,13 @@
 <span class="sd">        init</span>
 
 <span class="sd">        :param ChannelHandler broadcast_handler: broadcast handler.</span>
+<span class="sd">                                                 can be None.</span>
 <span class="sd">        :param keywords keywords: &#39;port=int&#39; to be listened packets.</span>
-<span class="sd">        if 0, port number</span>
-<span class="sd">        is seletcted randomly.</span>
+<span class="sd">                                  if 0, port number is seletcted randomly.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">Messaging</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">broadcast_handler</span><span class="p">,</span> <span class="o">**</span><span class="n">keywords</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">broadcast_handler</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">broadcast_handler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span>\
+           <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">broadcast_handler</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;cannot add non method handler.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="s">&#39;port&#39;</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">:</span>
