@@ -83,8 +83,6 @@ char *StorjTelehash::getGlobalIP(char *ip){
     char *addr = NULL;
 
     ip[0]='\0';
-    getifaddrs (&ifap);
-    LOG("%x",ifap);
     for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
         if (ifa->ifa_addr && ifa->ifa_addr->sa_family==AF_INET) {
             sa = (struct sockaddr_in *) ifa->ifa_addr;
@@ -95,7 +93,6 @@ char *StorjTelehash::getGlobalIP(char *ip){
             }
         }
     }
-
     freeifaddrs(ifap);
     return ip;
 }
