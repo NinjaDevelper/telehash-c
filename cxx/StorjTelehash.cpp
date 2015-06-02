@@ -169,7 +169,6 @@ int StorjTelehash::writeID(){
     fclose(fdout);
     lob_free(options);
     lob_free(json);
-    lob_free(keys);
     lob_free(secrets);
     return 0;
 }
