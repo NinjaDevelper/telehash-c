@@ -26,7 +26,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "StorjTelehash.h"
+#include "StorjTelehash.hpp"
 #include <Python.h>
 #include "bytesobject.h"
 

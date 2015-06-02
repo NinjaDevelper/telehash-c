@@ -38,7 +38,7 @@
 #include <netdb.h>
 
 #include <string> 
-#include "StorjTelehash.h"
+#include "StorjTelehash.hpp"
 
 int StorjTelehash::status=0;
 int StorjTelehash::count=0;
