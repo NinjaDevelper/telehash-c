@@ -36,8 +36,9 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <netdb.h>
-
+#include <ifaddrs.h>
 #include <string> 
+
 #include "StorjTelehash.hpp"
 
 int StorjTelehash::status=0;
@@ -77,34 +78,25 @@ int StorjTelehash::isLocal(char *adr){
 }
 
 char *StorjTelehash::getGlobalIP(char *ip){
-    struct ifreq ifr[100];
-    struct ifconf ifc;
-    int fd;
-    int nifs, i;
-
-    fd = socket(AF_INET, SOCK_DGRAM, 0);
-
-    ifc.ifc_len = sizeof(ifr);
-    ifc.ifc_ifcu.ifcu_buf = (char *)ifr;
-    ioctl(fd, SIOCGIFCONF, &ifc);
-
-    nifs = ifc.ifc_len / sizeof(struct ifreq);
+    struct ifaddrs *ifap = NULL, *ifa = NULL;
+    struct sockaddr_in *sa = NULL;
+    char *addr = NULL;
 
     ip[0]='\0';
-    for (i=0; i<nifs; i++) {
-        LOG("found interface %s", ifr[i].ifr_name);
-        ioctl(fd, SIOCGIFADDR, &ifr[i]);
-        char *adr=inet_ntoa(((struct sockaddr_in *)&ifr[i].ifr_addr)
-                              ->sin_addr);
-        if(!isLocal(adr)){
-            LOG("found global IP address %s", adr);
-            strcpy(ip,adr);
+    getifaddrs (&ifap);
+    for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr->sa_family==AF_INET) {
+            sa = (struct sockaddr_in *) ifa->ifa_addr;
+            addr = inet_ntoa(sa->sin_addr);
+            if(!isLocal(addr)){
+                LOG("found global IP address %s", addr);
+                strcpy(ip,addr);
+            }
         }
     }
 
-  close(fd);
-
-  return ip;
+    freeifaddrs(ifap);
+    return ip;
 }
 
 /*

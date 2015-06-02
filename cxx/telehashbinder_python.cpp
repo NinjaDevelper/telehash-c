@@ -64,7 +64,7 @@ char *EvaluatePyObject(PyObject *obj, char *str){
         if(PyUnicode_Check(result)){
             ascii=PyUnicode_AsASCIIString(result);
             buffer=PyBytes_AsString(ascii);
-            rbuf=(char *)malloc(strlen(buffer));
+            rbuf=(char *)malloc(strlen(buffer)+1);
             strcpy(rbuf,buffer);
             Py_XDECREF(ascii);
         }else{
