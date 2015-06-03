@@ -373,7 +373,6 @@ uint8_t mesh_receive(mesh_t mesh, lob_t outer, pipe_t pipe)
   if(!mesh || !outer || !pipe)
   {
     LOG("bad args");
-    tgc_gcollect();
     return 1;
   }
   
@@ -387,7 +386,6 @@ uint8_t mesh_receive(mesh_t mesh, lob_t outer, pipe_t pipe)
     {
       LOG("%02x handshake failed %s",outer->head[0],e3x_err());
       lob_free(outer);
-     tgc_gcollect();
       return 2;
     }
     
@@ -400,7 +398,6 @@ uint8_t mesh_receive(mesh_t mesh, lob_t outer, pipe_t pipe)
 
     // process the handshake
     uint8_t ret= mesh_receive_handshake(mesh, inner, pipe) ? 0 : 3;
-    tgc_gcollect();
     return ret;
   }
 
@@ -410,7 +407,6 @@ uint8_t mesh_receive(mesh_t mesh, lob_t outer, pipe_t pipe)
     if(outer->body_len < 16)
     {
       LOG("packet too small %d",outer->body_len);
-      tgc_gcollect();
       return 5;
     }
     util_hex(outer->body, 16, hex);
@@ -428,19 +424,16 @@ uint8_t mesh_receive(mesh_t mesh, lob_t outer, pipe_t pipe)
     {
       LOG("channel decryption fail for link %s %s",link->id->hashname,e3x_err());
       lob_free(outer);
-      tgc_gcollect();
       return 7;
     }
     
     LOG("channel packet %d bytes from %s",lob_len(inner),link->id->hashname);
     uint8_t ret= link_receive(link,inner,pipe) ? 0 : 8;
-    tgc_gcollect();
     return ret;
     
   }
   
   LOG("dropping unknown outer packet with header %d %s",outer->head_len,lob_json(outer));
   lob_free(outer);
-  tgc_gcollect();
   return 10;
 }

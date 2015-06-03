@@ -135,7 +135,6 @@ class ChannelReceiverNG(ChannelHandler):
 
 class TestStorjTelehash(object):
     def setup(self):
-        telehashbinder.set_gc(0)
         self.m2 = cls(self.broadcast_handler2)
         self.m3 = cls(self.broadcast_handler3, port=-9999)
         self.m4 = cls(self.broadcast_handler4, port=-9999)

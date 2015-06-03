@@ -15,6 +15,7 @@ test: cxx/StorjTelehash.o tests/test.o
 	$(CXX) $(INCLUDE) ${CFLAGS}  ${TEST_CPPFLAGS}  -o $@ -c $^  -std=c++11
 
 clean:
+	cd telehash-c;make clean
 	rm -f *.o
 	rm -f cxx/*.o
 	rm -f tests/*.o

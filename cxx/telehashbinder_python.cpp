@@ -273,16 +273,6 @@ static PyObject *telehashbinder_finalize(PyObject *self,
     Py_RETURN_NONE;
 }
 
-static PyObject *telehashbinder_setGC(PyObject *self, 
-                                             PyObject *args){
-    int add=0;
-    if (!PyArg_ParseTuple(args, "i",&add)){
-        return NULL;
-    }
-    StorjTelehash::setGC(add);
-    Py_RETURN_NONE;
-}
-
 static PyObject *telehashbinder_gcollect(PyObject *self, 
                                              PyObject *args){
     StorjTelehash::gcollect();
@@ -318,8 +308,6 @@ static PyMethodDef methods[] = {
          "stop receiving loop"},
     {"finalize", telehashbinder_finalize, METH_VARARGS
         , "finalize C object."},
-    {"set_gc", telehashbinder_setGC, METH_VARARGS
-        , "set to run GC or not."},
     {"gcollect", telehashbinder_gcollect, METH_VARARGS
         , "run force GC."},
     {"get_my_location", telehashbinder_getMyLocation, METH_VARARGS

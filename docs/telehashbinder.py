@@ -82,16 +82,6 @@ def finalize(cobj):
     pass
 
 
-def set_gc(cobj, use):
-    """
-    set  GC to stop or not. test use only. don't use it.
-
-    :param Object cobj: pointer of StorjTelehash instnace returned by init()
-    :param int use:  0 if you do not want to use. others if not.
-     """
-    pass
-
-
 def gcollect(cobj):
     """
     run force garbage collect.

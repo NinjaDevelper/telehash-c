@@ -35,11 +35,7 @@ typedef struct tgc_list {
 tgc_list_t blocks=NULL;
 tgc_list_t gcRoot=NULL;
 void *max=0,*min=0;
-int useGC=1;
 
-void tgc_setGC(int _useGC){
-    useGC=_useGC;
-}
 
 tgc_list_t _tgc_addList(tgc_list_t* top,void *ptr){
     tgc_list_t list=(tgc_list_t)calloc(1,sizeof(struct tgc_list));
@@ -147,7 +143,7 @@ void tgc_free(void *ptr){
     free(ptr);
 }
 
-void tgc_gcollect_force(){
+void tgc_gcollect(){
     tgc_list_t list=NULL;
     for(list=blocks;list;list=list->next){
         list->used=0;
@@ -169,10 +165,6 @@ void tgc_gcollect_force(){
     }
     LOG("%d/%d blocks were freed",fcount,ncount);
 }   
-
-void tgc_gcollect(){
-    if(useGC) tgc_gcollect_force();
-}
 
 void tgc_info(){
     int count=0;

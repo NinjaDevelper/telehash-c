@@ -314,8 +314,6 @@ void locationTest(){
     ok( bh==&bh4,"getBroadcastHandler check.");
 
     
-    //stop GC to use thread. GC is thread-unsafe.
-    StorjTelehash::setGC(0);
     string info1,info2;
     m1.getMyLocation(info1);
     m2.getMyLocation(info2);
@@ -377,12 +375,12 @@ void singleBroadcasteeTest(){
 
 void multiBroadcasteeTest(int add){
     s4.addBroadcaster((char *)location,add);
-    sleep(10);
+    sleep(3);
     StorjTelehash2::gcollect();
 
     status2=status4=0;
     s3.broadcast((char *)location,(char *)"{\"service\":\"farming0\"}");
-    sleep(10);
+    sleep(3);
     if(add){
         ok( status2==1,"broadcastee received another's json check m2.");
         ok( status4==1,"broadcastee received another's json check m4.");
@@ -410,7 +408,7 @@ void channelTest(){
     statusO=0;
     statusR=0;
     s3.openChannel((char *)location,(char *)"counter_test", *tch);
-    sleep(10);
+    sleep(3);
     LOG("receiver status=%d",statusR);
     LOG("opener status=%d",statusO);
     ok( statusO==2,"channel opener check.");
@@ -427,8 +425,6 @@ int main (int argc, char *argv[]) {
     channelTest();
 
     StorjTelehash2::stopAll();
-
-    StorjTelehash::setGC(1);
 
     done_testing();
 

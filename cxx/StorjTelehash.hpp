@@ -342,12 +342,6 @@ public:
     static void gcollect();
 
     /**
-     * set  GC to stop or not. test use only. don't use it.
-     * @param use  0 if you do not want to use. others if not.
-     */
-    static void setGC(int use);
-
-    /**
      * test use only. don't use it.
      * @return address to be tested.
      */

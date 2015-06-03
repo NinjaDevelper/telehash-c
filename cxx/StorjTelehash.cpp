@@ -457,14 +457,8 @@ StorjTelehash::~StorjTelehash(){
 #endif
 }	
 
-void StorjTelehash::setGC(int use){
-#ifndef __NO_TGC__
-    tgc_setGC(use);
-#endif
-}
-
 void StorjTelehash::gcollect(){
 #ifndef __NO_TGC__
-    tgc_gcollect_force();
+    tgc_gcollect();
 #endif
 }

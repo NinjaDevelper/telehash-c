@@ -19,7 +19,6 @@ void *tgc_realloc(void *ptr,size_t size);
 void *tgc_malloc(size_t size);
 char *tgc_strdup(const char *s);
 void tgc_free(void *ptr);
-void tgc_gcollect_force();
-void tgc_setGC(int _useGC);
+
 
 #endif
