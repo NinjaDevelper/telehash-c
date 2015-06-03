@@ -1,4 +1,3 @@
-CC=gcc
 ifeq ($(OS),Windows_NT)
 	CFLAGS+=-g -Wall -Wextra -Wno-unused-parameter -DDEBUG
 else

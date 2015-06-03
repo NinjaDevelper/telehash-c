@@ -133,11 +133,6 @@ private:
     static link_t targetLink;
 
     /**
-     * links needed to broadcast.
-     */
-    static list<link_t> broadcastee;
-    
-    /**
      * determin whethere adr is local or not.
      * 
      * @param adr address to be checked.

@@ -44,8 +44,11 @@
 int StorjTelehash::status=0;
 int StorjTelehash::count=0;
 link_t StorjTelehash::targetLink=NULL;
-list<link_t> StorjTelehash::broadcastee;
 char StorjTelehash::globalIP[3*4+3+1]; ;
+
+/**
+ * links needed to broadcast.
+ */
 static list<link_t> broadcastee;
 /**
  * registered factory instance that creates ChannelHander instance.
@@ -243,10 +246,12 @@ lob_t StorjTelehash::signupOnOpen(link_t link,lob_t open){
 
     if(!lob_get_cmp(open,(char *)"action",(char *)"add")){
         broadcastee.push_back(link);
+        tgc_addRoot(link);
         lob_set(json,(char *)"action",(char *)"add");
     }
     if(!lob_get_cmp(open,(char *)"action",(char *)"del")){
         broadcastee.remove(link);
+        tgc_rmRoot(link);
         lob_set(json,(char *)"action",(char *)"del");
     }
     
@@ -442,7 +447,13 @@ StorjTelehash::~StorjTelehash(){
 #ifndef __NO_TGC__
     if(--count==0){
         e3x_cipher_free();
+        list<link_t>::iterator it = broadcastee.begin();
+        while( it != broadcastee.end() ){
+            tgc_rmRoot(*it);
+            it++;
+        }
     }
+    gcollect();
 #endif
 }	
 
