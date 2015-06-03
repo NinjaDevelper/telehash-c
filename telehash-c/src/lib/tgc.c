@@ -30,6 +30,9 @@ typedef struct tgc_list {
     struct tgc_list *prev;
     int used;
     size_t size;
+    char fname[256];
+    int line;
+    char func[256];
 } *tgc_list_t;
 
 tgc_list_t blocks=NULL;
@@ -62,24 +65,27 @@ void _tgc_rmList(tgc_list_t *top,tgc_list_t list){
     free(list);
 }
 
-void *tgc_malloc(size_t size){
+void *tgc_malloc(size_t size, const char *file, int line,const  char *func){
     void *ptr=calloc(1,size);
     if(ptr>max) max=ptr;
     if(min==0 || ptr<min) min=ptr;
     tgc_list_t list=_tgc_addList(&blocks,ptr);
     list->size=size;
+    strcpy(list->fname,file);
+    list->line = line;
+    strcpy(list->func,func);
     return ptr;
 }
 
-char *tgc_strdup(const char *s){
-    char *p=(char *)tgc_malloc(strlen(s)+1);
+char *tgc_strdup(const char *s, const char *file, int line,const  char *func){
+    char *p=(char *)tgc_malloc(strlen(s)+1,file,line,func);
     if(p) strcpy(p,s);
     return p;
 }
 
-void *tgc_realloc(void *ptr,size_t size){
+void *tgc_realloc(void *ptr,size_t size, const char *file, int line, const char *func){
     tgc_list_t list=NULL;
-    if(ptr==NULL) return tgc_malloc(size);
+    if(ptr==NULL) return tgc_malloc(size,file,line,func);
     
     for(list=blocks;list;list=list->next){
         if(list->ptr==ptr) break;
@@ -92,6 +98,9 @@ void *tgc_realloc(void *ptr,size_t size){
         if(ptr>max) max=ptr;
         if(min==0 || ptr<min) min=ptr;
         list->size=size;
+        strcpy(list->fname,file);
+        list->line = line;
+        strcpy(list->func,func);
     }
     return ptr;
 }
@@ -158,6 +167,7 @@ void tgc_gcollect(){
         tgc_list_t next=list->next;
         if(!list->used){
             fcount++;
+            LOG("del %s %d %s",list->fname, list->line, list->func);
             free(list->ptr);
             _tgc_rmList(&blocks,list);
         }
