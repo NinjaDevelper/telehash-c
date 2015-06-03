@@ -279,7 +279,7 @@ public:
     }
     static void gcollect(){
         StorjTelehash2::stopAll();
-//        StorjTelehash::gcollect();
+        StorjTelehash::gcollect();
         StorjTelehash2::startAll();
     }
 };
@@ -306,6 +306,7 @@ char *location=NULL;
 
 
 void locationTest(){
+    LOG("starting location test...");
     ChannelHandlerFactory *h=m1.getChannelHandlerFactory();
     ok( h==&factory,"getChannelHandlerFactory check.");
 
@@ -353,6 +354,7 @@ void locationTest(){
 
 
 void singleBroadcasteeTest(){
+    LOG("starting single broadcast test...");
     s2.startThread();
     s3.startThread();
     s4.startThread();
@@ -392,6 +394,7 @@ void multiBroadcasteeTest(int add){
 
 
 void channelTest(){
+    LOG("starting channel test...");
     vector<CHANNEL_HANDLER> h1;
     h1.push_back(receiverHandler_1);
     h1.push_back(receiverHandler_2);

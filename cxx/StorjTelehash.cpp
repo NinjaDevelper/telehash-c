@@ -366,6 +366,8 @@ link_t StorjTelehash::_link(char *location){
     lob_t path=lob_get_array(loc,(char *)"paths");
     LOG("linking to %s\n",lob_json(path));
     link_path(link,path);
+    //critical section. assumes two parties would not call _link()
+    //(i.e. call method in this class) at the same time in a test.
     if(!link_up(link)){
         link_sync(link);
         targetLink=link;
