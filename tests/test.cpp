@@ -279,7 +279,7 @@ public:
     }
     static void gcollect(){
         StorjTelehash2::stopAll();
-        StorjTelehash::gcollect();
+//        StorjTelehash::gcollect();
         StorjTelehash2::startAll();
     }
 };
@@ -364,7 +364,7 @@ void singleBroadcasteeTest(){
     s3.addBroadcaster(location,1);
     LOG("location=%s",location);
 
-    sleep(3);
+    sleep(10);
     LOG("global IP=%s",m3.globalIP);
     ok( !strcmp(m3.globalIP,"127.0.0.1"),"addBroadcaster check.");
     StorjTelehash2::gcollect();
@@ -379,12 +379,12 @@ void singleBroadcasteeTest(){
 
 void multiBroadcasteeTest(int add){
     s4.addBroadcaster((char *)location,add);
-    sleep(3);
+    sleep(10);
     StorjTelehash2::gcollect();
 
     status2=status4=0;
     s3.broadcast((char *)location,(char *)"{\"service\":\"farming0\"}");
-    sleep(3);
+    sleep(10);
     if(add){
         ok( status2==1,"broadcastee received another's json check m2.");
         ok( status4==1,"broadcastee received another's json check m4.");
@@ -412,7 +412,7 @@ void channelTest(){
     statusO=0;
     statusR=0;
     s3.openChannel((char *)location,(char *)"counter_test", *tch);
-    sleep(3);
+    sleep(10);
     LOG("receiver status=%d",statusR);
     LOG("opener status=%d",statusO);
     ok( statusO==2,"channel opener check.");
