@@ -167,7 +167,6 @@ void tgc_gcollect(){
         tgc_list_t next=list->next;
         if(!list->used){
             fcount++;
-            LOG("del %s %d %s",list->fname, list->line, list->func);
             free(list->ptr);
             _tgc_rmList(&blocks,list);
         }
