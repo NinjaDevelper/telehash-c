@@ -67,7 +67,7 @@ void _tgc_rmList(tgc_list_t *top,tgc_list_t list){
 
 void *tgc_malloc(size_t size, const char *file, int line,const  char *func){
     void *ptr=calloc(1,size);
-    if(ptr>max) max=ptr;
+    if(ptr+size>max) max=ptr+size;
     if(min==0 || ptr<min) min=ptr;
     tgc_list_t list=_tgc_addList(&blocks,ptr);
     list->size=size;
@@ -95,7 +95,7 @@ void *tgc_realloc(void *ptr,size_t size, const char *file, int line, const char 
         exit(1);
      }else{
         ptr=list->ptr=realloc(ptr,size);
-        if(ptr>max) max=ptr;
+        if(ptr+size>max) max=ptr+size;
         if(min==0 || ptr<min) min=ptr;
         list->size=size;
         strcpy(list->fname,file);
@@ -125,12 +125,12 @@ void _tgc_mark(void *ptr){
     size_t i=0;
     
     for(list=blocks;list;list=list->next){
-        if(list->ptr<=ptr && ptr<=list->ptr+list->size && !list->used){
+        if(list->ptr<=ptr && ptr<list->ptr+list->size && !list->used){
             list->used=1;
             if(list->size>=sizeof(void*)){
                 for(i=0;i<list->size-sizeof(void*)+1;i++){
                    void *p=*(void **)(list->ptr+i);
-                   if(min<=p && p<=max)  _tgc_mark(p);
+                   if(min<=p && p<max)  _tgc_mark(p);
                 }
             }
             return;

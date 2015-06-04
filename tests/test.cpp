@@ -360,13 +360,13 @@ void singleBroadcasteeTest(){
     s3.addBroadcaster(location,1);
     LOG("location=%s",location);
 
-    sleep(10);
+    sleep(3);
     LOG("global IP=%s",m3.globalIP);
     ok( !strcmp(m3.globalIP,"127.0.0.1"),"addBroadcaster check.");
     StorjTelehash2::gcollect();
 
     s3.broadcast((char *)location,(char *)"{\"service\":\"farming0\"}");
-    sleep(10);
+    sleep(3);
     //broadcaster does not receive his json. 
     
     //bacause of stopping GC, run it manually.
