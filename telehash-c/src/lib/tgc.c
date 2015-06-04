@@ -85,14 +85,14 @@ char *tgc_strdup(const char *s, const char *file, int line,const  char *func){
 
 void *tgc_realloc(void *ptr,size_t size, const char *file, int line, const char *func){
     tgc_list_t list=NULL;
-    if(ptr==NULL) return tgc_malloc(size,file,line,func);
+    if(!ptr) return tgc_malloc(size,file,line,func);
     
     for(list=blocks;list;list=list->next){
         if(list->ptr==ptr) break;
     }
-    if(list==NULL){
+    if(!list){
         LOG("not allocated memory %h",ptr);
-        exit(1);
+        return NULL;
      }else{
         ptr=list->ptr=realloc(ptr,size);
         if(ptr+size>max) max=ptr+size;
