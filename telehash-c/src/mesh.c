@@ -66,7 +66,6 @@ mesh_t mesh_free(mesh_t mesh)
   if(mesh->ipv4_public) free(mesh->ipv4_public);
 
   tgc_rmRoot(mesh);
-  tgc_gcollect();
   free(mesh);
   return NULL;
 }
@@ -415,7 +414,6 @@ uint8_t mesh_receive(mesh_t mesh, lob_t outer, pipe_t pipe)
     {
       LOG("dropping, no link for token %s",hex);
       lob_free(outer);
-      tgc_gcollect();
       return 6;
     }
 

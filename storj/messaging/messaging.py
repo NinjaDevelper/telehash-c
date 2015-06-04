@@ -210,3 +210,15 @@ class Messaging(object):
                  e.g. telehash, etc.
         """
         pass
+
+    @abstractmethod
+    def get_my_id(self):
+        """
+        return my id information. format is:
+        jlde3uibwflz4hqnk4zehvj5o5kd4goyqtrwqwhiotw6n4qtrf2a
+
+        :param Object cobj: pointer of StorjTelehash instnace
+                            returned by init()
+        :return: id info.
+        """
+        pass

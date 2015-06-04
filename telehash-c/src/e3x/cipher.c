@@ -47,7 +47,6 @@ void e3x_cipher_free()
     free(e3x_cipher_sets[CS_3a]);
     tgc_rmRoot(e3x_cipher_sets[CS_3a]);
   }
-  tgc_gcollect();
 }
 
 e3x_cipher_t e3x_cipher_set(uint8_t csid, char *str)

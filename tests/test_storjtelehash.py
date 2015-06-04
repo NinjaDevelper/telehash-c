@@ -36,7 +36,6 @@ import logging
 import storj.messaging
 from storj.messaging.messaging import Messaging
 from storj.messaging.messaging import ChannelHandler
-from storj.messaging.storjtelehash import telehashbinder
 import storj.messaging.storjtelehash
 
 log_fmt = '%(filename)s:%(lineno)d %(funcName)s() %(message)s'
@@ -139,6 +138,9 @@ class TestStorjTelehash(object):
         self.m3 = cls(self.broadcast_handler3, port=-9999)
         self.m4 = cls(self.broadcast_handler4, port=-9999)
 
+        id = self.m2.get_my_id()
+        assert len(id) == 52
+        logging.debug("id=" + id)
         self.location = self.m2.get_my_location()
         logging.debug("location=" + self.location)
         self.status2 = 0

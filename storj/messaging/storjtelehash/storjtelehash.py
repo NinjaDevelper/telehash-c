@@ -30,6 +30,7 @@
 import types
 import threading
 import logging
+import time
 
 from storj.messaging.messaging import Messaging
 from storj.messaging.messaging import ChannelHandler
@@ -52,6 +53,12 @@ class StorjTelehash(Messaging):
     used in sublcass.
     """
 
+    lock = threading.Lock()
+
+    gc_thread = None
+
+    instances = []
+
     def __init__(self, broadcast_handler, **keywords):
         """
         init
@@ -73,6 +80,13 @@ class StorjTelehash(Messaging):
         self.cobj = telehashbinder.init(port, self.get_channel_handler,
                                         broadcast_handler)
         self.start_thread()
+        StorjTelehash.instances.append(self)
+
+        if StorjTelehash.gc_thread is None:
+            StorjTelehash.gc_thread = threading.Thread(
+                target=StorjTelehash.gcollect)
+            StorjTelehash.gc_thread.setDaemon(True)
+            StorjTelehash.gc_thread.start()
 
     def get_my_location(self):
         """
@@ -84,6 +98,32 @@ class StorjTelehash(Messaging):
         """
         Messaging.get_my_location(self)
         return telehashbinder.get_my_location(self.cobj)
+
+    def get_my_id(self):
+        """
+        return my id information. format is:
+        jlde3uibwflz4hqnk4zehvj5o5kd4goyqtrwqwhiotw6n4qtrf2a
+
+        :param Object cobj: pointer of StorjTelehash instnace returned
+                            by init()
+        :return: id info.
+        """
+        Messaging.get_my_id(self)
+        return telehashbinder.get_my_id(self.cobj)
+
+    @classmethod
+    def gcollect(cls):
+        while len(StorjTelehash.instances) > 0:
+            logging.debug("starting gc...")
+            with StorjTelehash.lock:
+                for i in StorjTelehash.instances:
+                    telehashbinder.set_stopflag(i.cobj, 1)
+                    i.thread.join()
+                telehashbinder.gcollect()
+                for i in StorjTelehash.instances:
+                    i.start_thread()
+            logging.debug("end of gc...")
+            time.sleep(60)
 
     def start_thread(self):
         """star to receive netowrk packets in a thread. """
@@ -102,15 +142,16 @@ class StorjTelehash(Messaging):
         :param str name: channel name that you want to open .
         :param ChannelHandler handler: channel handler.
         """
-        Messaging.open_channel(self, location, name, handler)
-        if isinstance(handler, ChannelHandler):
-            telehashbinder.set_stopflag(self.cobj, 1)
-            self.thread.join()
-            telehashbinder.open_channel(self.cobj, location, name,
-                                        handler.handle)
-            self.start_thread()
-        else:
-            raise TypeError("cannot add non ChannelHandler instance")
+        with StorjTelehash.lock:
+            Messaging.open_channel(self, location, name, handler)
+            if isinstance(handler, ChannelHandler):
+                telehashbinder.set_stopflag(self.cobj, 1)
+                self.thread.join()
+                telehashbinder.open_channel(self.cobj, location, name,
+                                            handler.handle)
+                self.start_thread()
+            else:
+                raise TypeError("cannot add non ChannelHandler instance")
 
     def add_broadcaster(self, location, add):
         """
@@ -121,11 +162,12 @@ class StorjTelehash(Messaging):
         :param  int add: if 0, request to not to  broadcast. request to
                           broaadcast if others.
         """
-        Messaging.add_broadcaster(self, location, add)
-        telehashbinder.set_stopflag(self.cobj, 1)
-        self.thread.join()
-        telehashbinder.add_broadcaster(self.cobj, location, add)
-        self.start_thread()
+        with StorjTelehash.lock:
+            Messaging.add_broadcaster(self, location, add)
+            telehashbinder.set_stopflag(self.cobj, 1)
+            self.thread.join()
+            telehashbinder.add_broadcaster(self.cobj, location, add)
+            self.start_thread()
 
     def broadcast(self, location, message):
         """
@@ -134,17 +176,20 @@ class StorjTelehash(Messaging):
         :param str location: json str where you want to send a broadcast.
         :param str message: broadcast message.
         """
-        Messaging.broadcast(self, location, message)
-        telehashbinder.set_stopflag(self.cobj, 1)
-        self.thread.join()
-        telehashbinder.broadcast(self.cobj, location, message)
-        self.start_thread()
+        with StorjTelehash.lock:
+            Messaging.broadcast(self, location, message)
+            telehashbinder.set_stopflag(self.cobj, 1)
+            self.thread.join()
+            telehashbinder.broadcast(self.cobj, location, message)
+            self.start_thread()
 
     def finalize(self):
         """
          destructor. stop a thread and call telehashbinder's finalization.
         """
-        if hasattr(self, "cobj"):
-            telehashbinder.set_stopflag(self.cobj, 1)
-            self.thread.join()
-            telehashbinder.finalize(self.cobj)
+        with StorjTelehash.lock:
+            StorjTelehash.instances.remove(self)
+            if hasattr(self, "cobj"):
+                telehashbinder.set_stopflag(self.cobj, 1)
+                self.thread.join()
+                telehashbinder.finalize(self.cobj)

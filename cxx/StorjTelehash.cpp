@@ -101,6 +101,11 @@ char *StorjTelehash::getGlobalIP(char *ip){
     return ip;
 }
 
+string &StorjTelehash::getMyId(string &id){
+    id = mesh->id->hashname;
+    return id;
+}
+
 /*
  * location={"hashname":"yd2g2jast2bmlvr76xukaiyuh555vmxug7d7ocwvjo54kl3ebfga",
  * "keys":{"1a":"al45izsjxe2sikv7mc6jpnwywybbkqvsou"},
@@ -453,8 +458,8 @@ StorjTelehash::~StorjTelehash(){
             tgc_rmRoot(*it);
             it++;
         }
+        gcollect();
     }
-    gcollect();
 #endif
 }	
 

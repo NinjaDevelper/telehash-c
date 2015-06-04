@@ -292,6 +292,20 @@ static PyObject *telehashbinder_getMyLocation(PyObject *self,
     return p;
 }
 
+static PyObject *telehashbinder_getMyId(PyObject *self, 
+                                             PyObject *args){
+    PyObject *cobj=NULL;
+    if (!PyArg_ParseTuple(args, "O",&cobj)){
+        return NULL;
+    }
+    StorjTelehash *m=(StorjTelehash *)PyCapsule_GetPointer(cobj,NULL);
+    string id;
+    m->getMyId(id);
+    PyObject *p= Py_BuildValue("s",id.c_str());
+    return p;
+}
+
+
 
 static PyMethodDef methods[] = {
     {"init", telehashbinder_init, METH_VARARGS, 
@@ -312,6 +326,8 @@ static PyMethodDef methods[] = {
         , "run force GC."},
     {"get_my_location", telehashbinder_getMyLocation, METH_VARARGS
         , "get my location."},
+   {"get_my_id", telehashbinder_getMyId, METH_VARARGS
+        , "get my id."},
     {NULL, NULL, 0, NULL}
 };
 

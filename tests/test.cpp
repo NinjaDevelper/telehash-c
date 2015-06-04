@@ -314,7 +314,11 @@ void locationTest(){
     ok( bh==&bh4,"getBroadcastHandler check.");
 
     
-    string info1,info2;
+    string info1,info2,id;
+    m1.getMyId(id);
+    LOG("id %s",id.c_str());
+    ok(id.length() == 52 , "hashname size check");
+
     m1.getMyLocation(info1);
     m2.getMyLocation(info2);
     LOG("info %s",info2.c_str());

@@ -84,7 +84,9 @@ def finalize(cobj):
 
 def gcollect(cobj):
     """
-    run force garbage collect.
+    run force garbage collect. 
+    You must go out from functions in telehash-c library and 
+    stop all threads before calling this method. 
 
     :param Object cobj: pointer of StorjTelehash instnace returned by init()
      """
@@ -100,5 +102,16 @@ def get_my_location(cobj):
 
      :param Object cobj: pointer of StorjTelehash instnace returned by init()
      :return: location info.
+     """
+    pass
+
+
+def get_my_id(cobj):
+    """
+     return my id information. format is:
+    jlde3uibwflz4hqnk4zehvj5o5kd4goyqtrwqwhiotw6n4qtrf2a
+
+     :param Object cobj: pointer of StorjTelehash instnace returned by init()
+     :return: id info.
      """
     pass

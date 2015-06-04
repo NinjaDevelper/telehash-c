@@ -291,6 +291,15 @@ public:
     string &getMyLocation(string &location);
 
     /**
+     * return my id. format is:
+     * jlde3uibwflz4hqnk4zehvj5o5kd4goyqtrwqwhiotw6n4qtrf2a
+     * 
+     * @param id  id info is stored.
+     * @return id string.
+     */
+    string &getMyId(string &id);
+
+    /**
      * open a channel associated a channel name.
      * it calls _link(), and net_udp4_received() is looped.
      * be careful when threading not to be reentrance.
@@ -324,7 +333,6 @@ public:
 
     /**
      * start receiving packet loop.
-     * call setStopFlag(1) when you want to stop.
      * 
      */
     void start();
@@ -337,8 +345,10 @@ public:
     void setStopFlag(int flag);
 
     /**
-     * run force GC . test use only. don't use it.
-    */
+     * run garbage collection.
+     * You must go out from functions in telehash-c library and 
+     * stop all threads before calling this method. 
+     */
     static void gcollect();
 
     /**
