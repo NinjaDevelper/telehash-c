@@ -279,7 +279,7 @@ public:
     }
     static void gcollect(){
         StorjTelehash2::stopAll();
-//        StorjTelehash::gcollect();
+        StorjTelehash::gcollect();
         StorjTelehash2::startAll();
     }
 };
