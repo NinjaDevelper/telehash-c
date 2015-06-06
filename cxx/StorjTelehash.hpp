@@ -37,14 +37,7 @@
 extern "C"{
 	#include "mesh.h"
     #include "net_udp4.h"
-    #include "tgc.h"
 }
-
-#ifndef __NO_TGC__
-extern "C"{
-	#include "tgc.h"
-}
-#endif
 
 using namespace std;
 
@@ -131,71 +124,6 @@ private:
      */
     link_t _link(char *location);
 
-    /**
-     * called when receving one packet on a channel.
-     * call ChannelHandler.handle() and send back handle()'s result.
-     * called from serviceOnOpenHandler() and serviceOnOpen().
-     * 
-     * @param link link used in this channel.
-     * @param chan channel
-     * @param packet paccket that is sent.
-     * @param c ChannelHandler instance.
-     * @param isOpen true if when opening channel.
-     */
-    void static sendOnChannel(link_t link, e3x_channel_t chan,
-                               lob_t packet,ChannelHandler *c, bool isOpen);
-                                          
-    /**
-     * handler called when finishing making a link. 
-     * (an argument in mesh_on_link())
-     * 
-     * @param link link
-     */
-    static void onLink(link_t link);
-
-    /**
-     * handler called when opening a channel. intend to be called when 
-     * requested a general channel. 
-     * (an argument in mesh_on_open())
-     * 
-     * @param link link used in this channel.
-     * @param open packet content.
-     * @return NULL if channel is processed in this handler. open if not.
-     */
-    static lob_t serviceOnOpen(link_t link,lob_t open);
-
-    /**
-     * handler when receiving a return of opening channel and sending a 
-     * message to a channel.
-     * called from openChannel() and serviceOnOpen().
-     * 
-     * @param link link used in this channel.
-     * @param chan channel.
-     * @param arg ChannelHandler instance.
-     */
-    static void serviceOnOpenHandler(link_t link, e3x_channel_t chan, 
-        void *arg);
-
-    /**
-     * handler when receiving ping channel. expaect a global ip address.
-     * called from openChannel() and serviceOnOpen().
-     * 
-     * @param link link used in this channel.
-     * @param chan channel.
-     * @param arg ChannelHandler instance. will be ignored.
-     */
-    static void pingHandler(link_t link, e3x_channel_t chan, void *arg);
-
-    /**
-     * handler called when opening a ping channel. return a global ip
-     * of sender.
-     * 
-     * @param link link used in this channel.
-     * @param open packet content.
-     * @return NULL if channel is processed in this handler. open if not.
-     */
-     static lob_t pingOnOpen(link_t link,lob_t open);
-
 
 public:
     /**
@@ -270,13 +198,6 @@ public:
      * @param flag 1 if stop. others if run.
      */
     void setStopFlag(int flag);
-
-    /**
-     * run garbage collection.
-     * You must go out from functions in telehash-c library and 
-     * stop all threads before calling this method. 
-     */
-    static void gcollect();
 
     /**
      * test use only. don't use it.

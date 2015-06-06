@@ -7,7 +7,6 @@
 #include <sys/ioctl.h>
 
 #include "net_udp4.h"
-#include "tgc.h"
 
 // individual pipe local info
 typedef struct pipe_udp4_struct

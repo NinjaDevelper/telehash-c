@@ -1,5 +1,4 @@
 #include "ext.h"
-#include "tgc.h"
 
 // direct packets based on type
 void peer_send(pipe_t pipe, lob_t packet, link_t link)

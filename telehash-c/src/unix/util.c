@@ -10,7 +10,6 @@
 #include "util_unix.h"
 
 #include "mesh.h"
-#include "tgc.h"
 
 lob_t util_fjson(char *file)
 {

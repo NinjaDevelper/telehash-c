@@ -1,5 +1,4 @@
 #include "socketio.h"
-#include "tgc.h"
 
 // utilities to parse and generate minimal socket.io / engine.io packets
 

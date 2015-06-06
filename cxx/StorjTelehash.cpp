@@ -171,14 +171,31 @@ int StorjTelehash::writeID(){
     return 0;
 }
 
-void StorjTelehash::onLink(link_t link){
+/**
+ * handler called when finishing making a link. 
+ * (an argument in mesh_on_link())
+ * 
+ * @param link link
+ */
+void onLink(link_t link){
     if(link==targetLink && link_up(link)){
         LOG("linked up");
         status=1;
     }
 }
 
-void StorjTelehash::sendOnChannel(link_t link, e3x_channel_t chan,
+/**
+ * called when receving one packet on a channel.
+ * call ChannelHandler.handle() and send back handle()'s result.
+ * called from serviceOnOpenHandler() and serviceOnOpen().
+ * 
+ * @param link link used in this channel.
+ * @param chan channel
+ * @param packet paccket that is sent.
+ * @param c ChannelHandler instance.
+ * @param isOpen true if when opening channel.
+ */
+void sendOnChannel(link_t link, e3x_channel_t chan,
     lob_t packet,ChannelHandler *ch, bool isOpen){
     if(!lob_get_cmp(packet,(char *)"end",(char *)"true")) {
         LOG("pointer delteted=%p",ch);
@@ -207,7 +224,7 @@ void StorjTelehash::sendOnChannel(link_t link, e3x_channel_t chan,
     free(json);
 }                                          
 
-void StorjTelehash::serviceOnOpenHandler(link_t link, e3x_channel_t chan,
+void serviceOnOpenHandler(link_t link, e3x_channel_t chan,
      void *arg){
     ChannelHandler* ch=(ChannelHandler *)arg;
     lob_t packet = e3x_channel_receiving(chan);
@@ -215,7 +232,16 @@ void StorjTelehash::serviceOnOpenHandler(link_t link, e3x_channel_t chan,
 //    lob_free(packet);
 }
 
-lob_t StorjTelehash::serviceOnOpen(link_t link,lob_t open){
+/**
+ * handler called when opening a channel. intend to be called when 
+ * requested a general channel. 
+ * (an argument in mesh_on_open())
+ * 
+ * @param link link used in this channel.
+ * @param open packet content.
+ * @return NULL if channel is processed in this handler. open if not.
+ */
+lob_t serviceOnOpen(link_t link,lob_t open){
     if(!link || !open) return open;
     char *type=(char *)lob_get(open,(char *)"type");
     ChannelHandlerFactory *factory=factories()[link->mesh->id->hashname];
@@ -237,14 +263,30 @@ typedef struct pipe_udp4_struct
   net_udp4_t net;
 } *pipe_udp4_t;
 
-void StorjTelehash::pingHandler(link_t link, e3x_channel_t chan,
+/**
+ * handler when receiving ping channel. expaect a global ip address.
+ * called from openChannel() and serviceOnOpen().
+ * 
+ * @param link link used in this channel.
+ * @param chan channel.
+ * @param arg ChannelHandler instance. will be ignored.
+ */
+void pingHandler(link_t link, e3x_channel_t chan,
      void *arg){
     lob_t packet = e3x_channel_receiving(chan);
     strcpy(globalIP,lob_get(packet,(char *)"IP"));
 //    lob_free(packet);
 }
 
-lob_t StorjTelehash::pingOnOpen(link_t link,lob_t open){
+/**
+ * handler called when opening a ping channel. return a global ip
+ * of sender.
+ * 
+ * @param link link used in this channel.
+ * @param open packet content.
+ * @return NULL if channel is processed in this handler. open if not.
+ */
+lob_t pingOnOpen(link_t link,lob_t open){
     if(!link || !open || lob_get_cmp(open,(char *)"type",
         (char *)"ping"))
        return open;
@@ -388,12 +430,6 @@ StorjTelehash::~StorjTelehash(){
     mesh_free(mesh);
     if(--count==0){
         e3x_cipher_free();
-        //gcollect();
     }
 }	
 
-void StorjTelehash::gcollect(){
-#ifndef __NO_TGC__
-    tgc_gcollect();
-#endif
-}

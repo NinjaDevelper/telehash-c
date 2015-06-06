@@ -11,7 +11,6 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-#include "tgc.h"
 
 #define BASE32_LOOKUP_MAX 43
 static char *base32Chars = "abcdefghijklmnopqrstuvwxyz234567";

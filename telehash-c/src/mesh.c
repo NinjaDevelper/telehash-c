@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "util.h"
-#include "tgc.h"
 
 // a default prime number for the internal hashtable used to track all active hashnames/lines
 #define MAXPRIME 4211
@@ -38,7 +37,6 @@ mesh_t mesh_new(uint32_t prime)
   if(!mesh->index) return mesh_free(mesh);
   
   LOG("mesh created version %d.%d.%d",TELEHASH_VERSION_MAJOR,TELEHASH_VERSION_MINOR,TELEHASH_VERSION_PATCH);
-  tgc_addRoot(mesh);
   return mesh;
 }
 
@@ -87,7 +85,6 @@ mesh_t mesh_free(mesh_t mesh)
   if(mesh->ipv4_public) free(mesh->ipv4_public);
   lob_freeall(mesh->cached);
   lob_freeall(mesh->handshakes);
-  tgc_rmRoot(mesh);
   hashname_free(mesh->id);
   free(mesh);
   return NULL;

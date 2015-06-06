@@ -9,7 +9,6 @@
 #include "js0n.h"
 #include "base32.h"
 #include "chacha.h"
-#include "tgc.h"
 
 lob_t lob_new()
 {

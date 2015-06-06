@@ -7,7 +7,6 @@
  */
 
 #include "sha256.h"
-#include "tgc.h"
 
 
 /**

@@ -1,5 +1,4 @@
 #include "ext.h"
-#include "tgc.h"
 
 typedef struct thtp_struct 
 {

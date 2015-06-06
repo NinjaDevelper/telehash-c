@@ -7,7 +7,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "tgc.h"
 
 typedef struct xhashname_struct
 {

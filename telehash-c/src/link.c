@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include "util.h"
 #include "mesh.h"
-#include "tgc.h"
 
 // internal structures to manage our link-local state about pipes and channels
 

@@ -1,5 +1,4 @@
 #include "ext.h"
-#include "tgc.h"
 
 sockc_t sockc_new(chan_t c)
 {

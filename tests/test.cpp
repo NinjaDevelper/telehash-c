@@ -213,11 +213,6 @@ public:
             it++;
         }
     }
-    static void gcollect(){
-        StorjTelehash2::stopAll();
-        StorjTelehash::gcollect();
-        StorjTelehash2::startAll();
-    }
 };
 
 vector<StorjTelehash2 *> StorjTelehash2::st2;
@@ -328,7 +323,6 @@ void channelTest(){
     LOG("opener status=%d",statusO);
     ok( statusO==2,"channel opener check.");
     ok( statusR==1,"channel reciever check.");
-    StorjTelehash2::gcollect();
 }
 
 int main (int argc, char *argv[]) {

@@ -2,7 +2,6 @@
 
 #include <stddef.h>
 #include "uECC.h"
-#include "tgc.h"
 
 #ifndef uECC_PLATFORM
     #if __AVR__

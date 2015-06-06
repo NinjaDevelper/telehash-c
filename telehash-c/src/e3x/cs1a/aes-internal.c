@@ -17,7 +17,6 @@
 
 
 #include "aes_i.h"
-#include "tgc.h"
 
 /*
  * rijndael-alg-fst.c

@@ -9,7 +9,6 @@
 #include <unistd.h>
 
 #include "util_sys.h"
-#include "tgc.h"
 
 at_t util_sys_seconds()
 {

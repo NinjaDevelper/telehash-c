@@ -5,7 +5,6 @@
 
 #include "e3x.h"
 #include "util.h"
-#include "tgc.h"
 
 e3x_cipher_t e3x_cipher_sets[CS_MAX];
 e3x_cipher_t e3x_cipher_default = NULL;
@@ -18,17 +17,14 @@ uint8_t e3x_cipher_init(lob_t options)
   e3x_cipher_sets[CS_1a] = cs1a_init(options);
   if(e3x_cipher_sets[CS_1a]) e3x_cipher_default = e3x_cipher_sets[CS_1a];
   if(lob_get(options, "err")) return 1;
-  tgc_addRoot(e3x_cipher_sets[CS_1a]);
 
   e3x_cipher_sets[CS_2a] = cs2a_init(options);
   if(e3x_cipher_sets[CS_2a]) e3x_cipher_default = e3x_cipher_sets[CS_2a];
   if(lob_get(options, "err")) return 1;
-  tgc_addRoot(e3x_cipher_sets[CS_2a]);
 
   e3x_cipher_sets[CS_3a] = cs3a_init(options);
   if(e3x_cipher_sets[CS_3a]) e3x_cipher_default = e3x_cipher_sets[CS_3a];
   if(lob_get(options, "err")) return 1;
-  tgc_addRoot(e3x_cipher_sets[CS_3a]);
 
   return 0;
 }
@@ -37,15 +33,12 @@ void e3x_cipher_free()
 {
   if(e3x_cipher_sets[CS_1a]){
     free(e3x_cipher_sets[CS_1a]);
-    tgc_rmRoot(e3x_cipher_sets[CS_1a]);
   }
   if(e3x_cipher_sets[CS_2a]){
     free(e3x_cipher_sets[CS_2a]);
-    tgc_rmRoot(e3x_cipher_sets[CS_2a]);
   }
   if(e3x_cipher_sets[CS_3a]){
     free(e3x_cipher_sets[CS_3a]);
-    tgc_rmRoot(e3x_cipher_sets[CS_3a]);
   }
 }
 

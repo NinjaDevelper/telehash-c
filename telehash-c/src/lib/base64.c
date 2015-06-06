@@ -2,7 +2,6 @@
 #include "base64.h"
 #include <stdint.h>
 #include <string.h>
-#include "tgc.h"
 
 // decode str of len into out (must be base64_decode_length(len) bit), return actual decoded len
 size_t base64_decode(const char *str, size_t len, uint8_t *out)

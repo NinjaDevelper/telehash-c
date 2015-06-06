@@ -3,7 +3,6 @@
 #include <string.h>
 #include "e3x.h"
 #include "util.h"
-#include "tgc.h"
 
 // make a new exchange
 // packet must contain the raw key in the body

@@ -16,7 +16,6 @@
  */
 
 #include "aes_i.h"
-#include "tgc.h"
 
 static void rijndaelEncrypt(const u32 rk[/*44*/], const u8 pt[16], u8 ct[16])
 {

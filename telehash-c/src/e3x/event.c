@@ -2,7 +2,6 @@
 #include "e3x.h"
 #include "xht.h"
 #include "util_sys.h"
-#include "tgc.h"
 
 struct e3x_event_struct
 {
