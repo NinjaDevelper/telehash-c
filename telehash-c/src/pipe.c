@@ -23,6 +23,7 @@ pipe_t pipe_free(pipe_t p)
   if(p->id) free(p->id);
   if(p->path) lob_free(p->path);
   if(p->notify) LOG("pipe free'd leaking notifications");
+  if(p->freee) p->freee(p);
   free(p);
   return NULL;
 }

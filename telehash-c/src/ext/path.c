@@ -27,7 +27,6 @@ void path_ping_handler(link_t link, e3x_channel_t chan, void *arg)
     }
     // TODO process incoming paths for public IPs
     
-    lob_free(packet);
   }
   
   if(e3x_channel_state(chan) == ENDED) free(ping);

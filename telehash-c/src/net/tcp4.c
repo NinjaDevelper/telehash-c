@@ -113,7 +113,7 @@ pipe_t tcp4_free(pipe_t pipe)
   to = (pipe_tcp4_t)pipe->arg;
   if(!to) return LOG("internal error, invalid pipe, leaking it");
 
-  xht_set(to->net->pipes,pipe->id,NULL);
+  xht_node_del(to->net->pipes,pipe->id);
   pipe_free(pipe);
   if(to->client > 0) close(to->client);
   util_chunks_free(to->chunks);
@@ -145,7 +145,7 @@ pipe_t tcp4_pipe(net_tcp4_t net, char *ip, int port)
 
   // set up pipe
   pipe->id = strdup(id);
-  xht_set(net->pipes,pipe->id,pipe);
+  xht_set(net->pipes,pipe->id,pipe, PIPE);
   pipe->send = tcp4_send;
 
   return pipe;
@@ -200,7 +200,7 @@ net_tcp4_t net_tcp4_new(mesh_t mesh, lob_t options)
 
   // connect us to this mesh
   net->mesh = mesh;
-  xht_set(mesh->index, "net_tcp4", net);
+  xht_set(mesh->index, "net_tcp4", net, TCP4);
   mesh_on_path(mesh, "net_tcp4", tcp4_path);
   
   // convenience
@@ -245,7 +245,7 @@ void net_tcp4_accept(net_tcp4_t net)
 }
 
 // check a single pipe's socket for any read/write activity
-void _walkflush(xht_t h, const char *key, void *val, void *arg)
+void _walkflush(xht_t h, const char *key, void *val, enum TYPE type, void *arg)
 {
   tcp4_flush((pipe_t)val);
 }

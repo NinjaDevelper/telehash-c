@@ -41,34 +41,6 @@ using namespace picojson;
 
 typedef char * (*CHANNEL_HANDLER)(char *json);
 
-class TestBroadcastHandler : public ChannelHandler{
-private:
-    char *(*bhandler)(char *json);
-
-public:
-    /**
-     * create myself with handlers.
-     * 
-     * @param h channels.
-     */
-	TestBroadcastHandler(char *(*bhandler)(char *json)){
-		this->bhandler=bhandler;
-	}
-	
-    /**
-     * handle one packet.
-     * 
-     * @param json one packet described in json.
-     * @return a json packet that should be sent back. not be sent if NULL.
-     */
-	char* handle(char *json){
-        return bhandler(json);
-	}
-    
-    ~TestBroadcastHandler(){
-    }
-};
-	
 class TestChannelHandler : public ChannelHandler{
 private:
     /**
@@ -193,37 +165,6 @@ char *receiverHandler_2(char *json){
 }
 
 
-int status2=0;
-char *broadcastHandler2(char *json){
-    LOG("json2 in=%s",json);
-    status2++;
-    value v1;
-    parse(v1, json);
-    string service=v1.get<object>()["service"].get<string>();
-    ok( service=="farming0","broadcast data check.");
-    if(status2>1) return NULL;
-    char *r=(char *)malloc(256);
-    strcpy(r,"{\"service\":\"farming1\"}");
-    return r;
-}
-
-int status4=0;
-char *broadcastHandler4(char *json){
-    LOG("json2 in=%s",json);
-    status4++;
-    value v1;
-    parse(v1, json);
-    string service=v1.get<object>()["service"].get<string>();
-    ok( service=="farming1","broadcast data check.");
-    return NULL;
-}
-
-
-char *broadcastHandler13(char *json){
-    ok( 0,"broadcast should not be received.");
-    return NULL;
-}
-
 
 class StorjTelehash2 {
 private:
@@ -248,14 +189,9 @@ public:
         t.join();
     }
 
-    void addBroadcaster(char *loc,int add){
+    void ping(char *loc){
         stopThread();
-        s->addBroadcaster(loc,add);
-        startThread();
-    }
-    void broadcast(char *loc,char *message){
-        stopThread();
-        s->broadcast(loc,message);
+        s->ping(loc);
         startThread();
     }
     void openChannel(char *loc,char *name, ChannelHandler &handler){
@@ -287,15 +223,12 @@ public:
 vector<StorjTelehash2 *> StorjTelehash2::st2;
 
 TestChannelHandlerFactory factory;
-TestBroadcastHandler bh13(broadcastHandler13);
-TestBroadcastHandler bh2(broadcastHandler2);
-TestBroadcastHandler bh4(broadcastHandler4);
 
 //m1 cannot connect to m2 because they share a key
-StorjTelehash m1(0,factory,bh13);
-StorjTelehash m2(1234,factory,bh2);
-StorjTelehash m3(-9999,factory,bh13);
-StorjTelehash m4(-9999,factory,bh4);
+StorjTelehash m1(0,factory);
+StorjTelehash m2(1234,factory);
+StorjTelehash m3(-9999,factory);
+StorjTelehash m4(-9999,factory);
 StorjTelehash2 s2(m2);
 StorjTelehash2 s3(m3);
 StorjTelehash2 s4(m4);
@@ -309,11 +242,12 @@ void locationTest(){
     LOG("starting location test...");
     ChannelHandlerFactory *h=m1.getChannelHandlerFactory();
     ok( h==&factory,"getChannelHandlerFactory check.");
-
-    ChannelHandler *bh=m4.getBroadcastHandler();
-    ok( bh==&bh4,"getBroadcastHandler check.");
-
-    
+    string str;
+    LOG("%x at %s",&m1,m1.getMyLocation(str).c_str());
+    LOG("%x at %s",&m2,m2.getMyLocation(str).c_str());
+    LOG("%x at %s",&m3,m3.getMyLocation(str).c_str());
+    LOG("%x at %s",&m4,m4.getMyLocation(str).c_str());
+   
     string info1,info2,id;
     m1.getMyId(id);
     LOG("id %s",id.c_str());
@@ -351,52 +285,29 @@ void locationTest(){
         "{\"keys\":{\"1a\":\""+k2+"\"},\"paths\":[{\"type\":\"udp4\",\"ip\""
         ":\"127.0.0.1\",\"port\":1234}]}";
     location=(char *)location_.c_str();
-}
+    LOG("%s",location);
 
-
-
-void singleBroadcasteeTest(){
-    LOG("starting single broadcast test...");
-    s2.startThread();
-    s3.startThread();
-    s4.startThread();
-
-    s3.addBroadcaster(location,1);
-    LOG("location=%s",location);
-
-    sleep(10);
-    LOG("global IP=%s",m3.globalIP);
-    ok( !strcmp(m3.globalIP,"127.0.0.1"),"addBroadcaster check.");
-    StorjTelehash2::gcollect();
-
-    s3.broadcast((char *)location,(char *)"{\"service\":\"farming0\"}");
-    sleep(3);
-    //broadcaster does not receive his json. 
-    
-    //bacause of stopping GC, run it manually.
-    StorjTelehash2::gcollect();
-}
-
-void multiBroadcasteeTest(int add){
-    s4.addBroadcaster((char *)location,add);
-    sleep(10);
-    StorjTelehash2::gcollect();
-
-    status2=status4=0;
-    s3.broadcast((char *)location,(char *)"{\"service\":\"farming0\"}");
-    sleep(10);
-    if(add){
-        ok( status2==1,"broadcastee received another's json check m2.");
-        ok( status4==1,"broadcastee received another's json check m4.");
-    }else{
-        //broadcastee didn't receive another's json check after removing 
-    }        
-    StorjTelehash2::gcollect();
 }
 
 
 void channelTest(){
     LOG("starting channel test...");
+    s2.startThread();
+    s3.startThread();
+    s4.startThread();
+
+    s4.ping(location);
+    string str;
+    m4.getMyLocation(str);
+    value v;
+    parse(v, str);
+    
+    string p=v.get<object>()["paths"].get<picojson::array>()[0].
+            get<object>()["ip"].get<string>();
+    LOG("global ip=%s",p.c_str());    
+    ok(p.length() > 8 ,"global ip test");
+
+
     vector<CHANNEL_HANDLER> h1;
     h1.push_back(receiverHandler_1);
     h1.push_back(receiverHandler_2);
@@ -423,9 +334,6 @@ void channelTest(){
 int main (int argc, char *argv[]) {
 
     locationTest();
-    singleBroadcasteeTest();
-    multiBroadcasteeTest(1);
-    multiBroadcasteeTest(0);
     channelTest();
 
     StorjTelehash2::stopAll();

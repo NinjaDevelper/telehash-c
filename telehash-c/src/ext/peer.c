@@ -45,7 +45,7 @@ pipe_t peer_pipe(mesh_t mesh, char *peer)
   pipe->id = strdup(peer);
   pipe->send = peer_send;
   pipe->next = pipes;
-  xht_set(mesh->index,"ext_peer_pipes",pipe);
+  xht_set(mesh->index,"ext_peer_pipes",pipe,PIPE);
 
   return pipe;
 }

@@ -1,4 +1,9 @@
 #include "xht.h"
+#include "link.h"
+#include "pipe.h"
+#include "net_serial.h"
+#include "net_udp4.h"
+#include "net_tcp4.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -10,6 +15,7 @@ typedef struct xhashname_struct
     struct xhashname_struct *next;
     const char *key;
     void *val;
+    enum TYPE type;
 } *xhn;
 
 struct xht_struct
@@ -38,6 +44,35 @@ uint32_t _xhter(const char *s)
     }
 
     return h;
+}
+#include <stdio.h>
+
+void *xht_node_del(xht_t h, const char *key)
+{
+    xhn n = NULL;
+    xhn p = NULL;
+    void *v = NULL;
+    uint32_t  i = _xhter(key) % h->prime;
+
+    for(n = &(h->zen[i]); n != 0; n = n->next){
+        if(n->key != 0 && strcmp(key, n->key) == 0){
+            v = n->val;
+            if(p){
+                p->next = n->next;
+                free(n);
+            } else { 
+                if(!n->next){
+                    memset(&(h->zen[i]), 0, sizeof(struct xhashname_struct));
+                } else {
+                    memcpy(&(h->zen[i]), n->next, sizeof(struct xhashname_struct));
+                    free(n->next);
+                }
+            }
+            return v;
+        }
+        p = n;
+    }
+    return NULL;
 }
 
 
@@ -68,7 +103,7 @@ xht_t xht_new(unsigned int prime)
 }
 
 /* does the set work, used by xht_set and xht_store */
-void _xht_set(xht_t h, const char *key, void *val, char flag)
+void _xht_set(xht_t h, const char *key, void *val, char flag, enum TYPE type)
 {
     uint32_t i;
     xhn n;
@@ -102,12 +137,14 @@ void _xht_set(xht_t h, const char *key, void *val, char flag)
     n->flag = flag;
     n->key = key;
     n->val = val;
+    n->type = type;
 }
 
-void xht_set(xht_t h, const char *key, void *val)
+void xht_set(xht_t h, const char *key, void *val, enum TYPE type)
 {
     if(h == 0 || key == 0) return;
-    _xht_set(h, key, val, 0);
+    _xht_set(h, key, val, 0, type);
+
 }
 
 void xht_store(xht_t h, const char *key, void *val, size_t vlen)
@@ -128,7 +165,7 @@ void xht_store(xht_t h, const char *key, void *val, size_t vlen)
       return;
     }
     memcpy(cval,val,vlen);
-    _xht_set(h, ckey, cval, 1);
+    _xht_set(h, ckey, cval, 1, MISC);
 }
 
 
@@ -178,6 +215,53 @@ void xht_walk(xht_t h, xht_walker w, void *arg)
     for(i = 0; i < h->prime; i++)
         for(n = &h->zen[i]; n != 0; n = n->next)
             if(n->key != 0 && n->val != 0)
-                (*w)(h, n->key, n->val, arg);
+                (*w)(h, n->key, n->val, n->type, arg);
 }
 
+// these sit in the xht index to wrap the e3x_channel and recipient handler
+typedef struct chan_struct
+{
+  e3x_channel_t c3;
+  void *arg;
+  void (*handle)(link_t link, e3x_channel_t c3, void *arg);
+} *chan_t;
+
+void xht_free_walk(xht_t h, const char *key, void *val, enum TYPE type,void *arg){
+    chan_t ch =NULL;
+    switch(type){
+    case CHANNEL:
+        e3x_channel_free((e3x_channel_t)val);
+        break;
+    case UDP4:
+        net_udp4_free((net_udp4_t)val);
+        break;
+    case TCP4:
+        net_tcp4_free((net_tcp4_t)val);
+        break;
+    case BLOCK:
+    // TODO
+        break;
+    case EVENT:
+        e3x_event_free((e3x_event_t)val);
+        break;
+    case LINK:
+        link_free((link_t)val);
+        break;
+    case PIPE:
+        pipe_free((pipe_t)val);
+        break;
+    case SERIAL:
+        net_serial_free((net_serial_t)val);
+        break;
+    case CHAN:
+        ch = (chan_t)val;
+        e3x_channel_free(ch->c3);
+        //fall through
+    case STRUCT:
+        LOG("free struct %x",val);
+        free(val);
+        break;
+    default:
+        break;
+    }
+}

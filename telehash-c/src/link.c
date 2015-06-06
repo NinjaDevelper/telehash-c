@@ -39,7 +39,7 @@ link_t link_new(mesh_t mesh, hashname_t id)
   
   link->id = id;
   link->mesh = mesh;
-  xht_set(mesh->index,id->hashname,link);
+  xht_set(mesh->index,id->hashname,link, LINK);
 
   // to size larger, app can xht_free(); link->channels = xht_new(BIGGER) at start itself
   link->channels = xht_new(5); // index of all channels
@@ -48,24 +48,37 @@ link_t link_new(mesh_t mesh, hashname_t id)
   return link;
 }
 
+
+
 void link_free(link_t link)
 {
   if(!link) return;
   LOG("dropping link %s",link->id->hashname);
-  xht_set(link->mesh->index,link->id->hashname,NULL);
+  LOG("del link %x from mesh %x",xht_node_del(link->mesh->index,link->id->hashname), link->mesh);
 
-  // TODO go through ->pipes
+  xht_walk(link->index, xht_free_walk,NULL);
 
-  // TODO go through link->channels
+  xht_walk(link->channels, xht_free_walk,NULL);
+
   xht_free(link->channels);
   xht_free(link->index);
+
+  seen_t n = NULL;
+  for(seen_t s = link->pipes; s;){
+      n = s->next;
+      pipe_free(s->pipe);
+      LOG("freeing pipe:%x",s);
+      free(s);
+      s = n;
+  }
 
   hashname_free(link->id);
   if(link->x)
   {
-    xht_set(link->mesh->index,link->token,NULL);
+    xht_node_del(link->mesh->index,link->token);
     e3x_exchange_free(link->x);
   }
+  lob_free(link->key);
   free(link);
 }
 
@@ -93,7 +106,10 @@ link_t link_keys(mesh_t mesh, lob_t keys)
   if(!mesh || !keys) return LOG("invalid args");
   csid = hashname_id(mesh->keys,keys);
   if(!csid) return LOG("no supported key");
-  return link_key(mesh, hashname_im(keys,csid), csid);
+  lob_t im = hashname_im(keys,csid);
+  link_t l = link_key(mesh, im, csid);
+  lob_free(im);
+  return l;
 }
 
 link_t link_key(mesh_t mesh, lob_t key, uint8_t csid)
@@ -152,11 +168,24 @@ link_t link_load(link_t link, uint8_t csid, lob_t key)
   
   // route packets to this token
   util_hex(e3x_exchange_token(link->x),16,link->token);
-  xht_set(link->mesh->index,link->token,link);
+  xht_set(link->mesh->index,link->token,link, LINK);
   e3x_exchange_out(link->x, util_sys_seconds());
   LOG("new session token %s to %s",link->token,link->id->hashname);
 
   return link;
+}
+
+pipe_t link_find_pipe(link_t link, const char *id){
+  seen_t seen = NULL;
+
+  for(seen = link->pipes; seen; seen = seen->next){
+    if(!strcmp(seen->pipe->id, id)){
+        LOG("found pipe %x",seen->pipe);
+        return seen->pipe;
+    }
+  }
+  LOG("not found pipe");
+  return NULL;
 }
 
 // try to turn a path into a pipe
@@ -282,6 +311,14 @@ link_t link_receive_handshake(link_t link, lob_t inner, pipe_t pipe)
   return link;
 }
 
+link_t _link_remove_if_end(link_t link, lob_t inner){
+    if(!lob_get_cmp(inner,"end","true")) {
+        link_free(link);
+        return NULL;
+    }
+    return link;
+}
+
 // process a decrypted channel packet
 link_t link_receive(link_t link, lob_t inner, pipe_t pipe)
 {
@@ -292,12 +329,15 @@ link_t link_receive(link_t link, lob_t inner, pipe_t pipe)
   // see if existing channel and send there
   if((chan = xht_get(link->index, lob_get(inner,"c"))))
   {
-    LOG("\t<-- %s",lob_json(inner));
+    LOG("\t<-- %s", lob_json(inner));
     if(e3x_channel_receive(chan->c3, inner)) return LOG("channel receive error, dropping %s",lob_json(inner));
     if(pipe) link_pipe(link,pipe); // we trust the pipe at this point
     if(chan->handle) chan->handle(link, chan->c3, chan->arg);
     // check if there's any packets to be sent back
-    return link_flush(link, chan->c3, NULL);
+    link =  link_flush(link, chan->c3, NULL);
+    if(link)
+        link = _link_remove_if_end(link, inner);
+    return link;
   }
 
   // if it's an open, validate and fire event
@@ -311,8 +351,7 @@ link_t link_receive(link_t link, lob_t inner, pipe_t pipe)
     lob_free(inner);
     return NULL;
   }
-  
-  return link;
+  return _link_remove_if_end(link, inner);
 }
 
 // send this packet to the best pipe
@@ -430,8 +469,8 @@ e3x_channel_t link_channel(link_t link, lob_t open)
   }
   memset(chan,0,sizeof (struct chan_struct));
   chan->c3 = c3;
-  xht_set(link->channels, e3x_channel_uid(c3), chan);
-  xht_set(link->index, e3x_channel_c(c3), chan);
+  xht_set(link->channels, e3x_channel_uid(c3), chan,CHAN);
+  xht_set(link->index, e3x_channel_c(c3), chan,  MISC);
 
   return c3;
 }
@@ -457,15 +496,21 @@ link_t link_flush(link_t link, e3x_channel_t c3, lob_t inner)
   
   if(inner) e3x_channel_send(c3, inner);
 
+  int ended = 0;
   while((inner = e3x_channel_sending(c3)))
   {
     LOG("\t--> %s",lob_json(inner));
     link_send(link, e3x_exchange_send(link->x, inner));
+    if(!lob_get_cmp(inner,"end","true")) {
+        ended = 1;
+    }
     lob_free(inner);
   }
   
-  // TODO if channel is now ended, remove from link->index
-
+  if(ended){
+    link_free(link);
+    return NULL;
+  }
   return link;
 }
 
@@ -479,6 +524,5 @@ link_t link_direct(link_t link, lob_t inner, pipe_t pipe)
   if(!lob_get_int(inner,"c")) lob_set_uint(inner,"c",e3x_exchange_cid(link->x, NULL));
 
   pipe->send(pipe, e3x_exchange_send(link->x, inner), link);
-  
-  return link;
+  return _link_remove_if_end(link, inner);
 }

@@ -99,7 +99,7 @@ pipe_t net_serial_add(net_serial_t net, const char *name, int (*read)(void), int
 
     // set up pipe
     pipe->id = strdup(name);
-    xht_set(net->pipes,pipe->id,pipe);
+    xht_set(net->pipes,pipe->id,pipe,PIPE);
     pipe->send = serial_send;
     
   }else{
@@ -127,7 +127,7 @@ net_serial_t net_serial_new(mesh_t mesh, lob_t options)
 
   // connect us to this mesh
   net->mesh = mesh;
-  xht_set(mesh->index, "net_serial", net);
+  xht_set(mesh->index, "net_serial", net,SERIAL);
   
   return net;
 }
@@ -142,7 +142,7 @@ void net_serial_free(net_serial_t net)
 }
 
 // check a single pipe's socket for any read/write activity
-static void _walkflush(xht_t h, const char *key, void *val, void *arg)
+static void _walkflush(xht_t h, const char *key, void *val, enum TYPE type, void *arg)
 {
   serial_flush((pipe_t)val);
 }

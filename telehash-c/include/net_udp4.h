@@ -16,7 +16,6 @@ typedef struct net_udp4_struct
   int server;
   int port;
   mesh_t mesh;
-  xht_t pipes;
   lob_t path; // to us
   int timeout;
 } *net_udp4_t;
@@ -31,6 +30,7 @@ net_udp4_t net_udp4_receive(net_udp4_t net);
 // set timeout when polling
 void net_udp4_timeout(net_udp4_t net, int timeout);
 
+void udp4_free_pipe(pipe_t pipe);
 
 #endif
 

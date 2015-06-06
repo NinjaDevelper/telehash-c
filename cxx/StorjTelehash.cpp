@@ -41,15 +41,11 @@
 
 #include "StorjTelehash.hpp"
 
-int StorjTelehash::status=0;
-int StorjTelehash::count=0;
-link_t StorjTelehash::targetLink=NULL;
-char StorjTelehash::globalIP[3*4+3+1]; ;
+int status=0;
+int count=0;
+link_t targetLink=NULL;
+char globalIP[3*4+3+1]; ;
 
-/**
- * links needed to broadcast.
- */
-static list<link_t> broadcastee;
 /**
  * registered factory instance that creates ChannelHander instance.
  * Construct On First Us
@@ -60,15 +56,12 @@ map<string,ChannelHandlerFactory *> &factories(){
 }
 
 /**
- * handler when receving a broadcast.
- * Construct On First Us
+ * determin whethere adr is local or not.
+ * 
+ * @param adr address to be checked.
+ * @return 0 if global IP, others if local IP.
  */
-map<string,ChannelHandler *>& broadcastHandlers(){
-    static map<string,ChannelHandler *> _broadcastHandlers;
-    return _broadcastHandlers;
-}
-
-int StorjTelehash::isLocal(char *adr){
+int isLocal(char *adr){
     if(!strcmp(adr,"127.0.0.1") || !strncmp(adr,"10.",3) 
         || !strncmp(adr,"192.168.",7)) return 1;
     if(!strncmp(adr,"172.",4) && adr[6]=='.'){
@@ -80,7 +73,13 @@ int StorjTelehash::isLocal(char *adr){
     return 0;
 }
 
-char *StorjTelehash::getGlobalIP(char *ip){
+/**
+ * try to get global IP from ethernet IF. 
+ * 
+ * @param global ip would be stored if found.
+ * @return pointer of ip.
+ */
+char *getGlobalIP(char *ip){
     struct ifaddrs *ifap = NULL, *ifa = NULL;
     struct sockaddr_in *sa = NULL;
     char *addr = NULL;
@@ -180,11 +179,10 @@ void StorjTelehash::onLink(link_t link){
 }
 
 void StorjTelehash::sendOnChannel(link_t link, e3x_channel_t chan,
-                                      lob_t packet,ChannelHandler *ch){
+    lob_t packet,ChannelHandler *ch, bool isOpen){
     if(!lob_get_cmp(packet,(char *)"end",(char *)"true")) {
         LOG("pointer delteted=%p",ch);
         delete(ch);
-
         return;
     }
     lob_t data=lob_get_json(packet,(char *)"data");
@@ -198,9 +196,13 @@ void StorjTelehash::sendOnChannel(link_t link, e3x_channel_t chan,
         LOG("pointer delteted=%p",ch);
         delete(ch);
     }
-    link_direct(link,tmp,NULL);
     LOG("sent %s",lob_json(tmp));
-    lob_free(tmp);
+    //must not use link_direct for on_open .
+    if(isOpen){
+        link_direct(link, tmp, NULL);
+        lob_free(tmp);
+    }
+    else e3x_channel_send(chan,tmp);
     lob_free(data);
     free(json);
 }                                          
@@ -209,8 +211,8 @@ void StorjTelehash::serviceOnOpenHandler(link_t link, e3x_channel_t chan,
      void *arg){
     ChannelHandler* ch=(ChannelHandler *)arg;
     lob_t packet = e3x_channel_receiving(chan);
-    sendOnChannel(link,chan,packet,ch);
-    lob_free(packet);
+    sendOnChannel(link,chan,packet,ch, false);
+//    lob_free(packet);
 }
 
 lob_t StorjTelehash::serviceOnOpen(link_t link,lob_t open){
@@ -224,7 +226,7 @@ lob_t StorjTelehash::serviceOnOpen(link_t link,lob_t open){
     LOG("openning channel in link_handler() with %s",lob_json(open));
     e3x_channel_t chan=link_channel(link,open);
     link_handle(link, chan, serviceOnOpenHandler,c);
-    sendOnChannel(link,chan,open,c);
+    sendOnChannel(link,chan,open,c, true);
     return NULL;
 }
 
@@ -235,78 +237,48 @@ typedef struct pipe_udp4_struct
   net_udp4_t net;
 } *pipe_udp4_t;
 
-void StorjTelehash::addBroadcasterHandler(link_t link, e3x_channel_t chan,
+void StorjTelehash::pingHandler(link_t link, e3x_channel_t chan,
      void *arg){
     lob_t packet = e3x_channel_receiving(chan);
     strcpy(globalIP,lob_get(packet,(char *)"IP"));
-    lob_free(packet);
+//    lob_free(packet);
 }
 
-lob_t StorjTelehash::signupOnOpen(link_t link,lob_t open){
+lob_t StorjTelehash::pingOnOpen(link_t link,lob_t open){
     if(!link || !open || lob_get_cmp(open,(char *)"type",
-        (char *)"signup"))
+        (char *)"ping"))
        return open;
     lob_t json = lob_new();
     lob_set(json,(char *)"end",(char *)"true");
     lob_set_uint(json,(char *)"c",lob_get_int(open,(char *)"c"));
-
-    if(!lob_get_cmp(open,(char *)"action",(char *)"add")){
-        broadcastee.push_back(link);
-        tgc_addRoot(link);
-        lob_set(json,(char *)"action",(char *)"add");
-    }
-    if(!lob_get_cmp(open,(char *)"action",(char *)"del")){
-        broadcastee.remove(link);
-        tgc_rmRoot(link);
-        lob_set(json,(char *)"action",(char *)"del");
-    }
     
     //ugly. using inner struct.
     pipe_udp4_t pu=(pipe_udp4_t)(link_pipes(link,NULL)->arg);
     char *ip=inet_ntoa(pu->sa.sin_addr);
     LOG("ip %s",ip);
     lob_set(json,(char *)"IP",ip);
-
+    
     LOG("sent %s",lob_json(json));
+    //must not use e3x_channel_send in channel on open handler.
     link_direct(link,json,NULL);
     lob_free(json);
     return NULL;
 }
 
-lob_t StorjTelehash::broadcastOnOpen(link_t link,lob_t open){
-    if(!link || !open || lob_get_cmp(open,(char *)"type",
-        (char *)"broadcast"))
-       return open;
-    lob_t data=lob_get_json(open,(char *)"data");
-    char *j=lob_json(data);
-    LOG("%s",link->mesh->id->hashname);
-    ChannelHandler* broadcastHandler=
-        broadcastHandlers()[link->mesh->id->hashname];
-    char *json_=broadcastHandler->handle(j);
-    if(json_){
-        list<link_t>::iterator it = broadcastee.begin();
-        while( it != broadcastee.end() ){
-            if(link!=*it){
-                lob_t json = lob_new();
-                lob_set_raw(json,(char *)"data",4,
-                            json_,strlen(json_));
-                lob_set(json,(char *)"end",(char *)"true");
-                lob_set(json,(char *)"type",(char *)"broadcast");
-                LOG("sent %s",lob_json(json));
-                e3x_channel_t chan=link_channel(*it,json);
-                link_flush(*it,chan, json); 
-                //json was freed in link_flush()
-            }
-            it++;
-        }
-        free(json_);
-    }
-    lob_free(data);
-    return NULL;
+void StorjTelehash::ping(char *location){
+    if(!location) return;
+    link_t link=_link(location);
+    lob_t options = lob_new();
+    lob_set(options,(char *)"type",(char *)"ping");
+    LOG("openChannel %s",lob_json(options));
+    e3x_channel_t chan=link_channel(link,options);
+    link_handle(link, chan, pingHandler, NULL);
+    link_flush(link,chan, options); 
+    //options is freed in link_flush
 }
 
 StorjTelehash::StorjTelehash(int port ,
-    ChannelHandlerFactory &factory, ChannelHandler &broadcastHandler){
+    ChannelHandlerFactory &factory){
 /*
  * must not use static variables! if not, it crashes 
  * if object would be created globaly.
@@ -330,13 +302,10 @@ StorjTelehash::StorjTelehash(int port ,
         lob_free(s);
     }
     factories()[mesh->id->hashname] = &factory;
-    broadcastHandlers()[mesh->id->hashname]=&broadcastHandler;
     mesh_on_discover(mesh,(char *)"auto",mesh_add); 
     mesh_on_link(mesh, (char *)"onLink", onLink);
     mesh_on_open(mesh,(char *)"service",serviceOnOpen);
-    mesh_on_open(mesh,(char *)"signup",signupOnOpen);
-    mesh_on_open(mesh,(char *)"broadcast",broadcastOnOpen);
-
+    mesh_on_open(mesh,(char *)"ping",pingOnOpen);
     lob_t p = lob_new();
     if(port>0){
         lob_set_int(p,(char *)"port",port);
@@ -353,10 +322,6 @@ StorjTelehash::StorjTelehash(int port ,
 
 ChannelHandlerFactory* StorjTelehash::getChannelHandlerFactory(){
     return factories()[mesh->id->hashname];
-}
-
-ChannelHandler* StorjTelehash::getBroadcastHandler(){
-    return broadcastHandlers()[mesh->id->hashname];
 }
 
 /*
@@ -406,35 +371,6 @@ void StorjTelehash::openChannel(char *location, char *name,
     //options is freed in link_flush
 }
 
-void StorjTelehash::addBroadcaster(char *location,int add){
-    link_t link=_link(location);
-    lob_t options = lob_new();
-    lob_set(options,(char *)"type",(char *)"signup");
-    if(add){
-        lob_set(options,(char *)"action",(char *)"add");
-    }else{
-        lob_set(options,(char *)"action",(char *)"del");
-    }
-    lob_set(options,(char *)"end",(char *)"true");
-    e3x_channel_t chan=link_channel(link,options);
-    link_handle(link, chan, addBroadcasterHandler,NULL);
-    link_flush(link,chan, options); 
-    //options is freed in link_flush
-}
-
-
-void StorjTelehash::broadcast(char *location, char *json){
-    link_t link=_link(location);
-    lob_t options = lob_new();
-    lob_set(options,(char *)"type",(char *)"broadcast");
-    lob_set_raw(options,(char *)"data",4,json,strlen(json));
-    lob_set(options,(char *)"end",(char *)"true");
-    LOG("sending %s",lob_json(options));
-    e3x_channel_t chan=link_channel(link,options);
-    link_flush(link,chan, options); 
-    //options is freed in link_flush
-}
-
 void StorjTelehash::setStopFlag(int flag){
     stopFlag=flag;
 }
@@ -448,19 +384,12 @@ int StorjTelehash::_isLocalTest(char *adr){
 
 
 StorjTelehash::~StorjTelehash(){
-    net_udp4_free(udp4);
+//    net_udp4_free(udp4);
     mesh_free(mesh);
-#ifndef __NO_TGC__
     if(--count==0){
         e3x_cipher_free();
-        list<link_t>::iterator it = broadcastee.begin();
-        while( it != broadcastee.end() ){
-            tgc_rmRoot(*it);
-            it++;
-        }
-        gcollect();
+        //gcollect();
     }
-#endif
 }	
 
 void StorjTelehash::gcollect(){

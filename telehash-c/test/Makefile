@@ -71,6 +71,7 @@ tests: build-tests
 		echo "=====[ running $$test ]=====" && \
 		if ./bin/test_$$test ; then \
 			echo "PASSED: $$test"; \
+#G_SLICE=always-malloc G_DEBUG=gc-friendly  valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --log-file=$$test.log --num-callers=40 ./bin/test_$$test ;\
 		else \
 			echo "FAILED: $$test"; exit 1; \
 		fi; \

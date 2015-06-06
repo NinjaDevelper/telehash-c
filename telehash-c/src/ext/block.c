@@ -53,7 +53,7 @@ lob_t block_on_open(link_t link, lob_t open)
     block->link = link;
     // add to list of all blocks
     block->next = xht_get(link->mesh->index, "blocks");
-    xht_set(link->mesh->index, "blocks", block);
+    xht_set(link->mesh->index, "blocks", block, BLOCK);
   }
 
   // create new channel for this block handler
@@ -86,7 +86,7 @@ link_t ext_block_send(link_t link, lob_t block)
   if(!(chan = xht_get(link->index,"block")))
   {
     // TODO create outgoing channel
-    xht_set(link->index,"block",chan);
+    xht_set(link->index,"block",chan, CHANNEL);
   }
   
   // break block into packets and send
