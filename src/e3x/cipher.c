@@ -29,6 +29,19 @@ uint8_t e3x_cipher_init(lob_t options)
   return 0;
 }
 
+void e3x_cipher_free()
+{
+  if(e3x_cipher_sets[CS_1a]){
+    free(e3x_cipher_sets[CS_1a]);
+  }
+  if(e3x_cipher_sets[CS_2a]){
+    free(e3x_cipher_sets[CS_2a]);
+  }
+  if(e3x_cipher_sets[CS_3a]){
+    free(e3x_cipher_sets[CS_3a]);
+  }
+}
+
 e3x_cipher_t e3x_cipher_set(uint8_t csid, char *str)
 {
   uint8_t i;

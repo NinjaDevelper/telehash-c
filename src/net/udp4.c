@@ -3,6 +3,9 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+#include <poll.h>
+#include <sys/ioctl.h>
+
 #include "net_udp4.h"
 
 // individual pipe local info
@@ -26,6 +29,10 @@ void udp4_send(pipe_t pipe, lob_t packet, link_t link)
   lob_free(packet);
 }
 
+void udp4_free_pipe(pipe_t pipe){
+    free(pipe->arg);
+}
+
 // internal, get or create a pipe
 pipe_t udp4_pipe(net_udp4_t net, char *ip, int port)
 {
@@ -34,7 +41,7 @@ pipe_t udp4_pipe(net_udp4_t net, char *ip, int port)
   char id[23];
 
   snprintf(id,23,"%s:%d",ip,port);
-  pipe = xht_get(net->pipes,id);
+  pipe = mesh_find_pipe(net->mesh, id);
   if(pipe) return pipe;
 
   LOG("new pipe to %s",id);
@@ -54,10 +61,10 @@ pipe_t udp4_pipe(net_udp4_t net, char *ip, int port)
     return LOG("OOM");
   }
   pipe->id = strdup(id);
-  xht_set(net->pipes,pipe->id,pipe);
 
   pipe->arg = to;
   pipe->send = udp4_send;
+  pipe->free = udp4_free_pipe;
 
   return pipe;
 }
@@ -81,15 +88,12 @@ pipe_t udp4_path(link_t link, lob_t path)
 net_udp4_t net_udp4_new(mesh_t mesh, lob_t options)
 {
   int port, sock;
-  unsigned int pipes;
   net_udp4_t net;
   struct sockaddr_in sa;
   socklen_t size = sizeof(struct sockaddr_in);
   
   port = lob_get_int(options,"port");
   if(!port) port = mesh->port_local; // might be another in use
-  pipes = lob_get_uint(options,"pipes");
-  if(!pipes) pipes = 11; // hashtable for active pipes
 
   // create a udp socket
   if((sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP) ) < 0 ) return LOG("failed to create socket %s",strerror(errno));
@@ -106,11 +110,10 @@ net_udp4_t net_udp4_new(mesh_t mesh, lob_t options)
   net->server = sock;
   net->port = ntohs(sa.sin_port);
   if(!mesh->port_local) mesh->port_local = (uint16_t)net->port; // use ours as the default if no others
-  net->pipes = xht_new(pipes);
 
   // connect us to this mesh
   net->mesh = mesh;
-  xht_set(mesh->index, "net_udp4", net);
+  xht_set(mesh->index, "net_udp4", net,UDP4);
   mesh_on_path(mesh, "net_udp4", udp4_path);
   
   // convenience
@@ -120,14 +123,22 @@ net_udp4_t net_udp4_new(mesh_t mesh, lob_t options)
   lob_set_int(net->path,"port",net->port);
   mesh->paths = lob_push(mesh->paths, net->path);
 
+  net->timeout = -1;
   return net;
+}
+
+void net_udp4_timeout(net_udp4_t net, int timeout)
+{
+  int val = 1;
+  ioctl(net->server, FIONBIO, &val);
+  net->timeout = timeout;
 }
 
 void net_udp4_free(net_udp4_t net)
 {
   if(!net) return;
   close(net->server);
-  xht_free(net->pipes);
+
 //  lob_free(net->path); owned by mesh
   free(net);
   return;
@@ -141,15 +152,28 @@ net_udp4_t net_udp4_receive(net_udp4_t net)
   size_t salen;
   lob_t packet;
   pipe_t pipe;
+  struct pollfd fds[1];
+
+  fds[0].fd = net->server;
+  fds[0].events = POLLIN | POLLERR;
   
   if(!net) return LOG("bad args");
 
   salen = sizeof(sa);
   memset(&sa,0,salen);
-  len = recvfrom(net->server, buf, sizeof(buf), 0, (struct sockaddr *)&sa, (socklen_t *)&salen);
-
+  if(net->timeout > 0){
+      poll(fds, 1, net->timeout);
+      if (fds[0].revents & POLLIN) {
+          len = recvfrom(net->server, buf, sizeof(buf), 0, (struct sockaddr *)&sa, (socklen_t *)&salen);
+      }else{
+          return net;
+      }
+  } else {
+      len = recvfrom(net->server, buf, sizeof(buf), 0, (struct sockaddr *)&sa, (socklen_t *)&salen);
+  }
   if(len < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) return net;
   if(len <= 0) return LOG("recvfrom error %s",strerror(errno));
+
 
   packet = lob_decloak(buf, (size_t)len);
   if(!packet)
@@ -161,7 +185,7 @@ net_udp4_t net_udp4_receive(net_udp4_t net)
   // create the id and look for existing pipe
   pipe = udp4_pipe(net, inet_ntoa(sa.sin_addr), ntohs(sa.sin_port));
   mesh_receive(net->mesh, packet, pipe);
-  
+  lob_free(packet);
   return net;
 }
 

@@ -17,6 +17,7 @@ struct pipe_struct
   void *arg; // for use by app/network transport
   pipe_t next; // for transport use
   void (*send)(pipe_t pipe, lob_t packet, link_t link); // deliver this packet via this pipe
+  void (*free)(pipe_t pipe);
 };
 
 pipe_t pipe_new(char *type);

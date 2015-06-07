@@ -21,6 +21,21 @@ lob_t lob_new()
   return p;
 }
 
+
+lob_t lob_deep_copy(lob_t p)
+{
+  lob_t np;
+  np = lob_copy(p);
+  np->id = p ->id;
+  np->arg = p ->arg;
+  np->cache = NULL;
+  if(p->chain) np->chain = lob_deep_copy(p->chain);
+  else p->chain = NULL;
+  if(p->next) np->next = lob_deep_copy(p->next);
+  else p->next = NULL;
+  return np;
+}
+
 lob_t lob_copy(lob_t p)
 {
   lob_t np;
@@ -64,9 +79,9 @@ lob_t lob_linked(lob_t parent)
 lob_t lob_free(lob_t p)
 {
   if(!p) return NULL;
+  lob_free(p->chain);
 //  LOG("LOB-- %p",p);
-  if(p->chain) lob_free(p->chain);
-  if(p->cache) free(p->cache);
+  free(p->cache);
   if(p->raw) free(p->raw);
   free(p);
   return NULL;
@@ -293,6 +308,7 @@ lob_t lob_set_base32(lob_t p, char *key, uint8_t *bin, size_t blen)
   base32_encode_into(bin, blen, val+1);
   val[vlen+1] = '"';
   lob_set_raw(p,key,0,val,vlen+2);
+  free(val);
   return p;
 }
 

@@ -10,6 +10,10 @@ EXT = src/ext/stream.c src/ext/block.c
 NET = src/net/loopback.c src/net/udp4.c src/net/tcp4.c src/net/serial.c
 UTIL = src/util/util.c src/util/uri.c src/util/chunks.c src/unix/util.c src/unix/util_sys.c
 
+ifneq ($(OS),Windows_NT)
+	CFLAGS+=-fPIC
+endif
+
 # CS1a by default
 CS = src/e3x/cs1a/aes.c src/e3x/cs1a/hmac.c src/e3x/cs1a/cs1a.c src/e3x/cs1a/uECC.c src/e3x/cs1a/sha256.c src/e3x/cs1a/aes-internal-enc.c src/e3x/cs1a/aes-internal.c
 

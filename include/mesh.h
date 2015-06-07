@@ -23,6 +23,8 @@ struct mesh_struct
   lob_t handshakes, cached; // handshakes
 };
 
+pipe_t mesh_find_pipe(mesh_t mesh, const char *id);
+
 // pass in a prime for the main index of hashnames+links+channels, 0 to use compiled default
 mesh_t mesh_new(uint32_t prime);
 mesh_t mesh_free(mesh_t mesh);

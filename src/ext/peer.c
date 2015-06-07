@@ -44,7 +44,7 @@ pipe_t peer_pipe(mesh_t mesh, char *peer)
   pipe->id = strdup(peer);
   pipe->send = peer_send;
   pipe->next = pipes;
-  xht_set(mesh->index,"ext_peer_pipes",pipe);
+  xht_set(mesh->index,"ext_peer_pipes",pipe,PIPE);
 
   return pipe;
 }
@@ -72,7 +72,7 @@ lob_t peer_open_connect(link_t link, lob_t open)
   if(!hn || !(hs = lob_parse(open->body,open->body_len)))
   {
     LOG("invalid peer request");
-    return lob_free(open);
+    return NULL;
   }
 
   LOG("incoming connect for %s via %s",hn,link->id->hashname);
@@ -84,7 +84,7 @@ lob_t peer_open_connect(link_t link, lob_t open)
   if(hs->head_len == 1) mesh_receive(link->mesh, hs, pipe);
   else mesh_receive_handshake(link->mesh, hs, pipe);
 
-  return lob_free(open);
+  return NULL;
 }
 
 // handle incoming peer request to route
@@ -158,7 +158,10 @@ link_t peer_connect(link_t peer, link_t router)
   if(!(handshakes = link_handshakes(peer)) || !(pipe = peer_pipe(peer->mesh, router->id->hashname))) return LOG("internal error");
   
   // loop through and send each one in a peer request through the router
-  for(hs = handshakes; hs; hs = lob_linked(hs)) peer_send(pipe, hs, peer);
-  
+  lob_t n = NULL;
+  for(hs = handshakes; hs; hs = n){
+       n = lob_linked(hs);
+       peer_send(pipe, hs, peer);
+  }  
   return peer;
 }
