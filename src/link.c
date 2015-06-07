@@ -62,7 +62,8 @@ void link_free(link_t link)
   xht_free(link->index);
 
   seen_t n = NULL;
-  for(seen_t s = link->pipes; s;){
+  seen_t s = NULL;
+  for(s = link->pipes; s;){
       n = s->next;
       pipe_free(s->pipe);
       LOG("freeing pipe:%x",s);
