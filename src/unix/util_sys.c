@@ -68,7 +68,7 @@ void *util_sys_log(const char *file, int line, const char *function, const char 
   va_list args;
   if(!_logging) return NULL;
   va_start (args, format);
-  vsnprintf (buffer, 256, format, args);
+  vsnprintf (buffer, 4096, format, args);
   fprintf(stderr,"%s:%d %s() %s\n", file, line, function, buffer);
   fflush(stderr);
   va_end (args);
