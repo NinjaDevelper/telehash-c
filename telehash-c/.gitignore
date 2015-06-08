@@ -1,8 +1,0 @@
-*.o
-*.a
-*.json
-*.dSYM
-.DS_Store
-test/bin/*
-node_modules/
-telehash.c
