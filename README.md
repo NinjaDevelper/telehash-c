@@ -1,62 +1,22 @@
-[![Build Status](https://travis-ci.org/StorjPlatform/StorjTelehash.svg?branch=master)](https://travis-ci.org/StorjPlatform/StorjTelehash)
-[![Coverage Status](https://coveralls.io/repos/StorjPlatform/StorjTelehash/badge.svg?branch=master)](https://coveralls.io/r/StorjPlatform/StorjTelehash?branch=master)
+telehash tools library in c
+===========================
 
-# Messaging Layer on Storj Platform by Telehash
+This is a full implementation of telehash in portable c, designed to be a library for apps to link with, source that can be copied into other projects, and usable components for embedded systems.
 
-## Requirements
-This requires 
-* `g++` (v4.8 or higher for test)
-* `python` (2.x or 3.x)
+## Building
 
-## Installation
+Just run `make` to build a `libtelehash.a` and some utility apps into `bin/*`.  Use `make test` to run a full test suite.
 
-To install 
+Use `npm install` to automatically install optional crypto dependencies (libsodium and libtomcrypt).
 
-    $ python setup.py install
-    
-To run the associated tests:
+## Library Interface
 
-    $ make test
-    $ LD_LIBRARY_PATH=libtap ./test
+The codebase is a set of components that can be used to create/integrate telehash services, here's a rough layout, see [src/](src/) and [include/](include/) for details.
 
-To run the associated tests for python:
+* `e3x_*`: all of the crypto handling
+* `mesh_*` and `link_*`: higher level easy interfaces for apps
+* `ext_*`: various useful extensions to a mesh to support built-in channels
+* `pipe_*` and `net_*`: transport and networking handling
+* `util_*` and [libs](include/lib.h): portable utilities and bundled libs
 
-    $ python  setup.py test -a "--doctest-modules --pep8 -v tests/ storj/messaging/ storj/messaging/storjtelehash/"
-
-
-for Windows OS, [Cygwin](https://www.cygwin.com/) must be installed first.
-
-1. download cygwin installer from [here](https://www.cygwin.com/setup-x86.exe) and run it.
-1. go forward to package selection, and select packages below, and go forward to install them.
-
-under devel category:
-
-1. gcc-g++
-1. make
-2. git
-
-under Python category:
-
-1. python
-1. python3
-1. python-setuptools
-1. python3-setuptools
-
-After that run c:\cygwin\cygwin.bat, where you can install and run StorjTelehash.
-
-## Usage
-
-Explanation about messaging layer is [here](Messaging.md).
-
-API Document for abstract messaging layer is [here](https://rawgit.com/StorjPlatform/StorjTelehash/master/docs/html/messaging.html)
-
-API Document for storjtelehash , which is concorete implementation of abstract messaging layer by telehash-c ,
-is [here](https://rawgit.com/StorjPlatform/StorjTelehash/master/docs/html/storjtelehash.html)
-
-API Document for telehashbinder , which is classes/functions used by storjtelehash,
-is [here](https://rawgit.com/StorjPlatform/StorjTelehash/master/docs/html/telehashbinder.html)
-
-# Contribution
-Improvements to the codebase and pull requests are encouraged.
-
-
+There's many examples of usage in the bundled [tests](test/).
