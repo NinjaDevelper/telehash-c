@@ -64,7 +64,7 @@ void util_sys_logging(int enabled)
 
 void *util_sys_log(const char *file, int line, const char *function, const char * format, ...)
 {
-  char buffer[256];
+  char buffer[4096];
   va_list args;
   if(!_logging) return NULL;
   va_start (args, format);
