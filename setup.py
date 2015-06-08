@@ -55,7 +55,6 @@ telehash_src = [
     'telehash-c/src/net/loopback.c',
     'telehash-c/src/net/tcp4.c',
     'telehash-c/src/lib/socketio.c',
-    'telehash-c/src/lib/tgc.c',
     'telehash-c/src/lib/hashname.c',
     'telehash-c/src/lib/base32.c',
     'telehash-c/src/lib/js0n.c',
@@ -86,7 +85,7 @@ telehash_src = [
     'telehash-c/src/util/chunks.c',
 ]
 
-module = Extension('storj.messaging.storjtelehash.telehashbinder',
+module = Extension('storj.telehashbinder',
                    sources = ['cxx/telehashbinder_python.cpp',
                     'cxx/StorjTelehash.cpp'] + telehash_src,
                     extra_compile_args = ['-fpermissive'],
@@ -125,11 +124,11 @@ setup(
     author_email='utamaro.sisho@gmail.com',
     description='Messaging Layer in Telehash.',
     long_description=LONG_DESCRIPTION,
-    packages=['storj', 'storj.messaging.storjtelehash', 'storj.messaging'],
+    packages=['storj'],
     cmdclass={'test': PyTest},
     ext_modules=[module],
     install_requires=install_requirements,
     tests_require=test_requirements,
-    namespace_packages=['storj', 'storj.messaging'],
+    namespace_packages=['storj'],
     keywords=['storj', 'storj platform', 'messaging layer', 'telehash']
 )

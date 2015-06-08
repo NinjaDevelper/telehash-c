@@ -53,7 +53,6 @@ void link_free(link_t link)
 {
   if(!link) return;
   LOG("dropping link %s",link->id->hashname);
-  LOG("del link %x from mesh %x",xht_node_del(link->mesh->index,link->id->hashname), link->mesh);
 
   xht_walk(link->index, xht_free_walk,NULL);
 

@@ -33,19 +33,14 @@ import pytest
 import time
 import logging
 
-import storj.messaging
-from storj.messaging.messaging import Messaging
-from storj.messaging.messaging import ChannelHandler
-import storj.messaging.storjtelehash
+from storj.messaging imoprt ChannelHandler
+from storj.messaging imoprt StorjTelehash
 
 log_fmt = '%(filename)s:%(lineno)d %(funcName)s() %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=log_fmt)
 
 counter_opener = 0
 counter_receiver = 0
-
-cls = storj.messaging.storjtelehash.StorjTelehash
-
 
 class CalledChannel(ChannelHandler):
 
@@ -134,9 +129,9 @@ class ChannelReceiverNG(ChannelHandler):
 
 class TestStorjTelehash(object):
     def setup(self):
-        self.m2 = cls(self.broadcast_handler2)
-        self.m3 = cls(self.broadcast_handler3, port=-9999)
-        self.m4 = cls(self.broadcast_handler4, port=-9999)
+        self.m2 = cls()
+        self.m3 = cls(9999)
+        self.m4 = cls(-9999)
 
         id = self.m2.get_my_id()
         assert len(id) == 52
@@ -146,40 +141,14 @@ class TestStorjTelehash(object):
         self.status2 = 0
         self.status4 = 0
 
-    def broadcast_handler2(self, packet):
-        logging.debug("broadcast packet2=" + packet)
-        j = json.loads(packet)
-        assert j['service'] == 'farming0'
-        self.status2 += 1
-        j['service'] = "farming1"
-        return json.dumps(j)
-
-    def broadcast_handler3(self, packet):
-        logging.debug("broadcast packet3=" + packet)
-        assert 1 == 0
-        return None
-
-    def broadcast_handler4(self, packet):
-        logging.debug("broadcast packjet4=" + packet)
-        j = json.loads(packet)
-        assert j['service'] == 'farming1'
-        self.status4 += 1
-        return None
-
     def test_storjtelehash(self):
-        with pytest.raises(TypeError):
-            m = cls("aaa", port=1234)
-
         with pytest.raises(TypeError):
             self.m3.open_channel(self.location, 'counter_test',
                                  ChannelOpener)
 
-        self.status = 0
-        self.m4.add_broadcaster(self.location, 1)
-        self.m3.broadcast(self.location, '{"service":"farming0"}')
-        time.sleep(2)
-        assert self.status2 == 1
-        assert self.status4 == 1
+        self.m3.ping(self.location)
+        loc = json.loads(self.m3.get_my_location())
+        assert len(loc['paths'][0]['ip']) > 8
 
         self.status = 0
         self.m2.add_channel_handler('counter_test',

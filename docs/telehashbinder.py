@@ -42,17 +42,6 @@ def add_broadcaster(cobj, location, add):
     pass
 
 
-def broadcast(cobj, location, message):
-    """
-    broadcast a message.
-
-    :param Object cobj: pointer of StorjTelehash instnace returned by init()
-    :param str location: json str where you want to send a broadcast.
-    :param str message: broadcast message.
-    """
-    pass
-
-
 def start(cobj):
     """
     star to receive netowrk packets in the current thread..
@@ -82,17 +71,6 @@ def finalize(cobj):
     pass
 
 
-def gcollect(cobj):
-    """
-    run force garbage collect. 
-    You must go out from functions in telehash-c library and 
-    stop all threads before calling this method. 
-
-    :param Object cobj: pointer of StorjTelehash instnace returned by init()
-     """
-    pass
-
-
 def get_my_location(cobj):
     """
      return my location information. format is:
@@ -113,5 +91,15 @@ def get_my_id(cobj):
 
      :param Object cobj: pointer of StorjTelehash instnace returned by init()
      :return: id info.
+     """
+    pass
+
+
+def ping(cobj):
+    """
+    open ping channel. expect a global ip address.
+
+    :param str location: destination to ping.
+    :return: id info.
      """
     pass

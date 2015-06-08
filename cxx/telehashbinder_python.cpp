@@ -161,28 +161,21 @@ public:
 static PyObject *telehashbinder_init(PyObject *self, PyObject *args){
     int port=0;
     PyObject *pyFactory=NULL;
-    PyObject *broadcastHandler=NULL;
     
     if (! PyEval_ThreadsInitialized()) {
         PyEval_InitThreads();
     }
-    if (!PyArg_ParseTuple(args, "iOO", &port,&pyFactory,&broadcastHandler)){
+    if (!PyArg_ParseTuple(args, "iO", &port,&pyFactory)){
         return NULL;
     }
     if (!PyCallable_Check(pyFactory)) {
         PyErr_SetString(PyExc_TypeError, "factory must be callable");
         return NULL;
     }
-    if (broadcastHandler==Py_None) broadcastHandler = NULL;
-    if (!broadcastHandler && !PyCallable_Check(broadcastHandler)) {
-        PyErr_SetString(PyExc_TypeError, "broadcastHandler must be callable");
-        return NULL;
-    }
 
-    ChannelHandler* pyBHandler=new ChannelHandlerImpl(broadcastHandler);
     ChannelHandlerFactoryImpl *f=
         new ChannelHandlerFactoryImpl(pyFactory);
-    StorjTelehash *m=new StorjTelehash(port,*f,*pyBHandler);
+    StorjTelehash *m=new StorjTelehash(port,*f);
     PyObject *p=PyCapsule_New(m, NULL,NULL);
     return p;
 }
@@ -201,33 +194,6 @@ static PyObject *telehashbinder_openChannel(PyObject *self,
     m->openChannel(location,channelName,*h);
     Py_RETURN_NONE;
 }
-
-static PyObject *telehashbinder_addBroadcaster(PyObject *self, 
-                                                   PyObject *args){
-    PyObject *cobj=NULL;
-    char *location=NULL;
-    int add=0;
-    if (!PyArg_ParseTuple(args, "Osi",&cobj,&location,&add)){
-        return NULL;
-    }
-    StorjTelehash *m=(StorjTelehash *)PyCapsule_GetPointer(cobj,NULL);
-    m->addBroadcaster(location,add);
-    Py_RETURN_NONE;
-}
-
-static PyObject *telehashbinder_broadcast(PyObject *self, 
-                                                   PyObject *args){
-    PyObject *cobj=NULL;
-    char *location=NULL;
-    char *message=NULL;
-    if (!PyArg_ParseTuple(args, "Oss",&cobj,&location,&message)){
-        return NULL;
-    }
-    StorjTelehash *m=(StorjTelehash *)PyCapsule_GetPointer(cobj,NULL);
-    m->broadcast(location,message);
-    Py_RETURN_NONE;
-}
-
 
 static PyObject *telehashbinder_start(PyObject *self, PyObject *args){
     PyGILState_STATE gstate;
@@ -265,17 +231,8 @@ static PyObject *telehashbinder_finalize(PyObject *self,
     StorjTelehash *m=(StorjTelehash *)PyCapsule_GetPointer(cobj,NULL);
     ChannelHandlerFactoryImpl *h=(ChannelHandlerFactoryImpl *)
                                            m->getChannelHandlerFactory();
-    ChannelHandlerImpl *b=(ChannelHandlerImpl *)
-                                           m->getBroadcastHandler();
-    delete b;
     delete h;
     delete m;
-    Py_RETURN_NONE;
-}
-
-static PyObject *telehashbinder_gcollect(PyObject *self, 
-                                             PyObject *args){
-    StorjTelehash::gcollect();
     Py_RETURN_NONE;
 }
 
@@ -305,25 +262,30 @@ static PyObject *telehashbinder_getMyId(PyObject *self,
     return p;
 }
 
-
+static PyObject *telehashbinder_ping(PyObject *self, 
+                                                PyObject *args){
+    PyObject *cobj=NULL;
+    char *location=NULL;
+    if (!PyArg_ParseTuple(args, "Os",&cobj,&location)){
+        return NULL;
+    }
+    StorjTelehash *m=(StorjTelehash *)PyCapsule_GetPointer(cobj,NULL);
+    m->ping(location);
+    Py_RETURN_NONE;
+}
 
 static PyMethodDef methods[] = {
     {"init", telehashbinder_init, METH_VARARGS, 
         "initialize"},
     {"open_channel", telehashbinder_openChannel, METH_VARARGS,
          "open a channel"},
-    {"add_broadcaster", telehashbinder_addBroadcaster, METH_VARARGS,
-         "add broadcaster"},
-    {"broadcast", telehashbinder_broadcast, METH_VARARGS,
-         "broadcast a message"},
-    {"start", telehashbinder_start, METH_VARARGS,
+    {"ping", telehashbinder_ping, METH_VARARGS,
+         "ping"},    {"start", telehashbinder_start, METH_VARARGS,
          "start receiving loop"},
     {"set_stopflag", telehashbinder_setStopFlag, METH_VARARGS,
          "stop receiving loop"},
     {"finalize", telehashbinder_finalize, METH_VARARGS
         , "finalize C object."},
-    {"gcollect", telehashbinder_gcollect, METH_VARARGS
-        , "run force GC."},
     {"get_my_location", telehashbinder_getMyLocation, METH_VARARGS
         , "get my location."},
    {"get_my_id", telehashbinder_getMyId, METH_VARARGS

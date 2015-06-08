@@ -64,7 +64,7 @@ pipe_t udp4_pipe(net_udp4_t net, char *ip, int port)
 
   pipe->arg = to;
   pipe->send = udp4_send;
-  pipe->freee = udp4_free_pipe;
+  pipe->free = udp4_free_pipe;
 
   return pipe;
 }
