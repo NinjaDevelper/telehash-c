@@ -54,7 +54,7 @@ extern e3x_cipher_t e3x_cipher_default; // just one of them for the rand/hash ut
 
 // calls all e3x_cipher_init_*'s to fill in e3x_cipher_sets[]
 uint8_t e3x_cipher_init(lob_t options);
-void e3x_cipher_free();
+void e3x_cipher_free(void);
 
 // return by id or hex
 e3x_cipher_t e3x_cipher_set(uint8_t csid, char *hex);

@@ -27,7 +27,7 @@ typedef struct lob_struct
 } *lob_t;
 
 // these all allocate/free memory
-lob_t lob_new();
+lob_t lob_new(void);
 lob_t lob_deep_copy(lob_t p);
 lob_t lob_copy(lob_t p);
 lob_t lob_free(lob_t p); // returns NULL for convenience

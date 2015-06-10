@@ -4,7 +4,7 @@
 typedef uint32_t at_t;
 
 // returns a number that increments in seconds for comparison (epoch or just since boot)
-at_t util_sys_seconds();
+at_t util_sys_seconds(void);
 
 // number of milliseconds since given epoch seconds value
 unsigned long long util_sys_ms(long epoch);
